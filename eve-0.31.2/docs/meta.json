@@ -1,0 +1,27 @@
+{
+  "pages": [
+    "---Getting Started---",
+    "getting-started",
+    "installation",
+    "project-structure",
+    "install-integrations",
+    "---Build Your Agent---",
+    "agent-config",
+    "instructions",
+    "tools",
+    "skills",
+    "channels",
+    "connections",
+    "extensions",
+    "sandbox",
+    "subagents",
+    "schedules",
+    "evals",
+    "---Learn More---",
+    "tutorial",
+    "guides",
+    "concepts",
+    "patterns",
+    "reference"
+  ]
+}

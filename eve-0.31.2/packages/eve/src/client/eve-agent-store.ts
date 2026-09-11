@@ -1,0 +1,511 @@
+import { Client } from "#client/client.js";
+import type { EveAgentReducer, EveAgentReducerEvent } from "#client/reducer.js";
+import type { ClientSession } from "#client/session.js";
+import { createEventDeduper } from "#protocol/event-dedupe.js";
+import type { MessageStreamEvent } from "#protocol/message.js";
+import { toError } from "#shared/errors.js";
+import type {
+  ClientAuth,
+  HeadersValue,
+  SendTurnPayload,
+  ClientSessionState,
+} from "#client/types.js";
+import type { UserContent } from "ai";
+
+/**
+ * Lifecycle state of an {@link EveAgentStore}: `ready` (idle), `submitted`
+ * (turn sent, awaiting the first event), `streaming` (events arriving), and
+ * `error` (the turn failed). A turn advances `ready` to `submitted` to
+ * `streaming` to `ready` (or `error`).
+ */
+export type EveAgentStoreStatus = "error" | "ready" | "streaming" | "submitted";
+
+/**
+ * Prepares one outbound turn immediately before the client sends it, e.g. to
+ * attach fresh one-turn client state such as page context via `clientContext`.
+ */
+export type PrepareSend = (input: SendTurnPayload) => SendTurnPayload | Promise<SendTurnPayload>;
+
+/**
+ * Immutable projected state of an {@link EveAgentStore}, read on every render.
+ *
+ * `data` is the reducer output, `events` is the raw server stream-event log for
+ * this session, `session` is the current serializable cursor, `status` is the
+ * turn lifecycle state and `error` is the last failure (or `undefined`).
+ */
+export interface EveAgentStoreSnapshot<TData> {
+  readonly data: TData;
+  readonly error: Error | undefined;
+  readonly events: readonly MessageStreamEvent[];
+  readonly session: ClientSessionState | undefined;
+  readonly status: EveAgentStoreStatus;
+}
+
+/**
+ * Hooks invoked while the store processes a turn.
+ *
+ * `onEvent`, `onError`, `onFinish` and `onSessionChange` are observe-only.
+ * `prepareSend` runs before each turn is sent and may return a modified
+ * {@link SendTurnPayload} (for example to attach one-turn client context).
+ */
+export interface EveAgentStoreCallbacks<TData> {
+  readonly onError?: (error: Error) => void;
+  readonly onEvent?: (event: MessageStreamEvent) => void;
+  readonly onFinish?: (snapshot: EveAgentStoreSnapshot<TData>) => void;
+  readonly onSessionChange?: (session: ClientSessionState | undefined) => void;
+  readonly prepareSend?: PrepareSend;
+}
+
+/**
+ * Configuration for constructing an {@link EveAgentStore}.
+ *
+ * Requires a {@link EveAgentReducer | reducer}, plus either connection options
+ * (`host`, `auth`, `headers`, `initialSession`) for a
+ * store-owned session or an existing {@link ClientSession} via `session`.
+ *
+ * `optimistic` (default `true`) projects submitted user messages before the
+ * server confirms them. `host` defaults to `""`. `initialEvents` and
+ * `initialSession` seed prior state on construction. Passing `session` makes
+ * `reset()` reuse that external session rather than create a new one.
+ * `initialEvents` must be an ordered prefix of the same session's stream; its
+ * endpoint may overlap the cursor because repeated ids are applied once.
+ */
+export interface EveAgentStoreInit<TData> {
+  readonly auth?: ClientAuth;
+  readonly headers?: HeadersValue;
+  readonly host?: string;
+  /** Ordered prefix of the session stream used to rehydrate projected state. */
+  readonly initialEvents?: readonly MessageStreamEvent[];
+  readonly initialSession?: ClientSessionState;
+  readonly optimistic?: boolean;
+  readonly reducer: EveAgentReducer<TData>;
+  readonly session?: ClientSession;
+}
+
+interface PendingMessageSubmission {
+  readonly createdAt: number;
+  readonly id: string;
+  readonly message: string;
+}
+
+/**
+ * Framework-agnostic state machine for an eve agent session.
+ *
+ * Manages the send/stream lifecycle, optimistic projection and subscriber
+ * notification; framework integrations (React, Vue) wrap it with their own
+ * reactivity primitives.
+ *
+ * Drives one turn at a time: `send` rejects if a turn is already submitted or
+ * streaming. Read the latest projection via the `snapshot` getter, observe
+ * changes with `subscribe`, register lifecycle hooks with `setCallbacks`,
+ * abort the in-flight turn with `stop` and discard all state with `reset`.
+ */
+export class EveAgentStore<TData> {
+  readonly #client: Client | undefined;
+  readonly #externalSession: boolean;
+  readonly #optimistic: boolean;
+  readonly #reducer: EveAgentReducer<TData>;
+  readonly #subscribers = new Set<() => void>();
+
+  /** Ids already folded into the projection: `initialEvents` and a reconnect can overlap. */
+  #seenEvents = createEventDeduper();
+
+  #abortController: AbortController | undefined;
+  #callbacks: EveAgentStoreCallbacks<TData> = {};
+  #data: TData;
+  #error: Error | undefined;
+  #events: readonly MessageStreamEvent[];
+  #operationId = 0;
+  #pendingMessageSubmission: PendingMessageSubmission | undefined;
+  #projectionEvents: readonly EveAgentReducerEvent[];
+  #session: ClientSession | undefined;
+  #snapshot: EveAgentStoreSnapshot<TData>;
+  #status: EveAgentStoreStatus = "ready";
+
+  constructor(init: EveAgentStoreInit<TData>) {
+    this.#externalSession = init.session !== undefined;
+    this.#client = this.#externalSession
+      ? undefined
+      : new Client({
+          auth: init.auth,
+          headers: init.headers,
+          host: init.host ?? "",
+        });
+    // Seed the deduper from the saved log so a live stream that replays the
+    // same prefix does not double-apply it.
+    const initialEvents: MessageStreamEvent[] = [];
+    for (const event of init.initialEvents ?? []) {
+      if (this.#seenEvents.admit(event)) initialEvents.push(event);
+    }
+    this.#events = initialEvents;
+    this.#projectionEvents = [...this.#events];
+    this.#optimistic = init.optimistic ?? true;
+    this.#reducer = init.reducer;
+    this.#session =
+      init.session ??
+      (init.initialSession === undefined
+        ? undefined
+        : this.#client?.sessions.attach(init.initialSession.sessionId, {
+            streamIndex: init.initialSession.streamIndex,
+          }));
+
+    this.#data = this.#reduceProjectionEvents(this.#projectionEvents);
+    this.#snapshot = this.#createSnapshot();
+  }
+
+  get snapshot(): EveAgentStoreSnapshot<TData> {
+    return this.#snapshot;
+  }
+
+  setCallbacks(callbacks: EveAgentStoreCallbacks<TData>): void {
+    this.#callbacks = callbacks;
+  }
+
+  subscribe(callback: () => void): () => void {
+    this.#subscribers.add(callback);
+    return () => {
+      this.#subscribers.delete(callback);
+    };
+  }
+
+  async send<TOutput = unknown>(input: SendTurnPayload<TOutput>): Promise<void> {
+    if (this.#status === "streaming" || this.#status === "submitted") {
+      throw new Error("eve session is already processing a turn.");
+    }
+
+    const operationId = this.#startOperation();
+    const abortController = new AbortController();
+    this.#abortController = abortController;
+    this.#error = undefined;
+    this.#status = "submitted";
+    this.#publish();
+
+    try {
+      const preparedInput = (await this.#callbacks.prepareSend?.(input)) ?? input;
+      assertExclusiveTurnInput(preparedInput);
+
+      if (!this.#isCurrentOperation(operationId)) {
+        return;
+      }
+
+      this.#projectOptimisticMessage(preparedInput);
+      this.#projectInputResponses(preparedInput);
+      this.#publish();
+
+      const turnInput = {
+        ...preparedInput,
+        signal: createAbortSignal(preparedInput.signal, abortController.signal),
+      };
+      const response = await this.#dispatchTurn(turnInput);
+
+      let sawEvent = false;
+      for await (const event of response) {
+        if (!this.#isCurrentOperation(operationId)) {
+          return;
+        }
+
+        if (!sawEvent) {
+          sawEvent = true;
+          this.#status = "streaming";
+        }
+
+        if (!this.#seenEvents.admit(event)) {
+          continue;
+        }
+
+        this.#events = [...this.#events, event];
+        this.#applyServerEvent(event);
+        this.#callbacks.onEvent?.(event);
+        this.#applyTerminalStreamFailure(event);
+        this.#publish();
+      }
+
+      if (!this.#isCurrentOperation(operationId)) {
+        return;
+      }
+
+      this.#status = this.#error === undefined ? "ready" : "error";
+    } catch (error) {
+      if (!this.#isCurrentOperation(operationId)) {
+        return;
+      }
+
+      if (isAbortError(error)) {
+        this.#status = "ready";
+        this.#failPendingMessageSubmission(toError(error));
+      } else {
+        this.#error = toError(error);
+        this.#status = "error";
+        this.#failPendingMessageSubmission(this.#error);
+        this.#callbacks.onError?.(this.#error);
+      }
+    } finally {
+      if (this.#isCurrentOperation(operationId)) {
+        this.#abortController = undefined;
+        this.#callbacks.onSessionChange?.(this.#session?.state);
+        this.#publish();
+        this.#callbacks.onFinish?.(this.#snapshot);
+      }
+    }
+  }
+
+  stop(): void {
+    this.#abortController?.abort();
+  }
+
+  reset(): void {
+    this.#invalidateOperation();
+    this.stop();
+    this.#abortController = undefined;
+    if (!this.#externalSession) this.#session = undefined;
+    this.#events = [];
+    this.#seenEvents = createEventDeduper();
+    this.#pendingMessageSubmission = undefined;
+    this.#projectionEvents = [];
+    this.#data = this.#reducer.initial();
+    this.#error = undefined;
+    this.#status = "ready";
+    this.#callbacks.onSessionChange?.(this.#session?.state);
+    this.#publish();
+  }
+
+  async #createFirstTurn<TOutput>(
+    input: SendTurnPayload<TOutput>,
+  ): Promise<Awaited<ReturnType<ClientSession["send"]>>> {
+    if (this.#client === undefined) {
+      throw new Error("An external eve session is required before sending.");
+    }
+    if (input.message === undefined) {
+      throw new Error("Cannot answer an input request before the session starts.");
+    }
+    const created = await this.#client.sessions.create({ ...input, message: input.message });
+    this.#session = created.session;
+    this.#callbacks.onSessionChange?.(created.session.state);
+    this.#publish();
+    return created.response;
+  }
+
+  async #dispatchTurn<TOutput>(
+    input: SendTurnPayload<TOutput>,
+  ): Promise<Awaited<ReturnType<ClientSession["send"]>>> {
+    if (this.#session === undefined) return await this.#createFirstTurn(input);
+    if (input.inputResponses === undefined) {
+      const { message, ...options } = input;
+      return await this.#session.send(message, options);
+    }
+    const { inputResponses, ...options } = input;
+    return await this.#session.respond(inputResponses, options);
+  }
+
+  #startOperation(): number {
+    this.#operationId += 1;
+    return this.#operationId;
+  }
+
+  #invalidateOperation(): void {
+    this.#operationId += 1;
+  }
+
+  #isCurrentOperation(operationId: number): boolean {
+    return this.#operationId === operationId;
+  }
+
+  #projectOptimisticMessage(input: SendTurnPayload): void {
+    if (!this.#optimistic || input.message === undefined) {
+      return;
+    }
+
+    const id = createSubmissionId();
+    const pending = {
+      createdAt: Date.now(),
+      id,
+      message: summarizeUserContent(input.message),
+    };
+    this.#pendingMessageSubmission = pending;
+    this.#appendProjectionEvent({
+      data: {
+        createdAt: pending.createdAt,
+        message: pending.message,
+        submissionId: pending.id,
+      },
+      type: "client.message.submitted",
+    });
+  }
+
+  #projectInputResponses(input: SendTurnPayload): void {
+    if (input.inputResponses === undefined || input.inputResponses.length === 0) {
+      return;
+    }
+
+    this.#appendProjectionEvent({
+      data: {
+        createdAt: Date.now(),
+        responses: input.inputResponses,
+      },
+      type: "client.input.responded",
+    });
+  }
+
+  #applyServerEvent(event: MessageStreamEvent): void {
+    if (event.type === "message.received" && this.#pendingMessageSubmission !== undefined) {
+      const submissionId = this.#pendingMessageSubmission.id;
+      this.#pendingMessageSubmission = undefined;
+      this.#replaceProjectionEvent(
+        (candidate) =>
+          candidate.type === "client.message.submitted" &&
+          candidate.data.submissionId === submissionId,
+        event,
+      );
+      return;
+    }
+
+    this.#appendProjectionEvent(event);
+  }
+
+  #applyTerminalStreamFailure(event: MessageStreamEvent): void {
+    const error = toTerminalStreamFailureError(event);
+    if (error === undefined) {
+      return;
+    }
+
+    this.#status = "error";
+    this.#failPendingMessageSubmission(error);
+
+    if (this.#error === undefined) {
+      this.#error = error;
+      this.#callbacks.onError?.(error);
+    }
+  }
+
+  #failPendingMessageSubmission(error: Error): void {
+    const pending = this.#pendingMessageSubmission;
+    if (pending === undefined) {
+      return;
+    }
+
+    this.#pendingMessageSubmission = undefined;
+    this.#replaceProjectionEvent(
+      (event) =>
+        event.type === "client.message.submitted" && event.data.submissionId === pending.id,
+      {
+        data: {
+          createdAt: pending.createdAt,
+          error: {
+            message: error.message,
+          },
+          message: pending.message,
+          submissionId: pending.id,
+        },
+        type: "client.message.failed",
+      },
+    );
+  }
+
+  #appendProjectionEvent(event: EveAgentReducerEvent): void {
+    this.#projectionEvents = [...this.#projectionEvents, event];
+    this.#data = this.#reducer.reduce(this.#data, event);
+  }
+
+  #replaceProjectionEvent(
+    predicate: (event: EveAgentReducerEvent) => boolean,
+    replacement: EveAgentReducerEvent,
+  ): void {
+    let replaced = false;
+    this.#projectionEvents = this.#projectionEvents.map((event) => {
+      if (!replaced && predicate(event)) {
+        replaced = true;
+        return replacement;
+      }
+      return event;
+    });
+
+    if (!replaced) {
+      this.#projectionEvents = [...this.#projectionEvents, replacement];
+    }
+
+    this.#data = this.#reduceProjectionEvents(this.#projectionEvents);
+  }
+
+  #reduceProjectionEvents(events: readonly EveAgentReducerEvent[]): TData {
+    let data = this.#reducer.initial();
+    for (const event of events) {
+      data = this.#reducer.reduce(data, event);
+    }
+    return data;
+  }
+
+  #createSnapshot(): EveAgentStoreSnapshot<TData> {
+    return {
+      data: this.#data,
+      error: this.#error,
+      events: this.#events,
+      session: this.#session?.state,
+      status: this.#status,
+    };
+  }
+
+  #publish(): void {
+    this.#snapshot = this.#createSnapshot();
+    for (const subscriber of this.#subscribers) {
+      subscriber();
+    }
+  }
+}
+
+function assertExclusiveTurnInput(input: SendTurnPayload): void {
+  const hasMessage = input.message !== undefined;
+  const hasResponses = input.inputResponses !== undefined;
+  if (hasMessage === hasResponses) {
+    throw new Error("A turn requires exactly one of message or inputResponses.");
+  }
+}
+
+let submissionSequence = 0;
+
+function createSubmissionId(): string {
+  const randomUUID = globalThis.crypto?.randomUUID;
+  if (randomUUID !== undefined) {
+    return randomUUID.call(globalThis.crypto);
+  }
+
+  submissionSequence += 1;
+  return `submission_${submissionSequence.toString()}`;
+}
+
+function createAbortSignal(first: AbortSignal | undefined, second: AbortSignal): AbortSignal {
+  return first ? AbortSignal.any([first, second]) : second;
+}
+
+function summarizeUserContent(message: string | UserContent): string {
+  if (typeof message === "string") {
+    return message;
+  }
+
+  const parts: string[] = [];
+  for (const part of message) {
+    if (part.type === "text") {
+      parts.push(part.text);
+      continue;
+    }
+
+    if (part.type === "file") {
+      parts.push(part.filename ? `[file: ${part.filename}]` : "[file]");
+    }
+  }
+
+  return parts.join("\n");
+}
+
+function isAbortError(error: unknown): boolean {
+  return error instanceof Error && error.name === "AbortError";
+}
+
+function toTerminalStreamFailureError(event: MessageStreamEvent): Error | undefined {
+  if (event.type !== "session.failed") {
+    return undefined;
+  }
+
+  const error = new Error(event.data.message);
+  error.name = event.data.code;
+  return error;
+}

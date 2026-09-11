@@ -1,0 +1,2240 @@
+import {
+  type ConnectionIdentity,
+  type IntegrationEntry,
+  channelEntries,
+  connectionEntries,
+  connectionProtocols as protocolsForIdentity,
+  extensionEntries,
+  instrumentationEntries,
+} from "@eve/catalog";
+import type { LogoKey } from "./logos";
+
+/**
+ * The docs integration gallery layers presentation (logo, keywords, setup
+ * markdown, auth modes) on top of the shared identity catalog
+ * (`@eve/catalog`). Identity — slug, name, kind, tagline and a
+ * connection's transport + model-facing description — comes from the catalog
+ * and is never re-declared here; this module owns only the docs-facing overlay,
+ * keyed by slug.
+ */
+
+export type IntegrationType = "channel" | "connection" | "extension" | "instrumentation";
+
+/** Wire protocol and transport identity types are owned by the shared catalog. */
+export type { ConnectionProtocol, McpTransport, OpenApiTransport } from "@eve/catalog";
+import type { ConnectionProtocol } from "@eve/catalog";
+
+/**
+ * How a connection authenticates. A mode uses either Vercel Connect (`user`,
+ * `app` or `jwtBearer`) or a server-side API key.
+ */
+export type AuthMode = "user" | "app" | "jwtBearer" | "apiKey";
+
+export interface ApiKeySpec {
+  /** Server-side environment variable containing the API key. */
+  env: string;
+  /** Header used to send the API key. */
+  header: string;
+}
+
+/**
+ * Structured description of a connection consumed by the detail page to
+ * generate Install, Quick start and Configure content. Transport (`mcp`,
+ * `openapi`) and `description` are filled from the shared catalog identity;
+ * Auth modes, connectors and configure notes are the docs-only overlay.
+ */
+export interface ConnectionSpec {
+  /** Vercel Connect connector UID; defaults to the integration slug. */
+  connector?: string;
+  /** Auth-mode-specific connector UIDs when one service needs separate connectors. */
+  connectors?: Partial<Record<AuthMode, string>>;
+  /** Service passed to `vercel connect create` when it differs from the connector UID. */
+  connectorService?: string;
+  /** Auth-mode-specific services passed to `vercel connect create`. */
+  connectorServices?: Partial<Record<AuthMode, string>>;
+  /** Supported auth modes in display order; the first is the default. */
+  authModes: AuthMode[];
+  /** API-key wiring when `authModes` includes `apiKey`. */
+  apiKey?: ApiKeySpec;
+  /** Model-facing description; defaults to the integration tagline. */
+  description?: string;
+  mcp?: ConnectionIdentity["mcp"];
+  openapi?: ConnectionIdentity["openapi"];
+  /** Optional provider-specific configure guidance, rendered as markdown. */
+  configureNote?: string;
+  /** Auth-mode-specific configure guidance, rendered as markdown. */
+  configureNotes?: Partial<Record<AuthMode, string>>;
+}
+
+export interface Integration {
+  /** URL slug and lookup key, derived once and reused everywhere. */
+  slug: string;
+  name: string;
+  type: IntegrationType;
+  /** Protocol badges shown on the gallery card (connections only). */
+  protocols?: ConnectionProtocol[];
+  /** One-line summary shown on the gallery card. */
+  tagline: string;
+  /** Brand logo key from `lib/integrations/logos`. */
+  logo: LogoKey;
+  /** Optional pill (e.g. "Chat SDK") shown next to the type label. */
+  badge?: string;
+  /** Canonical reference doc for deeper details. */
+  docsHref: string;
+  /** Searchable keywords beyond the name. */
+  keywords?: string[];
+  /**
+   * Channels and extensions author their setup as markdown. Connections leave
+   * these unset and supply a `connection` spec, from which content is generated.
+   */
+  install?: string;
+  quickStart?: string;
+  configure?: string;
+  /** Structured connection spec; present only for `type: "connection"`. */
+  connection?: ConnectionSpec;
+}
+
+/** Docs presentation overlay shared by every integration kind. */
+interface Presentation {
+  logo: LogoKey;
+  docsHref: string;
+  keywords?: string[];
+  /** Optional gallery pill (e.g. "Chat SDK") shown next to the type label. */
+  badge?: string;
+}
+
+/** Channel overlay: presentation plus hand-authored setup markdown. */
+interface ChannelPresentation extends Presentation {
+  install: string;
+  quickStart: string;
+  configure: string;
+}
+
+/** Extension overlay with hand-authored package setup. */
+interface ExtensionPresentation extends Presentation {
+  install: string;
+  quickStart: string;
+  configure: string;
+}
+
+/** Connection overlay: presentation plus Connect auth/config details. */
+interface ConnectionPresentation extends Presentation {
+  authModes: AuthMode[];
+  apiKey?: ApiKeySpec;
+  connector?: string;
+  connectors?: Partial<Record<AuthMode, string>>;
+  connectorService?: string;
+  connectorServices?: Partial<Record<AuthMode, string>>;
+  configureNote?: string;
+  configureNotes?: Partial<Record<AuthMode, string>>;
+}
+
+const channelPresentations: Record<string, ChannelPresentation> = {
+  slack: {
+    logo: "slack",
+    docsHref: "/docs/channels/slack",
+    keywords: ["chat", "messaging", "bot", "webhook"],
+    install: `The eve CLI scaffolds the channel for you. \`eve add channel/slack\` writes \`agent/channels/slack.ts\`, adds \`@vercel/connect\` and runs the Connect setup flow:
+
+\`\`\`bash
+eve add channel/slack
+\`\`\`
+
+To wire it up by hand instead, install the framework and the Connect SDK. Slack channels use [Vercel Connect](https://vercel.com/docs/connect) for both the outbound bot token and inbound webhook verification:
+
+\`\`\`bash
+npm install eve@latest @vercel/connect
+\`\`\``,
+    quickStart: `Create \`agent/channels/slack.ts\`. The channel name is derived from the filename, so no \`name\` field is needed:
+
+\`\`\`ts
+// agent/channels/slack.ts
+import { slackChannel } from "eve/channels/slack";
+import { connectSlackCredentials } from "@vercel/connect/eve";
+
+export default slackChannel({
+  credentials: connectSlackCredentials("slack/my-agent"),
+});
+\`\`\`
+
+Link the project and pull OIDC env vars so Connect can authenticate locally:
+
+\`\`\`bash
+vercel link
+vercel env pull
+\`\`\``,
+    configure: `Create a Slack Connect client and copy its UID (for example \`slack/my-agent\`), then attach this project as the webhook trigger destination at the route eve serves (\`/eve/v1/slack\`):
+
+\`\`\`bash
+vercel connect create slack --triggers
+\`\`\`
+
+The channel handles mentions, DMs, typing indicators, delivery and human-in-the-loop consent with sensible defaults. See the [Slack channel docs](/docs/channels/slack) for customizing each behavior.`,
+  },
+  discord: {
+    logo: "discord",
+    docsHref: "/docs/channels/discord",
+    keywords: ["chat", "messaging", "bot", "guild"],
+    install: `Add this channel from eve's registry. This writes \`agent/channels/discord.ts\`:
+
+\`\`\`bash
+eve add channel/discord
+\`\`\``,
+    quickStart: `Create \`agent/channels/discord.ts\`:
+
+\`\`\`ts
+// agent/channels/discord.ts
+import { discordChannel } from "eve/channels/discord";
+
+export default discordChannel({
+  credentials: {
+    botToken: () => process.env.DISCORD_BOT_TOKEN!,
+    publicKey: () => process.env.DISCORD_PUBLIC_KEY!,
+  },
+});
+\`\`\``,
+    configure: `Create a Discord application, add a bot and set the interactions endpoint URL to the route eve serves (\`/eve/v1/discord\`). Provide the bot token and public key through environment variables. See the [Discord channel docs](/docs/channels/discord) for intents and slash-command setup.`,
+  },
+  teams: {
+    logo: "teams",
+    docsHref: "/docs/channels/teams",
+    keywords: ["chat", "messaging", "bot", "microsoft"],
+    install: `Add this channel from eve's registry. This writes \`agent/channels/teams.ts\`:
+
+\`\`\`bash
+eve add channel/teams
+\`\`\``,
+    quickStart: `Create \`agent/channels/teams.ts\`:
+
+\`\`\`ts
+// agent/channels/teams.ts
+import { teamsChannel } from "eve/channels/teams";
+
+export default teamsChannel({
+  credentials: {
+    appId: () => process.env.TEAMS_APP_ID!,
+    appPassword: () => process.env.TEAMS_APP_PASSWORD!,
+  },
+});
+\`\`\``,
+    configure: `Register an Azure Bot, configure the messaging endpoint to eve's route (\`/eve/v1/teams\`) and supply the app ID and password via environment variables. See the [Teams channel docs](/docs/channels/teams) for the full provisioning checklist.`,
+  },
+  telegram: {
+    logo: "telegram",
+    docsHref: "/docs/channels/telegram",
+    keywords: ["chat", "messaging", "bot"],
+    install: `Add this channel from eve's registry. This writes \`agent/channels/telegram.ts\`:
+
+\`\`\`bash
+eve add channel/telegram
+\`\`\``,
+    quickStart: `Create \`agent/channels/telegram.ts\`:
+
+\`\`\`ts
+// agent/channels/telegram.ts
+import { telegramChannel } from "eve/channels/telegram";
+
+export default telegramChannel({
+  credentials: { botToken: () => process.env.TELEGRAM_BOT_TOKEN! },
+});
+\`\`\``,
+    configure: `Create a bot with [@BotFather](https://t.me/botfather), then register the webhook to point at eve's route (\`/eve/v1/telegram\`). Store the bot token in an environment variable. See the [Telegram channel docs](/docs/channels/telegram) for group privacy and command setup.`,
+  },
+  twilio: {
+    logo: "twilio",
+    docsHref: "/docs/channels/twilio",
+    keywords: ["sms", "voice", "calls", "phone", "transcription"],
+    install: `Add this channel from eve's registry. This writes \`agent/channels/twilio.ts\`:
+
+\`\`\`bash
+eve add channel/twilio
+\`\`\``,
+    quickStart: `Create \`agent/channels/twilio.ts\`. \`allowFrom\` is required and gates who can reach the inbound hooks:
+
+\`\`\`ts
+// agent/channels/twilio.ts
+import { twilioChannel } from "eve/channels/twilio";
+
+export default twilioChannel({
+  allowFrom: "+15551234567",
+  messaging: { from: "+15557654321" },
+});
+\`\`\`
+
+\`\`\`bash
+TWILIO_ACCOUNT_SID=AC...   # required for default outbound SMS
+TWILIO_AUTH_TOKEN=...      # required for inbound signature verification
+\`\`\``,
+    configure: `In the Twilio console, point your number's Messaging webhook at \`/eve/v1/twilio/messages\` and its Voice webhook at \`/eve/v1/twilio/voice\`. Inbound calls are answered with speech gathering and the transcript feeds the same session SMS uses. See the [Twilio channel docs](/docs/channels/twilio) for dispatch, streaming and voice specifics.`,
+  },
+  github: {
+    logo: "github",
+    docsHref: "/docs/channels/github",
+    keywords: ["issues", "pull requests", "app", "webhook", "code"],
+    install: `Add this channel from eve's registry to create a Vercel Connect GitHub App, route verified webhooks and write \`agent/channels/github.ts\`:
+
+\`\`\`bash
+eve add channel/github
+\`\`\``,
+    quickStart: `The guided setup writes \`agent/channels/github.ts\`:
+
+\`\`\`ts
+// agent/channels/github.ts
+import { connectGitHubCredentials } from "@vercel/connect/eve";
+import { githubChannel } from "eve/channels/github";
+
+export default githubChannel({
+  credentials: connectGitHubCredentials("github/my-agent"),
+});
+\`\`\``,
+    configure: `Sign in to Vercel, then let the guided flow create or link a project, provision the GitHub App and attach its verified webhook trigger to \`/eve/v1/github\`. Deploy, install the app from Vercel Connect, then add its \`@handle\` invocation token to a new issue, pull request or review comment. GitHub may not autocomplete or render the token as a linked mention. See the [GitHub channel docs](/docs/channels/github) for permissions and events.`,
+  },
+  "linear-agent": {
+    logo: "linear",
+    docsHref: "/docs/channels/linear",
+    keywords: ["issues", "comments", "agent sessions", "developer preview", "webhook"],
+    install: `Add this channel from eve's registry to create a Vercel Connect client, route verified Agent Session events and write \`agent/channels/linear.ts\`:
+
+\`\`\`bash
+eve add channel/linear-agent
+\`\`\``,
+    quickStart: `The guided setup writes \`agent/channels/linear.ts\`:
+
+\`\`\`ts
+// agent/channels/linear.ts
+import { connectLinearCredentials } from "@vercel/connect/eve";
+import { linearChannel } from "eve/channels/linear";
+
+export default linearChannel({
+  credentials: connectLinearCredentials("linear/my-agent"),
+});
+\`\`\``,
+    configure: `Sign in to Vercel, then let the guided flow create or link a project, provision the Linear app and attach its verified AgentSessionEvent trigger to \`/eve/v1/linear\`. Deploy, install the app in your Linear workspace from Vercel Connect, then delegate an issue or mention the agent. See the [Linear channel docs](/docs/channels/linear) for Agent Activity behavior.`,
+  },
+  eve: {
+    logo: "eve",
+    docsHref: "/docs/channels/eve",
+    keywords: [
+      "web",
+      "chat",
+      "ui",
+      "embed",
+      "frontend",
+      "next.js",
+      "svelte",
+      "sveltekit",
+      "nuxt",
+      "vue",
+      "react",
+    ],
+    install: `The eve CLI scaffolds the full Next.js web chat app alongside \`agent/channels/eve.ts\`:
+
+\`\`\`bash
+eve add channel/web
+\`\`\`
+
+To wire it up by hand instead — including into a Svelte or Nuxt app you already have — install the framework:
+
+\`\`\`bash
+npm install eve@latest
+\`\`\``,
+    quickStart: `The eve channel is on by default. Add \`agent/channels/eve.ts\` only when you want to override the default session routes or auth:
+
+\`\`\`ts
+// agent/channels/eve.ts
+import { eveChannel } from "eve/channels/eve";
+
+export default eveChannel();
+\`\`\`
+
+Point your frontend at the session routes eve serves (\`/eve/v1/session\`) and stream responses with the eve web client. Next.js, Nuxt and Svelte each have an integration that mounts those routes on your app's own origin, so there's no CORS to configure and no URL env var to keep in sync:
+
+- **Next.js.** Wrap \`next.config.ts\` with \`withEve()\` from \`eve/next\`, then call \`useEveAgent()\` from \`eve/react\`. See the [Next.js guide](/docs/guides/frontend/nextjs).
+- **Nuxt.** Add \`"eve/nuxt"\` to \`modules\` in \`nuxt.config.ts\`; the \`useEveAgent()\` composable from \`eve/vue\` is auto-imported. See the [Nuxt guide](/docs/guides/frontend/nuxt).
+- **Svelte.** Add the \`eveSvelteKit()\` Vite plugin before \`sveltekit()\` in \`vite.config.ts\`, then call \`useEveAgent()\` from \`eve/svelte\`. See the [SvelteKit guide](/docs/guides/frontend/sveltekit).
+
+On any other stack, wire it up by hand: run the agent as its own service and proxy \`/eve/v1/**\` to it or pass its origin as \`host\` to \`useEveAgent()\` and enable \`cors\` on the channel. Server-side code and custom UIs can call the routes through \`Client\` from \`eve/client\`.`,
+    configure: `The eve channel is the lowest-friction way to talk to your agent, with no third-party provisioning required. Layer in auth and route protection as needed and enable \`cors\` only when a browser reaches the channel from another origin. See the [eve channel docs](/docs/channels/eve), the [Frontend guide](/docs/guides/frontend/overview) and the per-framework guides for [Next.js](/docs/guides/frontend/nextjs), [Nuxt](/docs/guides/frontend/nuxt) and [SvelteKit](/docs/guides/frontend/sveltekit).`,
+  },
+  "chat-sdk-gchat": {
+    logo: "googlechat",
+    docsHref: "/docs/channels/chat-sdk",
+    badge: "Chat SDK",
+    keywords: ["chat sdk", "google chat", "spaces", "bot"],
+    install: `Add this Chat SDK channel from eve's registry. This writes \`agent/channels/gchat.ts\` and installs Chat SDK and its adapter dependencies:
+
+\`\`\`bash
+eve add channel/chat-sdk-gchat
+\`\`\``,
+    quickStart: `Create \`agent/channels/gchat.ts\`. Register Chat SDK handlers on \`bot\`, call \`send\` to hand each turn to eve and export the channel:
+
+\`\`\`ts
+// agent/channels/gchat.ts
+import { createGoogleChatAdapter } from "@chat-adapter/gchat";
+import { createMemoryState } from "@chat-adapter/state-memory";
+import type { Message, Thread } from "chat";
+import { chatSdkChannel } from "eve/channels/chat-sdk";
+
+export const { bot, channel, send } = chatSdkChannel({
+  userName: "My Agent",
+  adapters: { gchat: createGoogleChatAdapter() },
+  state: createMemoryState(),
+});
+
+bot.onNewMention(async (thread: Thread, message: Message) => {
+  await thread.subscribe();
+  await send(message.text, { thread });
+});
+
+bot.onSubscribedMessage(async (thread: Thread, message: Message) => {
+  await send(message.text, { thread });
+});
+
+export default channel;
+\`\`\`
+
+Credentials come from the \`createGoogleChatAdapter\` config or the adapter's environment variables; see the [Google Chat adapter docs](https://chat-sdk.dev/adapters/official/gchat).`,
+    configure: `The adapter mounts its webhook at \`/eve/v1/gchat\`. Point your Google Chat app's HTTP endpoint at it. The adapter owns provider auth, verification and delivery, while eve owns session dispatch, streaming, typing and human-in-the-loop. See the [Chat SDK channel docs](/docs/channels/chat-sdk) for routes, streaming and state options.`,
+  },
+  "chat-sdk-whatsapp": {
+    logo: "whatsapp",
+    docsHref: "/docs/channels/chat-sdk",
+    badge: "Chat SDK",
+    keywords: ["chat sdk", "whatsapp", "business cloud", "messaging"],
+    install: `Add this Chat SDK channel from eve's registry. This writes \`agent/channels/whatsapp.ts\` and installs Chat SDK and its adapter dependencies:
+
+\`\`\`bash
+eve add channel/chat-sdk-whatsapp
+\`\`\``,
+    quickStart: `Create \`agent/channels/whatsapp.ts\`. Register Chat SDK handlers on \`bot\`, call \`send\` to hand each turn to eve and export the channel:
+
+\`\`\`ts
+// agent/channels/whatsapp.ts
+import { createWhatsAppAdapter } from "@chat-adapter/whatsapp";
+import { createMemoryState } from "@chat-adapter/state-memory";
+import type { Message, Thread } from "chat";
+import { chatSdkChannel } from "eve/channels/chat-sdk";
+
+export const { bot, channel, send } = chatSdkChannel({
+  userName: "My Agent",
+  adapters: { whatsapp: createWhatsAppAdapter() },
+  state: createMemoryState(),
+});
+
+bot.onNewMention(async (thread: Thread, message: Message) => {
+  await thread.subscribe();
+  await send(message.text, { thread });
+});
+
+bot.onSubscribedMessage(async (thread: Thread, message: Message) => {
+  await send(message.text, { thread });
+});
+
+export default channel;
+\`\`\`
+
+Credentials come from the \`createWhatsAppAdapter\` config or the adapter's environment variables; see the [WhatsApp adapter docs](https://chat-sdk.dev/adapters/official/whatsapp).`,
+    configure: `The adapter mounts its webhook at \`/eve/v1/whatsapp\`. Point your WhatsApp Business Cloud webhook at it. The adapter owns provider auth, verification and delivery, while eve owns session dispatch, streaming, typing and human-in-the-loop. See the [Chat SDK channel docs](/docs/channels/chat-sdk) for routes, streaming and state options.`,
+  },
+  "chat-sdk-x": {
+    logo: "x",
+    docsHref: "/docs/channels/chat-sdk",
+    badge: "Chat SDK",
+    keywords: ["chat sdk", "x", "twitter", "mentions", "dms"],
+    install: `Add this Chat SDK channel from eve's registry. This writes \`agent/channels/x.ts\` and installs Chat SDK and its adapter dependencies:
+
+\`\`\`bash
+eve add channel/chat-sdk-x
+\`\`\``,
+    quickStart: `Create \`agent/channels/x.ts\`. Register Chat SDK handlers on \`bot\`, call \`send\` to hand each turn to eve and export the channel:
+
+\`\`\`ts
+// agent/channels/x.ts
+import { createXAdapter } from "@chat-adapter/x";
+import { createMemoryState } from "@chat-adapter/state-memory";
+import type { Message, Thread } from "chat";
+import { chatSdkChannel } from "eve/channels/chat-sdk";
+
+export const { bot, channel, send } = chatSdkChannel({
+  userName: "My Agent",
+  adapters: { x: createXAdapter() },
+  state: createMemoryState(),
+});
+
+bot.onNewMention(async (thread: Thread, message: Message) => {
+  await thread.subscribe();
+  await send(message.text, { thread });
+});
+
+bot.onSubscribedMessage(async (thread: Thread, message: Message) => {
+  await send(message.text, { thread });
+});
+
+export default channel;
+\`\`\`
+
+Credentials come from the \`createXAdapter\` config or the adapter's environment variables; see the [X adapter docs](https://chat-sdk.dev/adapters/official/x).`,
+    configure: `The adapter mounts its webhook at \`/eve/v1/x\`. Point your X account activity webhook at it. The adapter owns provider auth, verification and delivery, while eve owns session dispatch, streaming, typing and human-in-the-loop. See the [Chat SDK channel docs](/docs/channels/chat-sdk) for routes, streaming and state options.`,
+  },
+  "chat-sdk-messenger": {
+    logo: "messenger",
+    docsHref: "/docs/channels/chat-sdk",
+    badge: "Chat SDK",
+    keywords: ["chat sdk", "messenger", "facebook", "bot"],
+    install: `Add this Chat SDK channel from eve's registry. This writes \`agent/channels/messenger.ts\` and installs Chat SDK and its adapter dependencies:
+
+\`\`\`bash
+eve add channel/chat-sdk-messenger
+\`\`\``,
+    quickStart: `Create \`agent/channels/messenger.ts\`. Register Chat SDK handlers on \`bot\`, call \`send\` to hand each turn to eve and export the channel:
+
+\`\`\`ts
+// agent/channels/messenger.ts
+import { createMessengerAdapter } from "@chat-adapter/messenger";
+import { createMemoryState } from "@chat-adapter/state-memory";
+import type { Message, Thread } from "chat";
+import { chatSdkChannel } from "eve/channels/chat-sdk";
+
+export const { bot, channel, send } = chatSdkChannel({
+  userName: "My Agent",
+  adapters: { messenger: createMessengerAdapter() },
+  state: createMemoryState(),
+});
+
+bot.onNewMention(async (thread: Thread, message: Message) => {
+  await thread.subscribe();
+  await send(message.text, { thread });
+});
+
+bot.onSubscribedMessage(async (thread: Thread, message: Message) => {
+  await send(message.text, { thread });
+});
+
+export default channel;
+\`\`\`
+
+Credentials come from the \`createMessengerAdapter\` config or the adapter's environment variables; see the [Messenger adapter docs](https://chat-sdk.dev/adapters/official/messenger).`,
+    configure: `The adapter mounts its webhook at \`/eve/v1/messenger\`. Point your Messenger webhook at it. The adapter owns provider auth, verification and delivery, while eve owns session dispatch, streaming, typing and human-in-the-loop. See the [Chat SDK channel docs](/docs/channels/chat-sdk) for routes, streaming and state options.`,
+  },
+  "chat-sdk-zernio": {
+    logo: "zernio",
+    docsHref: "/docs/channels/chat-sdk",
+    badge: "Provider official",
+    keywords: [
+      "chat sdk",
+      "zernio",
+      "instagram",
+      "facebook",
+      "x",
+      "twitter",
+      "telegram",
+      "whatsapp",
+      "bluesky",
+      "reddit",
+    ],
+    install: `Add this Chat SDK channel from eve's registry. This writes \`agent/channels/zernio.ts\` and installs Chat SDK and its adapter dependencies:
+
+\`\`\`bash
+eve add channel/chat-sdk-zernio
+\`\`\``,
+    quickStart: `Create \`agent/channels/zernio.ts\`:
+
+\`\`\`ts
+// agent/channels/zernio.ts
+import { createZernioAdapter } from "@zernio/chat-sdk-adapter";
+import { createMemoryState } from "@chat-adapter/state-memory";
+import type { Message, Thread } from "chat";
+import { chatSdkChannel } from "eve/channels/chat-sdk";
+
+export const { bot, channel, send } = chatSdkChannel({
+  userName: "My Agent",
+  adapters: {
+    zernio: createZernioAdapter(),
+  },
+  state: createMemoryState(),
+});
+
+bot.onNewMention(async (thread: Thread, message: Message) => {
+  await thread.subscribe();
+  await send(message.text, { thread });
+});
+
+bot.onSubscribedMessage(async (thread: Thread, message: Message) => {
+  await send(message.text, { thread });
+});
+
+export default channel;
+\`\`\`
+
+See the [Zernio adapter documentation](https://chat-sdk.dev/adapters/vendor-official/zernio) for supported events, capabilities and credentials.`,
+    configure: `Set \`ZERNIO_API_KEY\` and \`ZERNIO_WEBHOOK_SECRET\`, then point Zernio webhooks at \`/eve/v1/zernio\`. Zernio provides one adapter for Instagram, Facebook, X, Telegram, WhatsApp, Bluesky and Reddit. See the [Chat SDK channel docs](/docs/channels/chat-sdk) for eve session dispatch, state, streaming and human-in-the-loop behavior.`,
+  },
+  "chat-sdk-velt": {
+    logo: "velt",
+    docsHref: "/docs/channels/chat-sdk",
+    badge: "Provider official",
+    keywords: [
+      "chat sdk",
+      "velt",
+      "comments",
+      "collaboration",
+      "documents",
+      "canvas",
+      "pdf",
+      "video",
+    ],
+    install: `Add this Chat SDK channel from eve's registry. This writes \`agent/channels/velt.ts\` and installs Chat SDK and its adapter dependencies:
+
+\`\`\`bash
+eve add channel/chat-sdk-velt
+\`\`\``,
+    quickStart: `Create \`agent/channels/velt.ts\`:
+
+\`\`\`ts
+// agent/channels/velt.ts
+import { createVeltAdapter } from "@veltdev/chat-sdk-adapter";
+import { createMemoryState } from "@chat-adapter/state-memory";
+import type { Message, Thread } from "chat";
+import { chatSdkChannel } from "eve/channels/chat-sdk";
+
+export const { bot, channel, send } = chatSdkChannel({
+  userName: "My Agent",
+  adapters: {
+    velt: createVeltAdapter({
+      apiKey: process.env.VELT_API_KEY!,
+      webhookSecret: process.env.VELT_WEBHOOK_SECRET!,
+      botUserId: "my-agent",
+      botUserName: "My Agent",
+    }),
+  },
+  state: createMemoryState(),
+});
+
+bot.onNewMention(async (thread: Thread, message: Message) => {
+  await thread.subscribe();
+  await send(message.text, { thread });
+});
+
+bot.onSubscribedMessage(async (thread: Thread, message: Message) => {
+  await send(message.text, { thread });
+});
+
+export default channel;
+\`\`\`
+
+See the [Velt adapter documentation](https://chat-sdk.dev/adapters/vendor-official/velt) for supported events, capabilities and credentials.`,
+    configure: `Create a Velt bot user and webhook, set \`VELT_API_KEY\` and \`VELT_WEBHOOK_SECRET\`, then send comment events to \`/eve/v1/velt\`. The adapter maps documents to channels, annotations to threads and comments to messages. See the [Chat SDK channel docs](/docs/channels/chat-sdk) for eve session dispatch, state, streaming and human-in-the-loop behavior.`,
+  },
+  "chat-sdk-sendblue": {
+    logo: "sendblue",
+    docsHref: "/docs/channels/chat-sdk",
+    badge: "Provider official",
+    keywords: ["chat sdk", "sendblue", "imessage", "sms", "rcs", "tapbacks", "phone"],
+    install: `Add this Chat SDK channel from eve's registry. This writes \`agent/channels/sendblue.ts\` and installs Chat SDK and its adapter dependencies:
+
+\`\`\`bash
+eve add channel/chat-sdk-sendblue
+\`\`\``,
+    quickStart: `Create \`agent/channels/sendblue.ts\`:
+
+\`\`\`ts
+// agent/channels/sendblue.ts
+import { createSendblueAdapter } from "chat-adapter-sendblue";
+import { createMemoryState } from "@chat-adapter/state-memory";
+import type { Message, Thread } from "chat";
+import { chatSdkChannel } from "eve/channels/chat-sdk";
+
+export const { bot, channel, send } = chatSdkChannel({
+  userName: "My Agent",
+  adapters: {
+    sendblue: createSendblueAdapter(),
+  },
+  state: createMemoryState(),
+});
+
+bot.onNewMention(async (thread: Thread, message: Message) => {
+  await thread.subscribe();
+  await send(message.text, { thread });
+});
+
+bot.onSubscribedMessage(async (thread: Thread, message: Message) => {
+  await send(message.text, { thread });
+});
+
+export default channel;
+\`\`\`
+
+See the [Sendblue adapter documentation](https://chat-sdk.dev/adapters/vendor-official/sendblue) for supported events, capabilities and credentials.`,
+    configure: `Set \`SENDBLUE_API_KEY\`, \`SENDBLUE_API_SECRET\` and \`SENDBLUE_FROM_NUMBER\`, then point Sendblue webhooks at \`/eve/v1/sendblue\`. The adapter also supports tapbacks, typing indicators, delivery callbacks and number lookup. See the [Chat SDK channel docs](/docs/channels/chat-sdk) for eve session dispatch, state, streaming and human-in-the-loop behavior.`,
+  },
+  "chat-sdk-novu": {
+    logo: "novu",
+    docsHref: "/docs/channels/chat-sdk",
+    badge: "Provider official",
+    keywords: [
+      "chat sdk",
+      "novu",
+      "slack",
+      "teams",
+      "whatsapp",
+      "telegram",
+      "email",
+      "multichannel",
+    ],
+    install: `Add this Chat SDK channel from eve's registry. This writes \`agent/channels/novu.ts\` and installs Chat SDK and its adapter dependencies:
+
+\`\`\`bash
+eve add channel/chat-sdk-novu
+\`\`\``,
+    quickStart: `Create \`agent/channels/novu.ts\`:
+
+\`\`\`ts
+// agent/channels/novu.ts
+import { createNovuAdapter } from "@novu/chat-sdk-adapter";
+import { createMemoryState } from "@chat-adapter/state-memory";
+import type { Message, Thread } from "chat";
+import { chatSdkChannel } from "eve/channels/chat-sdk";
+
+export const { bot, channel, send } = chatSdkChannel({
+  userName: "My Agent",
+  adapters: {
+    novu: createNovuAdapter(),
+  },
+  state: createMemoryState(),
+});
+
+bot.onNewMention(async (thread: Thread, message: Message) => {
+  await thread.subscribe();
+  await send(message.text, { thread });
+});
+
+bot.onSubscribedMessage(async (thread: Thread, message: Message) => {
+  await send(message.text, { thread });
+});
+
+export default channel;
+\`\`\`
+
+See the [Novu adapter documentation](https://chat-sdk.dev/adapters/vendor-official/novu) for supported events, capabilities and credentials.`,
+    configure: `Run \`npx novu connect --runtime chat-sdk\` to authenticate Novu, choose a channel and create the required environment variables. Novu manages provider credentials, identity, delivery and conversation history across its supported channels. See the [Chat SDK channel docs](/docs/channels/chat-sdk) for eve session dispatch, state, streaming and human-in-the-loop behavior.`,
+  },
+  "chat-sdk-liveblocks": {
+    logo: "liveblocks",
+    docsHref: "/docs/channels/chat-sdk",
+    badge: "Provider official",
+    keywords: [
+      "chat sdk",
+      "liveblocks",
+      "comments",
+      "collaboration",
+      "threads",
+      "mentions",
+      "reactions",
+    ],
+    install: `Add this Chat SDK channel from eve's registry. This writes \`agent/channels/liveblocks.ts\` and installs Chat SDK and its adapter dependencies:
+
+\`\`\`bash
+eve add channel/chat-sdk-liveblocks
+\`\`\``,
+    quickStart: `Create \`agent/channels/liveblocks.ts\`:
+
+\`\`\`ts
+// agent/channels/liveblocks.ts
+import { createLiveblocksAdapter } from "@liveblocks/chat-sdk-adapter";
+import { createMemoryState } from "@chat-adapter/state-memory";
+import type { Message, Thread } from "chat";
+import { chatSdkChannel } from "eve/channels/chat-sdk";
+
+export const { bot, channel, send } = chatSdkChannel({
+  userName: "My Agent",
+  adapters: {
+    liveblocks: createLiveblocksAdapter({
+      apiKey: process.env.LIVEBLOCKS_SECRET_KEY!,
+      webhookSecret: process.env.LIVEBLOCKS_WEBHOOK_SECRET!,
+      botUserId: "my-agent",
+      botUserName: "My Agent",
+    }),
+  },
+  state: createMemoryState(),
+});
+
+bot.onNewMention(async (thread: Thread, message: Message) => {
+  await thread.subscribe();
+  await send(message.text, { thread });
+});
+
+bot.onSubscribedMessage(async (thread: Thread, message: Message) => {
+  await send(message.text, { thread });
+});
+
+export default channel;
+\`\`\`
+
+See the [Liveblocks adapter documentation](https://chat-sdk.dev/adapters/vendor-official/liveblocks) for supported events, capabilities and credentials.`,
+    configure: `Create a Liveblocks webhook, set \`LIVEBLOCKS_SECRET_KEY\` and \`LIVEBLOCKS_WEBHOOK_SECRET\` and send comment events to \`/eve/v1/liveblocks\`. The adapter maps rooms to channels, comment threads to threads and comments to messages. See the [Chat SDK channel docs](/docs/channels/chat-sdk) for eve session dispatch, state, streaming and human-in-the-loop behavior.`,
+  },
+  "chat-sdk-linq": {
+    logo: "linq",
+    docsHref: "/docs/channels/chat-sdk",
+    badge: "Provider official",
+    keywords: ["chat sdk", "linq", "imessage", "sms", "apple messages", "tapbacks", "phone"],
+    install: `Add this Chat SDK channel from eve's registry. This writes \`agent/channels/linq.ts\` and installs Chat SDK and its adapter dependencies:
+
+\`\`\`bash
+eve add channel/chat-sdk-linq
+\`\`\``,
+    quickStart: `Create \`agent/channels/linq.ts\`:
+
+\`\`\`ts
+// agent/channels/linq.ts
+import { createLinqAdapter } from "@linqapp/chat-sdk-adapter";
+import { createMemoryState } from "@chat-adapter/state-memory";
+import type { Message, Thread } from "chat";
+import { chatSdkChannel } from "eve/channels/chat-sdk";
+
+export const { bot, channel, send } = chatSdkChannel({
+  userName: "My Agent",
+  adapters: {
+    linq: createLinqAdapter({
+      apiKey: process.env.LINQ_API_KEY!,
+      signingSecret: process.env.LINQ_WEBHOOK_SECRET!,
+    }),
+  },
+  state: createMemoryState(),
+});
+
+bot.onNewMention(async (thread: Thread, message: Message) => {
+  await thread.subscribe();
+  await send(message.text, { thread });
+});
+
+bot.onSubscribedMessage(async (thread: Thread, message: Message) => {
+  await send(message.text, { thread });
+});
+
+export default channel;
+\`\`\`
+
+See the [Linq adapter documentation](https://chat-sdk.dev/adapters/vendor-official/linq) for supported events, capabilities and credentials.`,
+    configure: `Create a Linq account, set \`LINQ_API_KEY\` and \`LINQ_WEBHOOK_SECRET\`, then point its signed webhook at \`/eve/v1/linq\`. Linq supports iMessage and SMS DMs and group chats, media, buffered streaming and tapbacks. See the [Chat SDK channel docs](/docs/channels/chat-sdk) for eve session dispatch, state, streaming and human-in-the-loop behavior.`,
+  },
+  "chat-sdk-kapso": {
+    logo: "kapso",
+    docsHref: "/docs/channels/chat-sdk",
+    badge: "Provider official",
+    keywords: ["chat sdk", "kapso", "whatsapp", "meta", "business", "buttons", "media"],
+    install: `Add this Chat SDK channel from eve's registry. This writes \`agent/channels/kapso.ts\` and installs Chat SDK and its adapter dependencies:
+
+\`\`\`bash
+eve add channel/chat-sdk-kapso
+\`\`\``,
+    quickStart: `Create \`agent/channels/kapso.ts\`:
+
+\`\`\`ts
+// agent/channels/kapso.ts
+import { createKapsoAdapter } from "@kapso/chat-adapter";
+import { createMemoryState } from "@chat-adapter/state-memory";
+import type { Message, Thread } from "chat";
+import { chatSdkChannel } from "eve/channels/chat-sdk";
+
+export const { bot, channel, send } = chatSdkChannel({
+  userName: "My Agent",
+  adapters: {
+    kapso: createKapsoAdapter({
+      kapsoApiKey: process.env.KAPSO_API_KEY!,
+      phoneNumberId: process.env.KAPSO_PHONE_NUMBER_ID!,
+      webhookSecret: process.env.KAPSO_WEBHOOK_SECRET!,
+    }),
+  },
+  state: createMemoryState(),
+});
+
+bot.onNewMention(async (thread: Thread, message: Message) => {
+  await thread.subscribe();
+  await send(message.text, { thread });
+});
+
+bot.onSubscribedMessage(async (thread: Thread, message: Message) => {
+  await send(message.text, { thread });
+});
+
+export default channel;
+\`\`\`
+
+See the [Kapso adapter documentation](https://chat-sdk.dev/adapters/vendor-official/kapso) for supported events, capabilities and credentials.`,
+    configure: `Connect a WhatsApp number in Kapso, set \`KAPSO_API_KEY\`, \`KAPSO_PHONE_NUMBER_ID\` and \`KAPSO_WEBHOOK_SECRET\`, then point the Kapso webhook at \`/eve/v1/kapso\`. Use this provider-managed option when you do not want to integrate directly with the WhatsApp Cloud API. See the [Chat SDK channel docs](/docs/channels/chat-sdk) for eve session dispatch, state, streaming and human-in-the-loop behavior.`,
+  },
+  photon: {
+    logo: "photon",
+    docsHref: "/docs/channels/photon",
+    badge: "First-party",
+    keywords: ["imessage", "apple messages", "photon", "sms", "phone"],
+    install: `Add Photon from eve's registry, then follow the guided project, phone and deployment setup:
+
+\`\`\`bash
+eve add channel/photon-imessage
+\`\`\``,
+    quickStart: `Create \`agent/channels/photon.ts\`:
+
+\`\`\`ts
+import { connectPhotonCredentials } from "@vercel/connect/eve";
+import { photonIMessageChannel } from "eve/channels/photon";
+
+export default photonIMessageChannel({
+  credentials: connectPhotonCredentials("photon/my-agent"),
+});
+\`\`\``,
+    configure: `The guided setup can create a dedicated Photon project or use existing credentials, register your phone and choose Vercel Connect or portable environment credentials. Connect-backed setup creates a native Photon connector and routes verified triggers to \`/eve/v1/photon\`; portable setup registers a signed Photon webhook directly.`,
+  },
+
+  "chat-sdk-dial": {
+    logo: "dial",
+    docsHref: "/docs/channels/chat-sdk",
+    badge: "Provider official",
+    keywords: ["chat sdk", "dial", "sms", "mms", "imessage", "voice", "phone", "calls"],
+    install: `Add this Chat SDK channel from eve's registry. This writes \`agent/channels/dial.ts\` and installs Chat SDK and its adapter dependencies:
+
+\`\`\`bash
+eve add channel/chat-sdk-dial
+\`\`\``,
+    quickStart: `Create \`agent/channels/dial.ts\`:
+
+\`\`\`ts
+// agent/channels/dial.ts
+import { createDialAdapter } from "@getdial/chat-sdk-adapter";
+import { createMemoryState } from "@chat-adapter/state-memory";
+import type { Message, Thread } from "chat";
+import { chatSdkChannel } from "eve/channels/chat-sdk";
+
+export const { bot, channel, send } = chatSdkChannel({
+  userName: "My Agent",
+  adapters: {
+    dial: createDialAdapter({
+      apiKey: process.env.DIAL_API_KEY!,
+      fromNumberId: process.env.DIAL_FROM_NUMBER_ID!,
+      webhookSecret: process.env.DIAL_WEBHOOK_SECRET!,
+    }),
+  },
+  state: createMemoryState(),
+});
+
+bot.onNewMention(async (thread: Thread, message: Message) => {
+  await thread.subscribe();
+  await send(message.text, { thread });
+});
+
+bot.onSubscribedMessage(async (thread: Thread, message: Message) => {
+  await send(message.text, { thread });
+});
+
+export default channel;
+\`\`\`
+
+See the [Dial adapter documentation](https://chat-sdk.dev/adapters/vendor-official/dial) for supported events, capabilities and credentials.`,
+    configure: `Create a Dial number, set \`DIAL_API_KEY\`, \`DIAL_FROM_NUMBER_ID\` and \`DIAL_WEBHOOK_SECRET\`, then point its webhook at \`/eve/v1/dial\`. Dial maps each phone-number pair to a thread and delivers SMS, MMS, iMessage and voice transcripts. See the [Chat SDK channel docs](/docs/channels/chat-sdk) for eve session dispatch, state, streaming and human-in-the-loop behavior.`,
+  },
+  "chat-sdk-agentphone": {
+    logo: "agentphone",
+    docsHref: "/docs/channels/chat-sdk",
+    badge: "Provider official",
+    keywords: ["chat sdk", "agentphone", "sms", "mms", "imessage", "voice", "phone", "calls"],
+    install: `Add this Chat SDK channel from eve's registry. This writes \`agent/channels/agentphone.ts\` and installs Chat SDK and its adapter dependencies:
+
+\`\`\`bash
+eve add channel/chat-sdk-agentphone
+\`\`\``,
+    quickStart: `Create \`agent/channels/agentphone.ts\`:
+
+\`\`\`ts
+// agent/channels/agentphone.ts
+import { createAgentPhoneAdapter } from "@agentphone/chat-sdk-adapter";
+import { createMemoryState } from "@chat-adapter/state-memory";
+import type { Message, Thread } from "chat";
+import { chatSdkChannel } from "eve/channels/chat-sdk";
+
+export const { bot, channel, send } = chatSdkChannel({
+  userName: "My Agent",
+  adapters: {
+    agentphone: createAgentPhoneAdapter({
+      apiKey: process.env.AGENTPHONE_API_KEY!,
+      agentId: process.env.AGENTPHONE_AGENT_ID!,
+      webhookSecret: process.env.AGENTPHONE_WEBHOOK_SECRET!,
+    }),
+  },
+  state: createMemoryState(),
+});
+
+bot.onNewMention(async (thread: Thread, message: Message) => {
+  await thread.subscribe();
+  await send(message.text, { thread });
+});
+
+bot.onSubscribedMessage(async (thread: Thread, message: Message) => {
+  await send(message.text, { thread });
+});
+
+export default channel;
+\`\`\`
+
+See the [AgentPhone adapter documentation](https://chat-sdk.dev/adapters/vendor-official/agentphone) for supported events, capabilities and credentials.`,
+    configure: `Create an AgentPhone agent, set \`AGENTPHONE_API_KEY\`, \`AGENTPHONE_AGENT_ID\` and \`AGENTPHONE_WEBHOOK_SECRET\`, then point its webhook at \`/eve/v1/agentphone\`. The adapter handles SMS, MMS, iMessage and completed voice-call transcripts. See the [Chat SDK channel docs](/docs/channels/chat-sdk) for eve session dispatch, state, streaming and human-in-the-loop behavior.`,
+  },
+  "chat-sdk-lark": {
+    logo: "lark",
+    docsHref: "/docs/channels/chat-sdk",
+    badge: "Provider official",
+    keywords: ["chat sdk", "lark", "feishu", "bytedance", "cardkit", "messaging"],
+    install: `Add this Chat SDK channel from eve's registry. This writes \`agent/channels/lark.ts\` and installs Chat SDK and its adapter dependencies:
+
+\`\`\`bash
+eve add channel/chat-sdk-lark
+\`\`\``,
+    quickStart: `Create \`agent/channels/lark.ts\`:
+
+\`\`\`ts
+// agent/channels/lark.ts
+import { createLarkAdapter } from "@larksuite/vercel-chat-adapter";
+import { createMemoryState } from "@chat-adapter/state-memory";
+import type { Message, Thread } from "chat";
+import { chatSdkChannel } from "eve/channels/chat-sdk";
+
+export const { bot, channel, send } = chatSdkChannel({
+  userName: "My Agent",
+  adapters: {
+    lark: createLarkAdapter(),
+  },
+  state: createMemoryState(),
+});
+
+bot.onNewMention(async (thread: Thread, message: Message) => {
+  await thread.subscribe();
+  await send(message.text, { thread });
+});
+
+bot.onSubscribedMessage(async (thread: Thread, message: Message) => {
+  await send(message.text, { thread });
+});
+
+await bot.initialize();
+
+export default channel;
+\`\`\`
+
+See the [Lark / Feishu adapter documentation](https://chat-sdk.dev/adapters/vendor-official/lark) for all supported events and credentials.`,
+    configure: `Create a Lark or Feishu app and set \`LARK_APP_ID\` and \`LARK_APP_SECRET\`. The adapter uses Lark’s WebSocket long connection rather than an HTTP webhook, so call \`bot.initialize()\` and run eve in a long-lived Node.js process. This is a vendor-official Chat SDK adapter built on the official Lark Node SDK. See the [Chat SDK channel docs](/docs/channels/chat-sdk) for eve session dispatch, state, streaming and human-in-the-loop behavior.`,
+  },
+  "chat-sdk-beeper": {
+    logo: "beeper",
+    docsHref: "/docs/channels/chat-sdk",
+    badge: "Provider official",
+    keywords: ["chat sdk", "matrix", "beeper", "encrypted chat", "e2ee", "signal", "instagram"],
+    install: `Add this Chat SDK channel from eve's registry. This writes \`agent/channels/beeper.ts\` and installs Chat SDK and its adapter dependencies:
+
+\`\`\`bash
+eve add channel/chat-sdk-beeper
+\`\`\``,
+    quickStart: `Create \`agent/channels/matrix.ts\`:
+
+\`\`\`ts
+// agent/channels/matrix.ts
+import { createMatrixAdapter } from "@beeper/chat-adapter-matrix";
+import { createMemoryState } from "@chat-adapter/state-memory";
+import type { Message, Thread } from "chat";
+import { chatSdkChannel } from "eve/channels/chat-sdk";
+
+export const { bot, channel, send } = chatSdkChannel({
+  userName: "My Agent",
+  adapters: {
+    matrix: createMatrixAdapter(),
+  },
+  state: createMemoryState(),
+});
+
+bot.onNewMention(async (thread: Thread, message: Message) => {
+  await thread.subscribe();
+  await send(message.text, { thread });
+});
+
+bot.onSubscribedMessage(async (thread: Thread, message: Message) => {
+  await send(message.text, { thread });
+});
+
+await bot.initialize();
+
+export default channel;
+\`\`\`
+
+See the [Beeper Matrix adapter documentation](https://chat-sdk.dev/adapters/vendor-official/matrix) for all supported events and credentials.`,
+    configure: `Set the Matrix homeserver, access token and bot identity environment variables documented by Beeper. This adapter consumes Matrix sync rather than webhooks, so call \`bot.initialize()\` and run eve in a long-lived Node.js process. It requires Node.js 22 or newer and a durable state adapter in production. See the [Chat SDK channel docs](/docs/channels/chat-sdk) for eve session dispatch, state, streaming and human-in-the-loop behavior.`,
+  },
+  "chat-sdk-resend": {
+    logo: "resend",
+    docsHref: "/docs/channels/chat-sdk",
+    badge: "Provider official",
+    keywords: [
+      "chat sdk",
+      "email",
+      "resend",
+      "inbound email",
+      "transactional email",
+      "attachments",
+    ],
+    install: `Add this Chat SDK channel from eve's registry. This writes \`agent/channels/resend.ts\` and installs Chat SDK and its adapter dependencies:
+
+\`\`\`bash
+eve add channel/chat-sdk-resend
+\`\`\``,
+    quickStart: `Create \`agent/channels/resend.ts\`:
+
+\`\`\`ts
+// agent/channels/resend.ts
+import { createResendAdapter } from "@resend/chat-sdk-adapter";
+import { createMemoryState } from "@chat-adapter/state-memory";
+import type { Message, Thread } from "chat";
+import { chatSdkChannel } from "eve/channels/chat-sdk";
+
+export const { bot, channel, send } = chatSdkChannel({
+  userName: "My Agent",
+  adapters: {
+    resend: createResendAdapter({
+      fromAddress: process.env.RESEND_FROM_ADDRESS!,
+      fromName: "My Agent",
+    }),
+  },
+  state: createMemoryState(),
+});
+
+bot.onNewMention(async (thread: Thread, message: Message) => {
+  await thread.subscribe();
+  await send(message.text, { thread });
+});
+
+bot.onSubscribedMessage(async (thread: Thread, message: Message) => {
+  await send(message.text, { thread });
+});
+
+export default channel;
+\`\`\`
+
+See the [Email (Resend) adapter documentation](https://chat-sdk.dev/adapters/vendor-official/resend) for all supported events and credentials.`,
+    configure: `Verify a sending domain in Resend, set \`RESEND_API_KEY\`, \`RESEND_WEBHOOK_SECRET\` and \`RESEND_FROM_ADDRESS\`, then point the Resend inbound webhook at \`/eve/v1/resend\`. This is a vendor-official Chat SDK adapter. See the [Chat SDK channel docs](/docs/channels/chat-sdk) for eve session dispatch, state, streaming and human-in-the-loop behavior.`,
+  },
+};
+const extensionPresentations: Record<string, ExtensionPresentation> = {
+  browserbase: {
+    logo: "browserbase",
+    docsHref: "https://www.npmjs.com/package/@browserbasehq/eve",
+    keywords: [
+      "browser",
+      "browser automation",
+      "cloud browser",
+      "stagehand",
+      "search",
+      "fetch",
+      "web automation",
+    ],
+    install: `Install the Browserbase extension for eve:
+
+\`\`\`bash
+eve add extension/browserbase
+\`\`\`
+
+The extension requires Node.js 24 or later. A Browserbase API key covers both cloud browser sessions and Stagehand inference through Browserbase Model Gateway, so you do not need a separate model-provider key.`,
+    quickStart: `Add your Browserbase API key to the agent's environment:
+
+\`\`\`bash title=".env.local"
+BROWSERBASE_API_KEY=bb_live_...
+\`\`\`
+
+Then mount the extension under \`agent/extensions/\`:
+
+\`\`\`ts title="agent/extensions/browserbase.ts"
+import browserbase from "@browserbasehq/eve";
+
+export default browserbase({
+  apiKey: process.env.BROWSERBASE_API_KEY!,
+});
+\`\`\`
+
+The filename supplies the \`browserbase\` namespace. The extension adds \`browserbase__search\`, \`browserbase__fetch\` and persistent browser tools for creating sessions, navigating, observing, acting, extracting structured data and running autonomous Stagehand tasks.`,
+    configure: `Use Search → Fetch → browser as an escalation path: search for sources first, fetch straightforward content without starting a session and create a browser only when a page requires JavaScript or interaction.
+
+You can configure the Stagehand model, session timeout and proxies:
+
+\`\`\`ts title="agent/extensions/browserbase.ts"
+import browserbase from "@browserbasehq/eve";
+
+export default browserbase({
+  apiKey: process.env.BROWSERBASE_API_KEY!,
+  model: "openai/gpt-5.4-mini",
+  sessionTimeoutSeconds: 900,
+  proxies: false,
+});
+\`\`\`
+
+Browserbase uses keep-alive sessions and eve's durable per-session state to reconnect across workflow steps and function invocations. Call \`browserbase__stop_session\` when the task finishes to release billable browser time. Keep API keys out of prompts and add approval gates around sensitive or irreversible browser actions. See the [Browserbase extension package](https://www.npmjs.com/package/@browserbasehq/eve) for the complete tool and configuration reference.`,
+  },
+  kernel: {
+    logo: "kernel",
+    docsHref: "https://www.kernel.sh/docs/integrations/vercel/eve-extension",
+    keywords: [
+      "browser",
+      "browser automation",
+      "cloud browser",
+      "playwright",
+      "mcp",
+      "managed auth",
+      "vercel connect",
+    ],
+    install: `Install the Kernel extension for eve:
+
+\`\`\`bash
+eve add extension/kernel
+\`\`\`
+
+The extension requires Node.js 24 or later and eve 0.25 or later. It mounts Kernel's hosted MCP browser tools and a \`browse\` skill without requiring you to maintain browser tool code.`,
+    quickStart: `Create and attach a Kernel connector with [Vercel Connect](https://vercel.com/connect):
+
+\`\`\`bash
+vercel connect create mcp.onkernel.com --name eve-extension
+vercel connect attach mcp.onkernel.com/eve-extension
+\`\`\`
+
+Then mount the extension under \`agent/extensions/\`:
+
+\`\`\`ts title="agent/extensions/kernel.ts"
+import kernel from "@onkernel/eve-extension";
+
+export default kernel({ connect: "mcp.onkernel.com/eve-extension" });
+\`\`\`
+
+The filename supplies the \`kernel\` namespace. The extension adds browser management, Playwright, computer control, managed auth, profiles, proxies and replay tools under \`kernel__browser__*\`, along with the \`browse\` skill.`,
+    configure: `For a personal or single-tenant agent, you can authenticate with a Kernel API key instead. Set \`KERNEL_API_KEY\`, then mount the extension with its default configuration:
+
+\`\`\`ts title="agent/extensions/kernel.ts"
+export { default } from "@onkernel/eve-extension";
+\`\`\`
+
+The default mount can execute JavaScript in the browser VM and reuse authenticated browser sessions. For team or multi-tenant agents, prefer Vercel Connect so each user authenticates separately and add an approval gate by overriding the extension's \`browser\` connection. See the [Kernel eve extension guide](https://www.kernel.sh/docs/integrations/vercel/eve-extension) for API-key configuration, connection overrides, the complete tool list and security guidance.`,
+  },
+  "upstash-agentkit": {
+    logo: "upstash",
+    docsHref: "https://upstash.com/docs/redis/sdks/agentkit/eve",
+    keywords: [
+      "upstash",
+      "agentkit",
+      "redis",
+      "memory",
+      "long-term memory",
+      "chat history",
+      "search",
+      "rag",
+      "full-text search",
+    ],
+    install: `Install the Upstash AgentKit extension for eve:
+
+\`\`\`bash
+eve add extension/upstash-agentkit
+\`\`\`
+
+The extension requires eve 0.25.2 or later. Add an Upstash Redis database's REST credentials to the agent's environment; the default Redis client reads them automatically:
+
+\`\`\`bash title=".env.local"
+UPSTASH_REDIS_REST_URL=https://...
+UPSTASH_REDIS_REST_TOKEN=...
+\`\`\``,
+    quickStart: `Mount the extension under \`agent/extensions/\`:
+
+\`\`\`ts title="agent/extensions/agentkit.ts"
+import agentkit from "@upstash/agentkit-eve-extension";
+
+export default agentkit({});
+\`\`\`
+
+The filename supplies the \`agentkit\` namespace. This minimal mount adds \`agentkit__recall_memory\` and \`agentkit__save_memory\`, plus instructions that teach the model when to use them. By default, memory is isolated by the authenticated principal when available and otherwise by the eve session ID.`,
+    configure: `Two further capabilities are opt-in and they are independent of each other: chat history covers the agent's own past conversations, while search is retrieval over documents you seed into your own Redis Search index.
+
+Enable durable transcript capture with \`chatHistory: true\`. A hook writes every user and assistant message to Redis as the session streams and the model gains \`agentkit__search_chat_history\` to find earlier conversations by what was said and \`agentkit__read_chat_history\` to read one back — so a user can ask about something settled in a previous session. Both tools take \`userId\` from the session rather than from model input, so they only ever reach the current user's own transcripts.
+
+To add RAG over your own data, install \`@upstash/redis\` and provide a Redis Search schema:
+
+\`\`\`bash
+pnpm add @upstash/redis
+\`\`\`
+
+\`\`\`ts title="agent/extensions/agentkit.ts"
+import { s } from "@upstash/redis";
+import agentkit from "@upstash/agentkit-eve-extension";
+
+export default agentkit({
+  chatHistory: true,
+  search: {
+    schema: s.object({
+      title: s.string(),
+      author: s.string().noTokenize(),
+      year: s.number(),
+    }),
+    indexName: "books",
+  },
+});
+\`\`\`
+
+Search configuration adds the dynamic \`agentkit__search\`, \`agentkit__search_aggregate\` and \`agentkit__search_count\` tools over that index, whose documents you write yourself; it is separate from chat history, which keeps its own keyspace and index. Both tool groups resolve at session start, so an unconfigured capability contributes no tools at all.
+
+For multi-tenant agents, set \`userId\` to a stable tenant-scoped value or derive it from the request context and never use a shared constant across tenants. You can also tune memory recall, search limits, chat-history keys and TTL or supply an explicit Redis client. See the [Upstash AgentKit eve extension guide](https://upstash.com/docs/redis/sdks/agentkit/eve) for the complete configuration and override reference.`,
+  },
+  jetty: {
+    logo: "jetty",
+    docsHref: "https://github.com/jettyio/jetty-sdk/tree/main/packages/eve#readme",
+    keywords: [
+      "evals",
+      "evaluation",
+      "grading",
+      "experiments",
+      "observability",
+      "trajectories",
+      "bandit",
+      "a/b testing",
+    ],
+    install: `Install the Jetty extension for eve:
+
+\`\`\`bash
+eve add extension/jetty
+\`\`\`
+
+The extension requires Node.js 24 or later and eve 0.25 or later. It can ingest every completed turn as a durable Jetty trajectory, grade turns inline, steer experiments from their grades and report native \`eve eval\` results.`,
+    quickStart: `Add your Jetty credentials and collection to the agent's environment:
+
+\`\`\`bash title=".env.local"
+JETTY_API_TOKEN=your_token
+JETTY_COLLECTION=your_collection
+\`\`\`
+
+Then mount the extension under \`agent/extensions/\`:
+
+\`\`\`ts title="agent/extensions/jetty.ts"
+import jetty from "@jetty/eve";
+
+export default jetty({
+  collection: process.env.JETTY_COLLECTION ?? "",
+  task: "triage-live",
+  judgeMode: "simple_judge",
+  arms: {
+    warm: "Write a warm, specific response.",
+    terse: "Write a concise, direct response.",
+  },
+});
+\`\`\`
+
+The filename supplies the \`jetty\` namespace. The extension contributes a turn-ingestion hook, dynamic instructions that select an experiment arm and \`jetty__experiment\`, which reports per-arm results and the current leader. Create the \`simple_judge\` task in Jetty before using inline grading; use the default \`ingest\` mode when a separate grader will score trajectories later.`,
+    configure: `The package also includes a reporter for eve's native eval runner:
+
+\`\`\`ts title="evals/evals.config.ts"
+import { Jetty } from "@jetty/eve/reporter";
+import { defineEvalConfig } from "eve/evals";
+
+export default defineEvalConfig({
+  reporters: [Jetty()],
+});
+\`\`\`
+
+The reporter reads \`JETTY_API_TOKEN\` and \`JETTY_COLLECTION\`, sends each eval result to Jetty and warns rather than failing the eval when Jetty is unavailable. The extension no-ops when its collection is empty, so the same agent can run without Jetty credentials.
+
+Jetty trajectories persist agent inputs and outputs. Redact PII before grading, put sensitive grader parameters in Jetty's \`secretParams\` rather than \`initParams\` and treat trajectory storage like any other logging surface. See the [Jetty eve extension documentation](https://github.com/jettyio/jetty-sdk/tree/main/packages/eve#readme) for all experiment settings and the [worked example](https://github.com/jettyio/jetty-sdk/tree/main/examples/eve-jetty) for the complete grading loop.`,
+  },
+  "github-tools": {
+    logo: "github",
+    docsHref: "https://github-tools.com/frameworks/eve#eve-extension",
+    keywords: [
+      "github",
+      "repositories",
+      "pull requests",
+      "issues",
+      "code review",
+      "ci",
+      "vercel connect",
+      "approval",
+    ],
+    install: `Install the GitHub Tools extension and Vercel Connect client:
+
+\`\`\`bash
+eve add extension/github-tools
+\`\`\`
+
+The extension provides the GitHub toolset as a versioned eve package. Use a Vercel Connect connector for short-lived, scoped GitHub tokens or omit \`@vercel/connect\` and authenticate with a GitHub token.`,
+    quickStart: `Create and attach a GitHub connector to the Vercel project that runs your agent:
+
+\`\`\`bash
+vercel link
+vercel connect create github --name my-connector
+vercel connect attach github/my-connector --yes
+vercel env pull
+\`\`\`
+
+Then mount the extension under \`agent/extensions/\`:
+
+\`\`\`ts title="agent/extensions/github.ts"
+import githubExtension from "@github-tools/eve-extension";
+
+export default githubExtension({
+  connector: "github/my-connector",
+  preset: "maintainer",
+  requireApproval: {
+    mergePullRequest: true,
+  },
+});
+\`\`\`
+
+The filename supplies the \`github\` namespace, so tools appear as \`github__listPullRequests\`, \`github__createIssue\` and \`github__addPullRequestComment\`. The preset automatically limits the connector token to the scopes its tools need.`,
+    configure: `Choose one or more presets to limit the available tools: \`code-review\`, \`issue-triage\`, \`repo-explorer\`, \`ci-ops\` or \`maintainer\`. Every write tool requires approval by default, while read tools do not. Use \`requireApproval\` to apply \`always\`, \`once\` or an input-dependent policy to individual tools:
+
+\`\`\`ts title="agent/extensions/github.ts"
+import githubExtension from "@github-tools/eve-extension";
+
+export default githubExtension({
+  connector: "github/my-connector",
+  preset: ["code-review", "issue-triage"],
+  requireApproval: {
+    addPullRequestComment: "once",
+    mergePullRequest: true,
+    createIssue: ({ toolInput }) => toolInput?.owner !== "my-org",
+  },
+});
+\`\`\`
+
+For local or non-Vercel deployments, omit \`connector\` and set \`GITHUB_TOKEN\`; the extension also accepts an explicit \`token\`. Prefer fine-grained credentials, expose only the presets the agent needs and keep approval enabled for writes. See the [GitHub Tools eve documentation](https://github-tools.com/frameworks/eve#eve-extension) for token authentication, per-tool overrides, commit attribution and the complete tool catalog.`,
+  },
+  hindsight: {
+    logo: "hindsight",
+    docsHref: "https://hindsight.vectorize.io/sdks/integrations/eve",
+    keywords: [
+      "memory",
+      "long-term memory",
+      "automatic recall",
+      "retention",
+      "user profile",
+      "context",
+      "Hindsight Cloud",
+      "self-hosted",
+      "Vectorize",
+    ],
+    install: `Install Hindsight memory for eve:
+
+\`\`\`bash
+eve add extension/hindsight
+\`\`\`
+
+This installs \`@vectorize-io/hindsight-eve\` and writes \`agent/instructions/hindsight.ts\` for recall plus \`agent/hooks/hindsight.ts\` for retention. The package requires Node.js 24 or later.`,
+    quickStart: `Create a Hindsight Cloud API key and add it to the agent's environment. The API URL defaults to Hindsight Cloud and the bank defaults to \`default\`:
+
+\`\`\`bash title=".env.local"
+HINDSIGHT_API_KEY=...
+HINDSIGHT_BANK_ID=my-agent
+\`\`\`
+
+The registry creates both capability files:
+
+\`\`\`ts title="agent/instructions/hindsight.ts"
+import { hindsightMemory } from "@vectorize-io/hindsight-eve";
+
+export default hindsightMemory();
+\`\`\`
+
+\`\`\`ts title="agent/hooks/hindsight.ts"
+import { hindsightRetainHook } from "@vectorize-io/hindsight-eve";
+
+export default hindsightRetainHook();
+\`\`\`
+
+Before each turn, the dynamic instructions resolver recalls the user's ambient profile and working context. After the turn, the hook retains the user message and assistant reply. Neither path depends on the model choosing to call a tool.`,
+    configure: `Recall uses a fixed broad query rather than the live user message. Tune the profile context and response budget in the instructions file when needed:
+
+\`\`\`ts title="agent/instructions/hindsight.ts"
+import { hindsightMemory } from "@vectorize-io/hindsight-eve";
+
+export default hindsightMemory({
+  recallQuery: "user preferences, identity, projects and working context",
+  budget: "high",
+  maxTokens: 2048,
+});
+\`\`\`
+
+For a self-hosted server, set \`HINDSIGHT_API_URL\` and pass \`apiKey: null\` to both factories when the server has no authentication. Other shared options include \`bankId\`, \`context\`, \`includeAssistantReply\`, \`timeoutMs\` and \`onError\`.
+
+A bank is one isolated memory store and both files must use the same bank. Do not share the default bank across untrusted users; use separate agent deployments with distinct \`HINDSIGHT_BANK_ID\` values for separate users or tenants. See the [Hindsight eve integration guide](https://hindsight.vectorize.io/sdks/integrations/eve) for Cloud, self-hosted and factory configuration.`,
+  },
+  "agent-browser": {
+    logo: "agent-browser",
+    docsHref:
+      "https://github.com/vercel-labs/agent-browser/tree/main/packages/%40agent-browser/eve",
+    keywords: [
+      "browser",
+      "browser automation",
+      "web automation",
+      "cli",
+      "chrome",
+      "playwright",
+      "puppeteer",
+      "kernel",
+      "browserbase",
+      "browser use",
+    ],
+    install: `Install the agent-browser extension for eve:
+
+\`\`\`bash
+eve add extension/agent-browser
+\`\`\`
+
+The extension installs agent-browser automatically on first use and runs it inside the agent's sandbox. It requires a sandbox backend with real process execution, such as Vercel Sandbox, Docker or microsandbox.`,
+    quickStart: `Mount the extension under \`agent/extensions/\`:
+
+\`\`\`ts title="agent/extensions/browser.ts"
+import browser from "@agent-browser/eve";
+
+export default browser({});
+\`\`\`
+
+The filename supplies the \`browser\` namespace. The extension adds tools such as \`browser__navigate\`, \`browser__snapshot\`, \`browser__click\`, \`browser__fill\`, \`browser__find\` and \`browser__screenshot\`. agent-browser keeps the underlying browser process and session state in the eve sandbox.`,
+    configure: `Restrict browser access to the sites the agent needs with the extension's domain allow-list:
+
+\`\`\`ts title="agent/extensions/browser.ts"
+import browser from "@agent-browser/eve";
+
+export default browser({
+  allowedDomains: ["example.com", "*.example.com"],
+  contentBoundaries: true,
+  maxOutputChars: 50_000,
+});
+\`\`\`
+
+Also configure the [sandbox network policy](/docs/sandbox#network-policy) for defense in depth. Treat saved browser state, cookies, screenshots, downloads and recordings as sensitive data. Do not place passwords or session tokens in prompts. Use the extension's per-tool overrides to gate or disable actions your agent should not take unattended.
+
+The extension also supports inline screenshots, session naming, proxies and production pre-installation. See the [agent-browser eve extension documentation](https://github.com/vercel-labs/agent-browser/tree/main/packages/%40agent-browser/eve) for the complete options and example app.`,
+  },
+};
+
+/**
+ * Connection presentation overlay, keyed by catalog slug. Transport (`mcp`,
+ * `openapi`) and the model-facing description come from `@eve/catalog`;
+ * this carries the docs-only auth modes, optional connector UID and configure
+ * note.
+ */
+const connectionPresentations: Record<string, ConnectionPresentation> = {
+  "browser-use": {
+    logo: "browser-use",
+    docsHref: "https://docs.browser-use.com/cloud/guides/mcp-server",
+    keywords: ["mcp", "browser", "browser automation", "cloud browser", "web automation"],
+    authModes: ["apiKey"],
+    apiKey: {
+      env: "BROWSER_USE_API_KEY",
+      header: "x-browser-use-api-key",
+    },
+    configureNote:
+      "Browser Use runs tasks in managed cloud browsers. Add approval gates or tool filters before allowing unattended browser actions.",
+  },
+  vercel: {
+    logo: "vercel",
+    docsHref: "https://vercel.com/docs/agent-resources/vercel-mcp",
+    keywords: ["mcp", "projects", "deployments", "logs", "oauth", "connect"],
+    authModes: ["user", "app"],
+    connector: "vercel",
+    connectors: { app: "vercel/your-connector" },
+    connectorService: "vercel",
+    connectorServices: { app: "api-key" },
+    configureNotes: {
+      user: "Select None when prompted for a token authentication method. Each user completes OAuth when needed.",
+      app: "Enter a team-scoped [Vercel token](https://vercel.com/kb/guide/how-do-i-use-a-vercel-api-access-token) when prompted, then copy the returned connector UID into the App example. This avoids per-user OAuth, though the Vercel token still belongs to the user who created it.",
+    },
+  },
+  linear: {
+    logo: "linear",
+    docsHref: "/docs/connections/mcp",
+    keywords: ["mcp", "issues", "project management", "oauth", "connect"],
+    authModes: ["user", "app"],
+  },
+  notion: {
+    logo: "notion",
+    docsHref: "/docs/connections",
+    keywords: ["mcp", "openapi", "docs", "wiki", "knowledge base", "connect"],
+    authModes: ["user", "app", "jwtBearer"],
+    configureNote:
+      "The OpenAPI setup sends the required `Notion-Version` header; bump it as Notion ships new API versions.",
+  },
+  datadog: {
+    logo: "datadog",
+    docsHref: "/docs/connections/mcp",
+    keywords: ["mcp", "observability", "metrics", "monitoring", "logs"],
+    authModes: ["jwtBearer"],
+    configureNote:
+      "Match the MCP `url` to your Datadog site (`datadoghq.com`, `datadoghq.eu` and so on).",
+  },
+  honeycomb: {
+    logo: "honeycomb",
+    docsHref: "/docs/connections/mcp",
+    keywords: ["mcp", "observability", "traces", "queries"],
+    authModes: ["jwtBearer"],
+  },
+  airtable: {
+    logo: "airtable",
+    docsHref: "/docs/connections/mcp",
+    keywords: ["mcp", "bases", "tables", "records", "no-code", "oauth", "connect"],
+    authModes: ["user"],
+  },
+  bitly: {
+    logo: "bitly",
+    docsHref: "/docs/connections/mcp",
+    keywords: ["mcp", "links", "qr codes", "analytics", "oauth", "connect"],
+    authModes: ["user"],
+  },
+  brex: {
+    logo: "brex",
+    docsHref: "/docs/connections/mcp",
+    keywords: ["mcp", "finance", "expenses", "cards", "spend", "oauth", "connect"],
+    authModes: ["user"],
+  },
+  candid: {
+    logo: "candid",
+    docsHref: "/docs/connections/mcp",
+    keywords: ["mcp", "nonprofits", "funders", "grants", "research", "oauth", "connect"],
+    authModes: ["user"],
+  },
+  clickhouse: {
+    logo: "clickhouse",
+    docsHref: "/docs/connections/mcp",
+    keywords: ["mcp", "sql", "analytics", "warehouse", "queries", "oauth", "connect"],
+    authModes: ["user"],
+  },
+  cloudinary: {
+    logo: "cloudinary",
+    docsHref: "/docs/connections/mcp",
+    keywords: ["mcp", "images", "videos", "assets", "media", "oauth", "connect"],
+    authModes: ["user"],
+  },
+  coda: {
+    logo: "coda",
+    docsHref: "/docs/connections/mcp",
+    keywords: ["mcp", "docs", "tables", "pages", "oauth", "connect"],
+    authModes: ["user"],
+  },
+  egnyte: {
+    logo: "egnyte",
+    docsHref: "/docs/connections/mcp",
+    keywords: ["mcp", "files", "content", "governance", "oauth", "connect"],
+    authModes: ["user"],
+  },
+  embat: {
+    logo: "embat",
+    docsHref: "/docs/connections/mcp",
+    keywords: ["mcp", "treasury", "cash", "payments", "accounting", "oauth", "connect"],
+    authModes: ["user"],
+  },
+  "hugging-face": {
+    logo: "hugging-face",
+    docsHref: "/docs/connections/mcp",
+    keywords: ["mcp", "models", "datasets", "spaces", "gradio", "ai", "oauth", "connect"],
+    authModes: ["user"],
+  },
+  "local-falcon": {
+    logo: "local-falcon",
+    docsHref: "/docs/connections/mcp",
+    keywords: ["mcp", "local seo", "rankings", "ai visibility", "oauth", "connect"],
+    authModes: ["user"],
+  },
+  make: {
+    logo: "make",
+    docsHref: "/docs/connections/mcp",
+    keywords: ["mcp", "scenarios", "workflows", "automation", "oauth", "connect"],
+    authModes: ["user"],
+  },
+  manufact: {
+    logo: "manufact",
+    docsHref: "/docs/connections/mcp",
+    keywords: ["mcp", "mcp servers", "deploy", "monitor", "oauth", "connect"],
+    authModes: ["user"],
+  },
+  mem0: {
+    logo: "mem0",
+    docsHref: "/docs/connections/mcp",
+    keywords: ["mcp", "memory", "agents", "retrieval", "ai", "oauth", "connect"],
+    authModes: ["user"],
+  },
+  miro: {
+    logo: "miro",
+    docsHref: "/docs/connections/mcp",
+    keywords: ["mcp", "boards", "whiteboard", "diagrams", "oauth", "connect"],
+    authModes: ["user"],
+  },
+  mixpanel: {
+    logo: "mixpanel",
+    docsHref: "/docs/connections/mcp",
+    keywords: ["mcp", "events", "funnels", "insights", "analytics", "oauth", "connect"],
+    authModes: ["user"],
+  },
+  natural: {
+    logo: "natural",
+    docsHref: "/docs/connections/mcp",
+    keywords: ["mcp", "payments", "wallets", "transfers", "oauth", "connect"],
+    authModes: ["user"],
+    configureNote:
+      "Natural moves real money. Add an approval gate or tool filters before allowing unattended payment actions.",
+  },
+  netlify: {
+    logo: "netlify",
+    docsHref: "/docs/connections/mcp",
+    keywords: ["mcp", "deploys", "sites", "hosting", "oauth", "connect"],
+    authModes: ["user"],
+  },
+  oreilly: {
+    logo: "oreilly",
+    docsHref: "/docs/connections/mcp",
+    keywords: ["mcp", "books", "courses", "learning", "oauth", "connect"],
+    authModes: ["user"],
+  },
+  planetscale: {
+    logo: "planetscale",
+    docsHref: "/docs/connections/mcp",
+    keywords: ["mcp", "postgres", "mysql", "databases", "oauth", "connect"],
+    authModes: ["user"],
+  },
+  posthog: {
+    logo: "posthog",
+    docsHref: "/docs/connections/mcp",
+    keywords: ["mcp", "insights", "events", "feature flags", "analytics", "oauth", "connect"],
+    authModes: ["user"],
+  },
+  postman: {
+    logo: "postman",
+    docsHref: "/docs/connections/mcp",
+    keywords: ["mcp", "apis", "collections", "workspaces", "oauth", "connect"],
+    authModes: ["user"],
+  },
+  razorpay: {
+    logo: "razorpay",
+    docsHref: "/docs/connections/mcp",
+    keywords: ["mcp", "payments", "settlements", "oauth", "connect"],
+    authModes: ["user"],
+  },
+  sentry: {
+    logo: "sentry",
+    docsHref: "/docs/connections/mcp",
+    keywords: ["mcp", "errors", "issues", "observability", "oauth", "connect"],
+    authModes: ["user"],
+  },
+  similarweb: {
+    logo: "similarweb",
+    docsHref: "/docs/connections/mcp",
+    keywords: ["mcp", "traffic", "market data", "competitive intelligence", "oauth", "connect"],
+    authModes: ["user"],
+  },
+  stripe: {
+    logo: "stripe",
+    docsHref: "/docs/connections/mcp",
+    keywords: ["mcp", "payments", "billing", "customers", "oauth", "connect"],
+    authModes: ["user"],
+  },
+  supabase: {
+    logo: "supabase",
+    docsHref: "/docs/connections/mcp",
+    keywords: ["mcp", "postgres", "auth", "storage", "oauth", "connect"],
+    authModes: ["user"],
+  },
+  "ticket-tailor": {
+    logo: "ticket-tailor",
+    docsHref: "/docs/connections/mcp",
+    keywords: ["mcp", "tickets", "orders", "events", "oauth", "connect"],
+    authModes: ["user"],
+  },
+  ticktick: {
+    logo: "ticktick",
+    docsHref: "/docs/connections/mcp",
+    keywords: ["mcp", "tasks", "habits", "todo", "oauth", "connect"],
+    authModes: ["user"],
+  },
+  tinybird: {
+    logo: "tinybird",
+    docsHref: "/docs/connections/mcp",
+    keywords: ["mcp", "sql", "analytics", "pipes", "datasources", "queries", "connect"],
+    authModes: ["app"],
+  },
+  todoist: {
+    logo: "todoist",
+    docsHref: "/docs/connections/mcp",
+    keywords: ["mcp", "tasks", "projects", "todo", "oauth", "connect"],
+    authModes: ["user"],
+  },
+  webflow: {
+    logo: "webflow",
+    docsHref: "/docs/connections/mcp",
+    keywords: ["mcp", "cms", "pages", "sites", "oauth", "connect"],
+    authModes: ["user"],
+  },
+  wix: {
+    logo: "wix",
+    docsHref: "/docs/connections/mcp",
+    keywords: ["mcp", "sites", "apps", "cms", "oauth", "connect"],
+    authModes: ["user"],
+  },
+  zapier: {
+    logo: "zapier",
+    docsHref: "/docs/connections/mcp",
+    keywords: ["mcp", "zaps", "workflows", "apps", "automation", "oauth", "connect"],
+    authModes: ["user"],
+  },
+  zomato: {
+    logo: "zomato",
+    docsHref: "/docs/connections/mcp",
+    keywords: ["mcp", "food", "ordering", "delivery", "oauth", "connect"],
+    authModes: ["user"],
+  },
+};
+
+/**
+ * Instrumentation overlay: presentation plus hand-authored setup markdown.
+ * Instrumentation providers use hand-authored setup files, so they follow the
+ * channel shape (markdown) rather than the generated connection shape.
+ */
+type InstrumentationPresentation = ChannelPresentation;
+
+const instrumentationPresentations: Record<string, InstrumentationPresentation> = {
+  braintrust: {
+    logo: "braintrust",
+    docsHref: "/docs/guides/instrumentation",
+    keywords: ["otel", "opentelemetry", "tracing", "observability", "evals", "monitoring"],
+    install: `Add the Braintrust integration from eve's registry:
+
+\`\`\`bash
+eve add instrumentation/braintrust
+\`\`\``,
+
+    quickStart: `eve installs a hook that traces agent activity and an instrumentation file that initializes the Braintrust logger:
+
+\`\`\`ts
+// agent/hooks/braintrust.ts
+import { braintrustEveHook } from "braintrust";
+import { defineState } from "eve/context";
+import { defineHook } from "eve/hooks";
+
+export default defineHook(
+  braintrustEveHook({
+    defineState,
+    metadata: {
+      app: "my-eve-agent", // Replace with your app name
+    },
+  }) as Parameters<typeof defineHook>[0],
+);
+\`\`\`
+
+\`\`\`ts
+// agent/instrumentation.ts
+import { braintrustEveInstrumentation, initLogger } from "braintrust";
+import { defineState } from "eve/context";
+import { defineInstrumentation } from "eve/instrumentation";
+
+export default defineInstrumentation(
+  braintrustEveInstrumentation({
+    defineState,
+    setup: ({ agentName }) => {
+      initLogger({
+        projectName: agentName,
+        apiKey: process.env.BRAINTRUST_API_KEY,
+      });
+    },
+  }) as Parameters<typeof defineInstrumentation>[0],
+);
+\`\`\``,
+    configure: `Create an API key in the Braintrust dashboard and expose it as \`BRAINTRUST_API_KEY\`. Replace the hook's \`app\` metadata with your app name. Spans land in the Braintrust project named after your agent. See the [instrumentation guide](/docs/guides/instrumentation) for the trace hierarchy and the \`recordInputs\`/\`recordOutputs\` controls.`,
+  },
+  "posthog-instrumentation": {
+    logo: "posthog",
+    docsHref: "/docs/guides/instrumentation",
+    keywords: ["otel", "opentelemetry", "tracing", "observability", "generations", "analytics"],
+    install: `Add PostHog AI Observability from eve's registry:
+
+\`\`\`bash
+eve add instrumentation/posthog
+\`\`\``,
+
+    quickStart: `eve installs \`agent/instrumentation.ts\` with PostHog's trace exporter. It also links spans to the user who initiated the session when an authenticated principal is available:
+
+\`\`\`ts
+// agent/instrumentation.ts
+import { trace } from "@opentelemetry/api";
+import { SimpleSpanProcessor } from "@opentelemetry/sdk-trace-base";
+import { PostHogTraceExporter } from "@posthog/ai/otel";
+import { registerOTel } from "@vercel/otel";
+import { defineInstrumentation } from "eve/instrumentation";
+
+export default defineInstrumentation({
+  setup: ({ agentName }) =>
+    registerOTel({
+      serviceName: agentName,
+      spanProcessors: [
+        new SimpleSpanProcessor(
+          new PostHogTraceExporter({
+            projectToken: process.env.POSTHOG_PROJECT_TOKEN!,
+            host: process.env.POSTHOG_HOST,
+          }),
+        ),
+      ],
+    }),
+  events: {
+    "step.started"(input) {
+      const distinctId =
+        input.session.auth.initiator?.principalId ??
+        input.session.auth.current?.principalId;
+
+      if (!distinctId) return undefined;
+
+      trace.getActiveSpan()?.setAttribute("posthog.distinct_id", distinctId);
+      return { runtimeContext: { posthog_distinct_id: distinctId } };
+    },
+  },
+});
+\`\`\``,
+    configure: `Copy your project token and client API host from PostHog's project settings and expose them as \`POSTHOG_PROJECT_TOKEN\` and \`POSTHOG_HOST\`. Remove the \`events\` handler to capture generations anonymously. PostHog groups turns using \`eve.session.id\` and preserves eve's trace hierarchy. See [PostHog's eve installation guide](https://posthog.com/docs/ai-observability/installation/eve) for verification steps and the [instrumentation guide](/docs/guides/instrumentation) for input and output capture controls.`,
+  },
+  "sentry-instrumentation": {
+    logo: "sentry",
+    docsHref: "/docs/guides/instrumentation",
+    keywords: ["otel", "opentelemetry", "tracing", "observability", "otlp", "errors"],
+    install: `Add Sentry instrumentation from eve's registry. Sentry ingests OTLP directly, so no Sentry SDK is required:
+
+\`\`\`bash
+eve add instrumentation/sentry
+\`\`\``,
+
+    quickStart: `Create \`agent/instrumentation.ts\` and point the OTLP exporter at your project's Sentry traces endpoint:
+
+\`\`\`ts
+// agent/instrumentation.ts
+import { defineInstrumentation } from "eve/instrumentation";
+import { OTLPHttpProtoTraceExporter, registerOTel } from "@vercel/otel";
+
+export default defineInstrumentation({
+  setup: ({ agentName }) =>
+    registerOTel({
+      serviceName: agentName,
+      traceExporter: new OTLPHttpProtoTraceExporter({
+        url: process.env.SENTRY_OTLP_TRACES_ENDPOINT!,
+        headers: {
+          "x-sentry-auth": \`sentry sentry_key=\${process.env.SENTRY_PUBLIC_KEY}\`,
+        },
+      }),
+    }),
+});
+\`\`\``,
+    configure: `Copy the OTLP traces endpoint and public key from your Sentry project under **Settings → Client Keys (DSN)** and expose them as environment variables. Sentry's OTLP intake accepts traces only and span events are dropped at ingestion. See the [instrumentation guide](/docs/guides/instrumentation) for the trace hierarchy and the \`recordInputs\`/\`recordOutputs\` controls.`,
+  },
+  "datadog-instrumentation": {
+    logo: "datadog",
+    docsHref: "/docs/guides/instrumentation",
+    keywords: ["otel", "opentelemetry", "tracing", "observability", "apm", "otlp"],
+    install: `Add Datadog instrumentation from eve's registry:
+
+\`\`\`bash
+eve add instrumentation/datadog
+\`\`\``,
+    quickStart: `Create \`agent/instrumentation.ts\` and point the OTLP exporter at Datadog's intake for your site, authenticated with your API key:
+
+\`\`\`ts
+// agent/instrumentation.ts
+import { defineInstrumentation } from "eve/instrumentation";
+import { OTLPHttpProtoTraceExporter, registerOTel } from "@vercel/otel";
+
+export default defineInstrumentation({
+  setup: ({ agentName }) =>
+    registerOTel({
+      serviceName: agentName,
+      traceExporter: new OTLPHttpProtoTraceExporter({
+        url: process.env.DATADOG_OTLP_TRACES_ENDPOINT!,
+        headers: { "dd-api-key": process.env.DD_API_KEY! },
+      }),
+    }),
+});
+\`\`\``,
+    configure: `Datadog's direct OTLP trace intake is site-specific (for example \`datadoghq.com\` vs \`datadoghq.eu\`) and currently in Preview; look up the endpoint for your site in Datadog's OTLP intake docs. For production, Datadog recommends routing through an OpenTelemetry Collector with the Datadog exporter instead. See the [instrumentation guide](/docs/guides/instrumentation) for the trace hierarchy and the \`recordInputs\`/\`recordOutputs\` controls.`,
+  },
+  "honeycomb-instrumentation": {
+    logo: "honeycomb",
+    docsHref: "/docs/guides/instrumentation",
+    keywords: ["otel", "opentelemetry", "tracing", "observability", "queries", "otlp"],
+    install: `Add Honeycomb instrumentation from eve's registry. Honeycomb ingests OTLP directly:
+
+\`\`\`bash
+eve add instrumentation/honeycomb
+\`\`\``,
+
+    quickStart: `Create \`agent/instrumentation.ts\` and send traces to Honeycomb's OTLP endpoint with your ingest key:
+
+\`\`\`ts
+// agent/instrumentation.ts
+import { defineInstrumentation } from "eve/instrumentation";
+import { OTLPHttpProtoTraceExporter, registerOTel } from "@vercel/otel";
+
+export default defineInstrumentation({
+  setup: ({ agentName }) =>
+    registerOTel({
+      serviceName: agentName,
+      traceExporter: new OTLPHttpProtoTraceExporter({
+        url: "https://api.honeycomb.io/v1/traces",
+        headers: { "x-honeycomb-team": process.env.HONEYCOMB_API_KEY! },
+      }),
+    }),
+});
+\`\`\``,
+    configure: `Create an ingest key under your Honeycomb environment settings and expose it as \`HONEYCOMB_API_KEY\`. Spans arrive in a dataset named after your agent (the OTel service name). EU teams use \`https://api.eu1.honeycomb.io/v1/traces\`. See the [instrumentation guide](/docs/guides/instrumentation) for the trace hierarchy and the \`recordInputs\`/\`recordOutputs\` controls.`,
+  },
+  arize: {
+    logo: "arize",
+    docsHref: "/docs/guides/instrumentation",
+    keywords: ["otel", "opentelemetry", "tracing", "llm observability", "evaluation", "otlp"],
+    install: `Add Arize instrumentation from eve's registry. Arize AX ingests OTLP directly:
+
+\`\`\`bash
+eve add instrumentation/arize
+\`\`\``,
+
+    quickStart: `Create \`agent/instrumentation.ts\` and send traces to Arize's OTLP endpoint with your space ID and API key:
+
+\`\`\`ts
+// agent/instrumentation.ts
+import { defineInstrumentation } from "eve/instrumentation";
+import { OTLPHttpProtoTraceExporter, registerOTel } from "@vercel/otel";
+
+export default defineInstrumentation({
+  setup: ({ agentName }) =>
+    registerOTel({
+      serviceName: agentName,
+      attributes: { "openinference.project.name": agentName },
+      traceExporter: new OTLPHttpProtoTraceExporter({
+        url: "https://otlp.arize.com/v1/traces",
+        headers: {
+          space_id: process.env.ARIZE_SPACE_ID!,
+          api_key: process.env.ARIZE_API_KEY!,
+        },
+      }),
+    }),
+});
+\`\`\``,
+    configure: `Copy the space ID and API key from your Arize AX space settings and expose them as \`ARIZE_SPACE_ID\` and \`ARIZE_API_KEY\`. The \`openinference.project.name\` resource attribute routes spans to a project named after your agent. See the [instrumentation guide](/docs/guides/instrumentation) for the trace hierarchy and the \`recordInputs\`/\`recordOutputs\` controls.`,
+  },
+  raindrop: {
+    logo: "raindrop",
+    docsHref: "/docs/guides/instrumentation",
+    keywords: ["otel", "opentelemetry", "tracing", "observability", "ai issues", "otlp"],
+    install: `Add Raindrop instrumentation from eve's registry. Raindrop ingests OTLP directly:
+
+\`\`\`bash
+eve add instrumentation/raindrop
+\`\`\``,
+
+    quickStart: `Create \`agent/instrumentation.ts\` and send traces to Raindrop's OTLP endpoint with your write key:
+
+\`\`\`ts
+// agent/instrumentation.ts
+import { defineInstrumentation } from "eve/instrumentation";
+import { OTLPHttpProtoTraceExporter, registerOTel } from "@vercel/otel";
+
+export default defineInstrumentation({
+  setup: ({ agentName }) =>
+    registerOTel({
+      serviceName: agentName,
+      traceExporter: new OTLPHttpProtoTraceExporter({
+        url: "https://api.raindrop.ai/v1/traces",
+        headers: {
+          Authorization: \`Bearer \${process.env.RAINDROP_WRITE_KEY}\`,
+        },
+      }),
+    }),
+});
+\`\`\``,
+    configure: `Create a write key in the Raindrop dashboard and expose it as \`RAINDROP_WRITE_KEY\`. Raindrop's Vercel AI SDK integration picks up the AI SDK spans eve emits on every turn. See the [instrumentation guide](/docs/guides/instrumentation) for the trace hierarchy and the \`recordInputs\`/\`recordOutputs\` controls.`,
+  },
+  jaeger: {
+    logo: "jaeger",
+    docsHref: "/docs/guides/instrumentation",
+    keywords: ["otel", "opentelemetry", "tracing", "observability", "local", "self-hosted"],
+    install: `Add Jaeger instrumentation from eve's registry:
+
+\`\`\`bash
+eve add instrumentation/jaeger
+\`\`\``,
+    quickStart: `Create \`agent/instrumentation.ts\` and point the OTLP exporter at your Jaeger collector:
+
+\`\`\`ts
+// agent/instrumentation.ts
+import { defineInstrumentation } from "eve/instrumentation";
+import { OTLPHttpProtoTraceExporter, registerOTel } from "@vercel/otel";
+
+export default defineInstrumentation({
+  setup: ({ agentName }) =>
+    registerOTel({
+      serviceName: agentName,
+      traceExporter: new OTLPHttpProtoTraceExporter({
+        url: "http://localhost:4318/v1/traces",
+      }),
+    }),
+});
+\`\`\``,
+    configure: `Run Jaeger locally with Docker and open the UI at \`http://localhost:16686\`:
+
+\`\`\`bash
+docker run --rm -p 16686:16686 -p 4318:4318 jaegertracing/jaeger:latest
+\`\`\`
+
+Point the exporter at your collector's OTLP HTTP endpoint when self-hosting. See the [instrumentation guide](/docs/guides/instrumentation) for the trace hierarchy and the \`recordInputs\`/\`recordOutputs\` controls.`,
+  },
+};
+
+function buildChannel(entry: IntegrationEntry): Integration {
+  const presentation = channelPresentations[entry.slug];
+  if (presentation === undefined) {
+    throw new Error(
+      `Channel "${entry.slug}" is in the catalog gallery but has no docs presentation.`,
+    );
+  }
+  return {
+    slug: entry.slug,
+    name: entry.name,
+    type: "channel",
+    tagline: entry.tagline,
+    logo: presentation.logo,
+    badge: presentation.badge,
+    docsHref: presentation.docsHref,
+    keywords: presentation.keywords,
+    install: presentation.install,
+    quickStart: presentation.quickStart,
+    configure: presentation.configure,
+  };
+}
+
+function buildConnection(entry: IntegrationEntry): Integration {
+  const presentation = connectionPresentations[entry.slug];
+  if (presentation === undefined) {
+    throw new Error(
+      `Connection "${entry.slug}" is in the catalog gallery but has no docs presentation.`,
+    );
+  }
+  if (entry.connection === undefined) {
+    throw new Error(`Catalog connection "${entry.slug}" is missing its connection identity.`);
+  }
+  const identity: ConnectionIdentity = entry.connection;
+  const spec: ConnectionSpec = {
+    authModes: presentation.authModes,
+    description: identity.description,
+  };
+  if (presentation.apiKey !== undefined) spec.apiKey = presentation.apiKey;
+  if (presentation.connector !== undefined) spec.connector = presentation.connector;
+  if (presentation.connectors !== undefined) spec.connectors = presentation.connectors;
+  if (presentation.connectorService !== undefined) {
+    spec.connectorService = presentation.connectorService;
+  }
+  if (presentation.connectorServices !== undefined) {
+    spec.connectorServices = presentation.connectorServices;
+  }
+  if (identity.mcp !== undefined) spec.mcp = identity.mcp;
+  if (identity.openapi !== undefined) spec.openapi = identity.openapi;
+  if (presentation.configureNote !== undefined) spec.configureNote = presentation.configureNote;
+  if (presentation.configureNotes !== undefined) spec.configureNotes = presentation.configureNotes;
+  return {
+    slug: entry.slug,
+    name: entry.name,
+    type: "connection",
+    tagline: entry.tagline,
+    protocols: protocolsForIdentity(identity),
+    logo: presentation.logo,
+    docsHref: presentation.docsHref,
+    keywords: presentation.keywords,
+    connection: spec,
+  };
+}
+
+function buildExtension(entry: IntegrationEntry): Integration {
+  const presentation = extensionPresentations[entry.slug];
+  if (presentation === undefined) {
+    throw new Error(
+      `Extension "${entry.slug}" is in the catalog gallery but has no docs presentation.`,
+    );
+  }
+  return {
+    slug: entry.slug,
+    name: entry.name,
+    type: "extension",
+    tagline: entry.tagline,
+    logo: presentation.logo,
+    docsHref: presentation.docsHref,
+    keywords: presentation.keywords,
+    install: presentation.install,
+    quickStart: presentation.quickStart,
+    configure: presentation.configure,
+  };
+}
+
+function buildInstrumentation(entry: IntegrationEntry): Integration {
+  const presentation = instrumentationPresentations[entry.slug];
+  if (presentation === undefined) {
+    throw new Error(
+      `Instrumentation provider "${entry.slug}" is in the catalog gallery but has no docs presentation.`,
+    );
+  }
+  return {
+    slug: entry.slug,
+    name: entry.name,
+    type: "instrumentation",
+    tagline: entry.tagline,
+    logo: presentation.logo,
+    docsHref: presentation.docsHref,
+    keywords: presentation.keywords,
+    install: presentation.install,
+    quickStart: presentation.quickStart,
+    configure: presentation.configure,
+  };
+}
+
+const channels: Integration[] = channelEntries()
+  .filter((entry) => entry.surfaces.gallery)
+  .map(buildChannel);
+
+const connections: Integration[] = connectionEntries()
+  .filter((entry) => entry.surfaces.gallery)
+  .map(buildConnection);
+
+const extensions: Integration[] = extensionEntries()
+  .filter((entry) => entry.surfaces.gallery)
+  .map(buildExtension);
+
+const instrumentation: Integration[] = instrumentationEntries()
+  .filter((entry) => entry.surfaces.gallery)
+  .map(buildInstrumentation);
+
+/** Display label for each connection protocol. */
+export const protocolLabel: Record<ConnectionProtocol, string> = {
+  mcp: "MCP",
+  openapi: "OpenAPI",
+};
+
+/** Accent badge classes per protocol, readable in light and dark mode. */
+export const protocolBadgeClassName: Record<ConnectionProtocol, string> = {
+  mcp: "bg-blue-100 text-blue-900",
+  openapi: "bg-purple-100 text-purple-900",
+};
+
+/** Display label for each auth mode. */
+export const authModeLabel: Record<AuthMode, string> = {
+  user: "User",
+  app: "App",
+  jwtBearer: "JWT bearer",
+  apiKey: "API key",
+};
+
+export const integrations: Integration[] = [
+  ...channels,
+  ...extensions,
+  ...connections,
+  ...instrumentation,
+];
+
+export const getIntegration = (slug: string): Integration | undefined =>
+  integrations.find((integration) => integration.slug === slug);
+
+export const integrationSlugs = (): string[] => integrations.map((integration) => integration.slug);
