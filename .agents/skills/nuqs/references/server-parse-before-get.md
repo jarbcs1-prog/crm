@@ -73,7 +73,7 @@ export function ResultsHeader() {
 ```tsx
 export default async function SearchPage({ searchParams }: PageProps) {
   const { q, page } = await searchParamsCache.parse(searchParams)
-  // Use q and page directly or let children use get()
+  // Use q and page directly, or let children use get()
 
   return <Results query={q} page={page} />
 }

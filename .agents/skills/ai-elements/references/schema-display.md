@@ -2,7 +2,7 @@
 
 Display REST API endpoint documentation with parameters, request/response bodies.
 
-The `SchemaDisplay` component visualizes REST API endpoints with HTTP methods, paths, parameters and request/response schemas.
+The `SchemaDisplay` component visualizes REST API endpoints with HTTP methods, paths, parameters, and request/response schemas.
 
 See `scripts/schema-display.tsx` for this example.
 

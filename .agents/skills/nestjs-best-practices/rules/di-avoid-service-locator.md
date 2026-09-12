@@ -7,7 +7,7 @@ tags: dependency-injection, anti-patterns, testing
 
 ## Avoid Service Locator Anti-Pattern
 
-Avoid using `ModuleRef.get()` or global containers to resolve dependencies at runtime. This hides dependencies, makes code harder to test and breaks the benefits of dependency injection. Use constructor injection instead.
+Avoid using `ModuleRef.get()` or global containers to resolve dependencies at runtime. This hides dependencies, makes code harder to test, and breaks the benefits of dependency injection. Use constructor injection instead.
 
 **Incorrect (service locator anti-pattern):**
 

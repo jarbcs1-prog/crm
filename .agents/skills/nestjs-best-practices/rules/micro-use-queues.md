@@ -7,7 +7,7 @@ tags: microservices, queues, bullmq, background-jobs
 
 ## Use Message Queues for Background Jobs
 
-Use `@nestjs/bullmq` for background job processing. Queues decouple long-running tasks from HTTP requests, enable retry logic and distribute workload across workers. Use them for emails, file processing, notifications and any task that shouldn't block user requests.
+Use `@nestjs/bullmq` for background job processing. Queues decouple long-running tasks from HTTP requests, enable retry logic, and distribute workload across workers. Use them for emails, file processing, notifications, and any task that shouldn't block user requests.
 
 **Incorrect (long-running tasks in HTTP handlers):**
 

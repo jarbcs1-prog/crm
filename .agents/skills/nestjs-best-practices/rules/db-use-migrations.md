@@ -7,7 +7,7 @@ tags: database, migrations, typeorm, schema
 
 ## Use Database Migrations
 
-Never use `synchronize: true` in production. Use migrations for all schema changes. Migrations provide version control for your database, enable safe rollbacks and ensure consistency across all environments.
+Never use `synchronize: true` in production. Use migrations for all schema changes. Migrations provide version control for your database, enable safe rollbacks, and ensure consistency across all environments.
 
 **Incorrect (using synchronize or manual SQL):**
 
@@ -16,7 +16,7 @@ Never use `synchronize: true` in production. Use migrations for all schema chang
 TypeOrmModule.forRoot({
   type: 'postgres',
   synchronize: true, // DANGEROUS in production!
-  // Can drop columns, tables or data
+  // Can drop columns, tables, or data
 });
 
 // Manual SQL in production

@@ -7,7 +7,7 @@ tags: history, push, replace, navigation, back-button, ux
 
 ## Choose the Right history Mode (push vs replace)
 
-`history: 'replace'` is the default: state updates rewrite the current history entry, so the back button never walks through intermediate values. Reach for `history: 'push'` only when a state change *is* navigation the user should be able to undo (pagination, tabs, modal state). Getting this backwards produces two opposite bugs — a back button that leaves the site or one that is unusable.
+`history: 'replace'` is the default: state updates rewrite the current history entry, so the back button never walks through intermediate values. Reach for `history: 'push'` only when a state change *is* navigation the user should be able to undo (pagination, tabs, modal state). Getting this backwards produces two opposite bugs — a back button that leaves the site, or one that is unusable.
 
 **Use `history: 'push'` for navigation-like state:**
 
@@ -63,6 +63,6 @@ setPage(5)                          // navigation → pushes
 setPage(1, { history: 'replace' })  // "reset to first page" shouldn't spam Back
 ```
 
-The mirror pattern also works: keep the parser on `replace`, mirror the input in local `useState` while typing and `setQuery(input, { history: 'push' })` only on explicit submit.
+The mirror pattern also works: keep the parser on `replace`, mirror the input in local `useState` while typing, and `setQuery(input, { history: 'push' })` only on explicit submit.
 
 Reference: [nuqs History Option](https://nuqs.dev/docs/options)

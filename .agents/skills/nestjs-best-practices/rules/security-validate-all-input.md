@@ -7,7 +7,7 @@ tags: security, validation, dto, pipes
 
 ## Validate All Input with DTOs and Pipes
 
-Always validate incoming data using class-validator decorators on DTOs and the global ValidationPipe. Never trust user input. Validate all request bodies, query parameters and route parameters before processing.
+Always validate incoming data using class-validator decorators on DTOs and the global ValidationPipe. Never trust user input. Validate all request bodies, query parameters, and route parameters before processing.
 
 **Incorrect (trust raw input without validation):**
 
@@ -93,7 +93,7 @@ export class CreateUserDto {
   @MinLength(8)
   @MaxLength(100)
   @Matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/, {
-    message: 'Password must contain uppercase, lowercase and number',
+    message: 'Password must contain uppercase, lowercase, and number',
   })
   password: string;
 }

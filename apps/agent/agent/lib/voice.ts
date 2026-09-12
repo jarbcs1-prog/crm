@@ -1,6 +1,7 @@
-import { CallStatus } from "@crm/db";
-import { mkdirSync } from "node:fs";
 import { spawn } from "node:child_process";
+import { mkdirSync } from "node:fs";
+import { fileURLToPath } from "node:url";
+import { CallStatus } from "@crm/db";
 
 const DEFAULT_BASE_URL = "https://l7api.com/v1.2/voipstudio";
 
@@ -18,7 +19,10 @@ export function voiceApiKey(): string | undefined {
 }
 
 export function voiceBaseUrl(): string {
-	return (process.env.VOIPSTUDIO_BASE_URL?.trim() || DEFAULT_BASE_URL).replace(/\/+$/, "");
+	return (process.env.VOIPSTUDIO_BASE_URL?.trim() || DEFAULT_BASE_URL).replace(
+		/\/+$/,
+		"",
+	);
 }
 
 export function callerId(): string | undefined {
@@ -34,6 +38,22 @@ export function voiceRecordingsDir(): string {
 	return process.env.VOICE_RECORDINGS_DIR?.trim() || "voice-recordings";
 }
 
+export function kokoroCacheDir(): string {
+	return (
+		process.env.KOKORO_TTS_CACHE_DIR?.trim() ||
+		"F:\\.cache\\huggingface\\hub\\models\\Kokoro-82M\\snapshots\\f3ff3571791e39611d31c381e3a41a3af07b4987"
+	);
+}
+
+export function kokoroVoice(): string {
+	return process.env.KOKORO_TTS_VOICE?.trim() || "af_heart";
+}
+
+export function kokoroSpeed(): number {
+	const value = Number.parseFloat(process.env.KOKORO_TTS_SPEED?.trim() ?? "");
+	return Number.isNaN(value) ? 1.0 : value;
+}
+
 export function recordingPath(callId: string, ext = "wav"): string {
 	return `${voiceRecordingsDir()}/${callId}.${ext}`;
 }
@@ -42,7 +62,10 @@ export function isTerminalStatus(status: CallStatus): boolean {
 	return TERMINAL.has(status);
 }
 
-export async function callApi<T>(path: string, options: { method?: string; body?: unknown } = {}): Promise<T | undefined> {
+export async function callApi<T>(
+	path: string,
+	options: { method?: string; body?: unknown } = {},
+): Promise<T | undefined> {
 	const key = voiceApiKey();
 	if (!key) throw new Error("VOIPSTUDIO_API_KEY is not configured.");
 
@@ -50,13 +73,17 @@ export async function callApi<T>(path: string, options: { method?: string; body?
 		method: options.method ?? "GET",
 		headers: {
 			"X-Auth-Token": key,
-			...(options.body === undefined ? {} : { "Content-Type": "application/json" }),
+			...(options.body === undefined
+				? {}
+				: { "Content-Type": "application/json" }),
 		},
 		body: options.body === undefined ? undefined : JSON.stringify(options.body),
 	});
 
 	if (!response.ok) {
-		throw new Error(`VoIPStudio responded with HTTP ${response.status} for ${options.method ?? "GET"} ${path}.`);
+		throw new Error(
+			`VoIPStudio responded with HTTP ${response.status} for ${options.method ?? "GET"} ${path}.`,
+		);
 	}
 
 	const text = await response.text();
@@ -73,7 +100,11 @@ interface CallResponse {
 	data?: { id?: string };
 }
 
-export async function makeCall(input: { to: string; callerId?: string; from?: string }): Promise<{ id: string }> {
+export async function makeCall(input: {
+	to: string;
+	callerId?: string;
+	from?: string;
+}): Promise<{ id: string }> {
 	const made = await callApi<CallResponse>("/calls", {
 		method: "POST",
 		body: input.callerId
@@ -88,7 +119,10 @@ export async function makeCall(input: { to: string; callerId?: string; from?: st
 	return { id };
 }
 
-export async function webcall(input: { from: string; to: string }): Promise<{ id: string }> {
+export async function webcall(input: {
+	from: string;
+	to: string;
+}): Promise<{ id: string }> {
 	const made = await callApi<CallResponse>("/webcalls", {
 		method: "POST",
 		body: { from: input.from, to: input.to },
@@ -99,15 +133,24 @@ export async function webcall(input: { from: string; to: string }): Promise<{ id
 	return { id };
 }
 
-export async function getCall(sipCallId: string): Promise<Record<string, unknown> | undefined> {
-	return callApi<Record<string, unknown>>(`/calls/${encodeURIComponent(sipCallId)}`);
+export async function getCall(
+	sipCallId: string,
+): Promise<Record<string, unknown> | undefined> {
+	return callApi<Record<string, unknown>>(
+		`/calls/${encodeURIComponent(sipCallId)}`,
+	);
 }
 
 export async function hangup(sipCallId: string): Promise<void> {
-	await callApi(`/calls/${encodeURIComponent(sipCallId)}`, { method: "DELETE" });
+	await callApi(`/calls/${encodeURIComponent(sipCallId)}`, {
+		method: "DELETE",
+	});
 }
 
-export async function transfer(sipCallId: string, destination: string): Promise<void> {
+export async function transfer(
+	sipCallId: string,
+	destination: string,
+): Promise<void> {
 	await callApi(`/calls/${encodeURIComponent(sipCallId)}`, {
 		method: "PATCH",
 		body: { dst: destination },
@@ -126,33 +169,64 @@ export interface CallCode {
 	codephrase: string;
 }
 
-export function callCode(status: number | string | null | undefined, code: number | null | undefined): CallCode {
+export function callCode(
+	status: number | string | null | undefined,
+	code: number | null | undefined,
+): CallCode {
 	const tail = typeof status === "string" ? status.trim() : status;
 	const httpStatus =
-		typeof tail === "number" || (typeof tail === "string" && /^\d+$/.test(tail)) ? Number(tail) : 0;
+		typeof tail === "number" || (typeof tail === "string" && /^\d+$/.test(tail))
+			? Number(tail)
+			: 0;
 
 	if (code === 487 || httpStatus === 487) {
-		return { status: CallStatus.NO_ANSWER, codephrase: "The provider reports the call was not answered." };
+		return {
+			status: CallStatus.NO_ANSWER,
+			codephrase: "The provider reports the call was not answered.",
+		};
 	}
 	if (code === 408 || httpStatus === 408) {
-		return { status: CallStatus.FAILED, codephrase: "The provider reports the call timed out before anyone answered." };
+		return {
+			status: CallStatus.FAILED,
+			codephrase:
+				"The provider reports the call timed out before anyone answered.",
+		};
 	}
 	if (httpStatus < 200 && httpStatus > 0) {
-		return { status: CallStatus.RINGING, codephrase: "The line is still ringing; nobody has picked up yet." };
+		return {
+			status: CallStatus.RINGING,
+			codephrase: "The line is still ringing; nobody has picked up yet.",
+		};
 	}
 	if (httpStatus === 200) {
-		return { status: CallStatus.IN_PROGRESS, codephrase: "The call is live; whoever answers will hear the pitch." };
+		return {
+			status: CallStatus.IN_PROGRESS,
+			codephrase: "The call is live; whoever answers will hear the pitch.",
+		};
 	}
 	if (httpStatus < 300 && httpStatus > 0) {
-		return { status: CallStatus.RINGING, codephrase: "The provider is forwarding the call." };
+		return {
+			status: CallStatus.RINGING,
+			codephrase: "The provider is forwarding the call.",
+		};
 	}
 	if (httpStatus >= 500) {
-		return { status: CallStatus.FAILED, codephrase: "The provider reported a server error; the call could not be completed." };
+		return {
+			status: CallStatus.FAILED,
+			codephrase:
+				"The provider reported a server error; the call could not be completed.",
+		};
 	}
-	return { status: CallStatus.FAILED, codephrase: "The provider refused the call." };
+	return {
+		status: CallStatus.FAILED,
+		codephrase: "The provider refused the call.",
+	};
 }
 
-export async function transcribe(input: { data: Blob; mime: string }): Promise<string | null> {
+export async function transcribe(input: {
+	data: Blob;
+	mime: string;
+}): Promise<string | null> {
 	const endpoint = process.env.FASTER_WHISPER_URL?.trim();
 	if (!endpoint) return null;
 
@@ -161,17 +235,22 @@ export async function transcribe(input: { data: Blob; mime: string }): Promise<s
 	form.append("file", input.data, `recording.${ext}`);
 	form.append("response_format", "json");
 
-	const response = await fetch(`${endpoint.replace(/\/+$/, "")}/v1/audio/transcriptions`, {
-		method: "POST",
-		body: form,
-	});
+	const response = await fetch(
+		`${endpoint.replace(/\/+$/, "")}/v1/audio/transcriptions`,
+		{
+			method: "POST",
+			body: form,
+		},
+	);
 
 	if (!response.ok) return null;
 
 	const text = await response.text();
 	try {
 		const parsed = JSON.parse(text) as { text?: unknown };
-		return typeof parsed.text === "string" && parsed.text.length > 0 ? parsed.text : null;
+		return typeof parsed.text === "string" && parsed.text.length > 0
+			? parsed.text
+			: null;
 	} catch {
 		return null;
 	}
@@ -184,15 +263,31 @@ export interface SpeechResult {
 }
 
 export async function synthesizeSpeech(text: string): Promise<SpeechResult> {
-	const voice = process.env.EDGE_TTS_VOICE?.trim() || "en-US-AriaNeural";
-	const path = recordingPath(crypto.randomUUID(), "mp3");
+	const scriptPath = fileURLToPath(
+		new URL("../scripts/kokoro-tts.py", import.meta.url),
+	);
+	const path = recordingPath(crypto.randomUUID(), "wav");
 	mkdirSync(voiceRecordingsDir(), { recursive: true });
 
-	const proc = spawn("edge-tts", ["--voice", voice, "--text", text, "--write-media", path]);
-	const exitCode = await new Promise<number>((resolve) => proc.on("close", resolve));
+	const proc = spawn("python", [
+		scriptPath,
+		"--text",
+		text,
+		"--output",
+		path,
+		"--voice",
+		kokoroVoice(),
+		"--speed",
+		String(kokoroSpeed()),
+		"--cache-dir",
+		kokoroCacheDir(),
+	]);
+	const exitCode = await new Promise<number>((resolve) =>
+		proc.on("close", resolve),
+	);
 
 	if (exitCode !== 0) {
-		return { ok: false, reason: `edge-tts exited with code ${exitCode}.` };
+		return { ok: false, reason: `kokoro-tts exited with code ${exitCode}.` };
 	}
 	return { ok: true, path };
 }

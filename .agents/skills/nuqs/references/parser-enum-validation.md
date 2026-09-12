@@ -7,7 +7,7 @@ tags: parser, parseAsStringEnum, parseAsStringLiteral, validation, security
 
 ## Use Enum Parsers for Constrained Values
 
-When state should only accept specific values (like status, sort direction or view mode), use enum or literal parsers. This prevents invalid values from URL tampering and provides type safety.
+When state should only accept specific values (like status, sort direction, or view mode), use enum or literal parsers. This prevents invalid values from URL tampering and provides type safety.
 
 **Incorrect (accepts any string):**
 

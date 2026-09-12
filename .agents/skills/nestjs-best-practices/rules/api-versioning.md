@@ -7,7 +7,7 @@ tags: api, versioning, breaking-changes, compatibility
 
 ## Use API Versioning for Breaking Changes
 
-Use NestJS built-in versioning when making breaking changes to your API. Choose a versioning strategy (URI, header or media type) and apply it consistently. This allows old clients to continue working while new clients use updated endpoints.
+Use NestJS built-in versioning when making breaking changes to your API. Choose a versioning strategy (URI, header, or media type) and apply it consistently. This allows old clients to continue working while new clients use updated endpoints.
 
 **Incorrect (breaking changes without versioning):**
 

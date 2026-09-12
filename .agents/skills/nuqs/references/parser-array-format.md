@@ -56,6 +56,6 @@ export default function TagFilter() {
 | `parseAsArrayOf` | `?ids=1,2,3` | Compact URLs, numeric IDs, custom backends | All versions |
 | `parseAsNativeArrayOf` | `?tag=a&tag=b` | Standard form encoding, PHP/Rails backends | **v2.7+** (MultiParsers) |
 
-If you're on nuqs < 2.7, use `parseAsArrayOf` with a separator change (e.g. `.withOptions({ ... })`) or upgrade — there is no shim.
+If you're on nuqs < 2.7, use `parseAsArrayOf` with a separator change (e.g., `.withOptions({ ... })`) or upgrade — there is no shim.
 
 Reference: [nuqs Array Parsers](https://nuqs.dev/docs/parsers/built-in)

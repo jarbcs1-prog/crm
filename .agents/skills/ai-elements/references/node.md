@@ -2,7 +2,7 @@
 
 A composable node component for React Flow-based canvases with Card-based styling.
 
-The `Node` component provides a composable, Card-based node for React Flow canvases. It includes support for connection handles, structured layouts and consistent styling using shadcn/ui components.
+The `Node` component provides a composable, Card-based node for React Flow canvases. It includes support for connection handles, structured layouts, and consistent styling using shadcn/ui components.
 
 
 

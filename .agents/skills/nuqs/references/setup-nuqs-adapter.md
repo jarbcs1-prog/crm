@@ -76,6 +76,6 @@ export default function MyApp({ Component, pageProps }: AppProps) {
 - `nuqs/adapters/tanstack-router` — TanStack Router (added v2.5)
 - `nuqs/adapters/testing` — Tests (see `debug-testing`)
 
-The dedicated `react-router/v5` adapter subpath was removed in v2.9 — v5 apps import the unversioned `nuqs/adapters/react-router` (which still aliases v6) or upgrade. That bare alias is itself deprecated and slated for removal in v3, so pin `/v6`, `/v7` or `/v8` explicitly.
+The dedicated `react-router/v5` adapter subpath was removed in v2.9 — v5 apps import the unversioned `nuqs/adapters/react-router` (which still aliases v6) or upgrade. That bare alias is itself deprecated and slated for removal in v3, so pin `/v6`, `/v7`, or `/v8` explicitly.
 
 Reference: [nuqs Adapters](https://nuqs.dev/docs/adapters)

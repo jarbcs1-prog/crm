@@ -2,7 +2,7 @@
 
 Display environment variables with masking and copy functionality.
 
-The `EnvironmentVariables` component displays environment variables with value masking, visibility toggle and copy functionality.
+The `EnvironmentVariables` component displays environment variables with value masking, visibility toggle, and copy functionality.
 
 See `scripts/environment-variables.tsx` for this example.
 

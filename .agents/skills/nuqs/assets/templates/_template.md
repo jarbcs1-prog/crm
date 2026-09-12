@@ -1,7 +1,7 @@
 ---
 title: {Rule Title}
 impact: {CRITICAL|HIGH|MEDIUM-HIGH|MEDIUM|LOW-MEDIUM|LOW}
-impactDescription: {Quantified impact, e.g. "2-10× improvement", "200ms savings"}
+impactDescription: {Quantified impact, e.g., "2-10× improvement", "200ms savings"}
 tags: {prefix}, {technique}, {tool-if-mentioned}, {related-concepts}
 ---
 

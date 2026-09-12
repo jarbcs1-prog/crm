@@ -7,7 +7,7 @@ tags: security, jwt, authentication, tokens
 
 ## Implement Secure JWT Authentication
 
-Use `@nestjs/jwt` with `@nestjs/passport` for authentication. Store secrets securely, use appropriate token lifetimes, implement refresh tokens and validate tokens properly. Never expose sensitive data in JWT payloads.
+Use `@nestjs/jwt` with `@nestjs/passport` for authentication. Store secrets securely, use appropriate token lifetimes, implement refresh tokens, and validate tokens properly. Never expose sensitive data in JWT payloads.
 
 **Incorrect (insecure JWT implementation):**
 

@@ -110,7 +110,7 @@ useEffect(() => {
 
 ## Rules of Hooks
 
-1. Only call hooks at the **top level** (not inside loops, conditions or nested functions)
+1. Only call hooks at the **top level** (not inside loops, conditions, or nested functions)
 2. Only call hooks from **React functions** (components or custom hooks)
 
 Would you like to explore more advanced hooks like \`useCallback\` or \`useMemo\`?`,

@@ -1,11 +1,11 @@
 ---
 name: nuqs
-description: nuqs (type-safe URL query state) best practices for Next.js and other React frameworks. This skill should be used when writing, reviewing or refactoring code that uses nuqs for URL state management. Triggers on tasks involving useQueryState, useQueryStates, search params, URL state, query parameters, nuqs parsers, limitUrlUpdates, Standard Schema, NuqsAdapter or Next.js routing with state.
+description: nuqs (type-safe URL query state) best practices for Next.js and other React frameworks. This skill should be used when writing, reviewing, or refactoring code that uses nuqs for URL state management. Triggers on tasks involving useQueryState, useQueryStates, search params, URL state, query parameters, nuqs parsers, limitUrlUpdates, Standard Schema, NuqsAdapter, or Next.js routing with state.
 ---
 
 # Community nuqs Best Practices for Next.js & React
 
-Comprehensive guide for type-safe URL query state management with nuqs across Next.js, React Router, TanStack Router, Remix and plain React. Covers nuqs v2.5–v2.9 features. Contains 39 rules across 8 categories, prioritized by impact to guide code generation, refactoring and code review.
+Comprehensive guide for type-safe URL query state management with nuqs across Next.js, React Router, TanStack Router, Remix, and plain React. Covers nuqs v2.5–v2.9 features. Contains 39 rules across 8 categories, prioritized by impact to guide code generation, refactoring, and code review.
 
 ## When to Apply
 

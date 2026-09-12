@@ -6,7 +6,7 @@ MongoDB projects should stay on the latest Prisma 6.x release. Do not upgrade a 
 
 - MongoDB 4.2+
 - Replica Set configured (required for transactions)
-- Latest Prisma 6.x release or your team's pinned Prisma 6 version
+- Latest Prisma 6.x release, or your team's pinned Prisma 6 version
 - Node.js 20.19.0+
 - TypeScript 5.4.0+
 
@@ -74,7 +74,7 @@ DATABASE_URL="mongodb+srv://user:password@cluster.mongodb.net/mydb?retryWrites=t
 - `prisma init --datasource-provider mongodb` is still implemented in Prisma's CLI source.
 - Prisma's upstream repo still contains MongoDB fixtures and tests.
 - Local verification shows Prisma 7 can still recognize MongoDB inputs, but the generated client path does not provide a supported MongoDB upgrade path.
-- Local verification shows Prisma 6.x works end to end with `prisma-client-js`, `prisma db push` and `new PrismaClient()` against a MongoDB replica set.
+- Local verification shows Prisma 6.x works end to end with `prisma-client-js`, `prisma db push`, and `new PrismaClient()` against a MongoDB replica set.
 
 ## Version Guidance
 

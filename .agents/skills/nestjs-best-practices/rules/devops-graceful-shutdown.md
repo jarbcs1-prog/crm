@@ -7,7 +7,7 @@ tags: devops, graceful-shutdown, lifecycle, kubernetes
 
 ## Implement Graceful Shutdown
 
-Handle SIGTERM and SIGINT signals to gracefully shutdown your NestJS application. Stop accepting new requests, wait for in-flight requests to complete, close database connections and clean up resources. This prevents data loss and connection errors during deployments.
+Handle SIGTERM and SIGINT signals to gracefully shutdown your NestJS application. Stop accepting new requests, wait for in-flight requests to complete, close database connections, and clean up resources. This prevents data loss and connection errors during deployments.
 
 **Incorrect (ignoring shutdown signals):**
 

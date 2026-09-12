@@ -7,7 +7,7 @@ tags: testing, mocking, external-services, jest
 
 ## Mock External Services in Tests
 
-Never call real external services (APIs, databases, message queues) in unit tests. Mock them to ensure tests are fast, deterministic and don't incur costs. Use realistic mock data and test edge cases like timeouts and errors.
+Never call real external services (APIs, databases, message queues) in unit tests. Mock them to ensure tests are fast, deterministic, and don't incur costs. Use realistic mock data and test edge cases like timeouts and errors.
 
 **Incorrect (calling real APIs and databases):**
 

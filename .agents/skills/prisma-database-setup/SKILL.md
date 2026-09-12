@@ -1,6 +1,10 @@
 ---
 name: prisma-database-setup
-description: Guides for configuring Prisma with different database providers (PostgreSQL, MySQL, SQLite, MongoDB, etc.). Use when setting up a new project, changing databases or troubleshooting connection issues. Triggers on "configure postgres", "connect to mysql", "setup mongodb", "sqlite setup".
+description: Guides for configuring Prisma with different database providers (PostgreSQL, MySQL, SQLite, MongoDB, etc.). Use when setting up a new project, changing databases, or troubleshooting connection issues. Triggers on "configure postgres", "connect to mysql", "setup mongodb", "sqlite setup".
+license: MIT
+metadata:
+  author: prisma
+  version: "7.6.0"
 ---
 
 # Prisma Database Setup
@@ -52,7 +56,7 @@ Your configuration shape depends on the provider and Prisma major version:
 
 1. **All providers** use **`prisma/schema.prisma`**.
 2. **Prisma 7 SQL setups** typically use **`prisma.config.ts`** for datasource URLs.
-3. **MongoDB projects should stay on Prisma 6.x**, keep `url = env("DATABASE_URL")` in the schema and continue using the classic MongoDB setup.
+3. **MongoDB projects should stay on Prisma 6.x**, keep `url = env("DATABASE_URL")` in the schema, and continue using the classic MongoDB setup.
 
 ## Driver Adapters
 

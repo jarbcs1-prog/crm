@@ -7,7 +7,7 @@ tags: architecture, modules, organization
 
 ## Organize by Feature Modules
 
-Organize your application into feature modules that encapsulate related functionality. Each feature module should be self-contained with its own controllers, services, entities and DTOs. Avoid organizing by technical layer (all controllers together, all services together). This enables 3-5x faster onboarding and feature development.
+Organize your application into feature modules that encapsulate related functionality. Each feature module should be self-contained with its own controllers, services, entities, and DTOs. Avoid organizing by technical layer (all controllers together, all services together). This enables 3-5x faster onboarding and feature development.
 
 **Incorrect (technical layer organization):**
 

@@ -2,7 +2,7 @@
 
 Display streaming console output with full ANSI color support.
 
-The `Terminal` component displays console output with ANSI color support, streaming indicators and auto-scroll functionality.
+The `Terminal` component displays console output with ANSI color support, streaming indicators, and auto-scroll functionality.
 
 See `scripts/terminal.tsx` for this example.
 

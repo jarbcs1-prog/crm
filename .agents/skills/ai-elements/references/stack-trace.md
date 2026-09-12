@@ -2,7 +2,7 @@
 
 Displays formatted JavaScript/Node.js error stack traces with syntax highlighting and collapsible frames.
 
-The `StackTrace` component displays formatted JavaScript/Node.js error stack traces with clickable file paths, internal frame dimming and collapsible content.
+The `StackTrace` component displays formatted JavaScript/Node.js error stack traces with clickable file paths, internal frame dimming, and collapsible content.
 
 See `scripts/stack-trace.tsx` for this example.
 
@@ -143,7 +143,7 @@ See `scripts/stack-trace-no-internal.tsx` for this example.
 | `open` | `boolean` | - | Controlled open state. |
 | `defaultOpen` | `boolean` | `false` | Whether the content is expanded by default. |
 | `onOpenChange` | `(open: boolean) => void` | - | Callback when open state changes. |
-| `onFilePathClick` | `(path: string, line?: number, column?: number) => void` | - | Callback when a file path is clicked. Receives the file path, line number and column number. |
+| `onFilePathClick` | `(path: string, line?: number, column?: number) => void` | - | Callback when a file path is clicked. Receives the file path, line number, and column number. |
 | `children` | `React.ReactNode` | - | Child elements (StackTraceHeader, StackTraceContent, etc.). |
 | `className` | `string` | - | Additional CSS classes. |
 | `...props` | `React.HTMLAttributes<HTMLDivElement>` | - | Any other props are spread to the root div. |
@@ -168,7 +168,7 @@ See `scripts/stack-trace-no-internal.tsx` for this example.
 
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
-| `children` | `React.ReactNode` | - | Custom content. Defaults to the parsed error type (e.g.  |
+| `children` | `React.ReactNode` | - | Custom content. Defaults to the parsed error type (e.g.,  |
 | `className` | `string` | - | Additional CSS classes. |
 | `...props` | `React.HTMLAttributes<HTMLSpanElement>` | - | Any other props are spread to the span element. |
 

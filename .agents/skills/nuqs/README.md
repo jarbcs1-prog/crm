@@ -4,7 +4,7 @@ A comprehensive best practices skill for using [nuqs](https://nuqs.dev) - type-s
 
 ## Overview
 
-This skill provides 42 rules across 8 categories to help AI agents and developers write correct, performant and maintainable code when using nuqs for URL state management.
+This skill provides 42 rules across 8 categories to help AI agents and developers write correct, performant, and maintainable code when using nuqs for URL state management.
 
 ## Getting Started
 
@@ -47,7 +47,7 @@ pnpm validate
 ---
 title: Rule Title
 impact: CRITICAL|HIGH|MEDIUM|LOW
-impactDescription: Quantified impact (e.g. "2-10× improvement")
+impactDescription: Quantified impact (e.g., "2-10× improvement")
 tags: prefix, keyword1, keyword2
 ---
 
@@ -70,7 +70,7 @@ Reference: [Link](url)
 
 ## File Naming Convention
 
-- Rule files: `{prefix}-{descriptive-slug}.md` (e.g. `parser-use-typed-parsers.md`)
+- Rule files: `{prefix}-{descriptive-slug}.md` (e.g., `parser-use-typed-parsers.md`)
 - Prefix must match a section defined in `references/_sections.md`
 - Use lowercase with hyphens
 
@@ -78,8 +78,8 @@ Reference: [Link](url)
 
 | Level | Description |
 |-------|-------------|
-| CRITICAL | Causes build failures, runtime errors or major performance issues |
-| HIGH | Significant bugs, performance degradation or maintenance problems |
+| CRITICAL | Causes build failures, runtime errors, or major performance issues |
+| HIGH | Significant bugs, performance degradation, or maintenance problems |
 | MEDIUM | Noticeable issues or suboptimal patterns |
 | LOW-MEDIUM | Minor improvements or edge case handling |
 | LOW | Nice-to-have optimizations or advanced patterns |

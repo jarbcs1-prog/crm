@@ -60,7 +60,7 @@ function App() {
 | Plain React (no router) | `nuqs/adapters/react` | For Vite / CRA apps with no router |
 | Testing | `nuqs/adapters/testing` | See `debug-testing` |
 
-**Deprecation:** The dedicated `react-router/v5` subpath was removed in v2.9 (v5 apps use the unversioned alias or upgrade). The unversioned `nuqs/adapters/react-router` import (which still aliases v6) is itself deprecated and slated for removal in nuqs v3 — always pin `/v6`, `/v7` or `/v8` explicitly.
+**Deprecation:** The dedicated `react-router/v5` subpath was removed in v2.9 (v5 apps use the unversioned alias or upgrade). The unversioned `nuqs/adapters/react-router` import (which still aliases v6) is itself deprecated and slated for removal in nuqs v3 — always pin `/v6`, `/v7`, or `/v8` explicitly.
 
 **Key isolation (v2.5+):** All non-Next.js adapters scope re-renders to the specific URL key a hook subscribes to. Next.js continues to re-render the entire subtree on any URL change because its `URLSearchParams` context is global. If fine-grained re-renders matter and you're not on Next.js, you generally don't need to memoize aggressively. See `perf-avoid-rerender`.
 

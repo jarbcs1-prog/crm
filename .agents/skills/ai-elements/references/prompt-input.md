@@ -1,8 +1,8 @@
 # Prompt Input
 
-Allows a user to send a message with file attachments to a large language model. It includes a textarea, file upload capabilities, a submit button and a dropdown for selecting the model.
+Allows a user to send a message with file attachments to a large language model. It includes a textarea, file upload capabilities, a submit button, and a dropdown for selecting the model.
 
-The `PromptInput` component allows a user to send a message with file attachments to a large language model. It includes a textarea, file upload capabilities, a submit button and a dropdown for selecting the model.
+The `PromptInput` component allows a user to send a message with file attachments to a large language model. It includes a textarea, file upload capabilities, a submit button, and a dropdown for selecting the model.
 
 See `scripts/prompt-input.tsx` for this example.
 
@@ -277,7 +277,7 @@ See `scripts/prompt-input-tooltip.tsx` for this example.
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
 | `onSubmit` | `(message: PromptInputMessage, event: FormEvent) => void` | - | Handler called when the form is submitted with message text and files. |
-| `accept` | `string` | - | File types to accept (e.g.  |
+| `accept` | `string` | - | File types to accept (e.g.,  |
 | `multiple` | `boolean` | - | Whether to allow multiple file selection. |
 | `globalDrop` | `boolean` | - | When true, accepts file drops anywhere on the document. |
 | `syncHiddenInput` | `boolean` | - | Render a hidden input with given name for native form posts. |
@@ -308,7 +308,7 @@ See `scripts/prompt-input-tooltip.tsx` for this example.
 
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
-| `tooltip` | `string | { content: ReactNode; shortcut?: string; side?: ` | - | Optional tooltip to display on hover. Can be a string or an object with content, shortcut and side properties. |
+| `tooltip` | `string | { content: ReactNode; shortcut?: string; side?: ` | - | Optional tooltip to display on hover. Can be a string or an object with content, shortcut, and side properties. |
 | `...props` | `React.ComponentProps<typeof Button>` | - | Any other props are spread to the underlying shadcn/ui Button component. |
 
 #### Tooltip Examples
@@ -375,7 +375,7 @@ See `scripts/prompt-input-tooltip.tsx` for this example.
 
 ### Attachments
 
-Attachment components have been moved to a separate module. See the [Attachment](/components/attachment) component documentation for details on `<Attachments />`, `<Attachment />`, `<AttachmentPreview />`, `<AttachmentInfo />` and `<AttachmentRemove />`.
+Attachment components have been moved to a separate module. See the [Attachment](/components/attachment) component documentation for details on `<Attachments />`, `<Attachment />`, `<AttachmentPreview />`, `<AttachmentInfo />`, and `<AttachmentRemove />`.
 
 ### `<PromptInputActionMenu />`
 

@@ -7,7 +7,7 @@ tags: dependency-injection, tokens, interfaces
 
 ## Use Injection Tokens for Interfaces
 
-TypeScript interfaces are erased at compile time and can't be used as injection tokens. Use string tokens, symbols or abstract classes when you want to inject implementations of interfaces. This enables swapping implementations for testing or different environments.
+TypeScript interfaces are erased at compile time and can't be used as injection tokens. Use string tokens, symbols, or abstract classes when you want to inject implementations of interfaces. This enables swapping implementations for testing or different environments.
 
 **Incorrect (interface can't be used as token):**
 

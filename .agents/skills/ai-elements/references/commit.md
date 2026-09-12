@@ -1,8 +1,8 @@
 # Commit
 
-Display commit information with hash, message, author and file changes.
+Display commit information with hash, message, author, and file changes.
 
-The `Commit` component displays commit details including hash, message, author, timestamp and changed files.
+The `Commit` component displays commit details including hash, message, author, timestamp, and changed files.
 
 See `scripts/commit.tsx` for this example.
 

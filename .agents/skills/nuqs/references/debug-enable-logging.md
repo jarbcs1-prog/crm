@@ -7,7 +7,7 @@ tags: debug, logging, localStorage, troubleshooting, devtools
 
 ## Enable Debug Logging for Troubleshooting
 
-Enable nuqs debug logs to understand state changes, URL updates and timing. Useful for diagnosing issues with state synchronization or unexpected behavior.
+Enable nuqs debug logs to understand state changes, URL updates, and timing. Useful for diagnosing issues with state synchronization or unexpected behavior.
 
 **Incorrect (no visibility into nuqs operations):**
 

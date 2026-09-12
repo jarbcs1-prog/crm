@@ -1,8 +1,8 @@
 # Agent
 
-A composable component for displaying AI agent configuration with model, instructions, tools and output schema.
+A composable component for displaying AI agent configuration with model, instructions, tools, and output schema.
 
-The `Agent` component displays an interface for showing AI agent configuration details. It's designed to represent a configured agent from the AI SDK, showing the agent's model, system instructions, available tools (with expandable input schemas) and output schema.
+The `Agent` component displays an interface for showing AI agent configuration details. It's designed to represent a configured agent from the AI SDK, showing the agent's model, system instructions, available tools (with expandable input schemas), and output schema.
 
 See `scripts/agent.tsx` for this example.
 
@@ -61,7 +61,7 @@ export default function Page() {
       <AgentContent>
         <AgentInstructions>
           Analyze the sentiment of the provided text and return a structured
-          analysis with sentiment classification, confidence score and summary.
+          analysis with sentiment classification, confidence score, and summary.
         </AgentInstructions>
         <AgentTools>
           <AgentTool tool={webSearch} value="web_search" />

@@ -2,7 +2,7 @@
 
 A button component that captures voice input and converts it to text, with cross-browser support.
 
-The `SpeechInput` component provides an easy-to-use interface for capturing voice input in your application. It uses the Web Speech API for real-time transcription in supported browsers (Chrome, Edge) and falls back to MediaRecorder with an external transcription service for browsers that don't support Web Speech API (Firefox, Safari).
+The `SpeechInput` component provides an easy-to-use interface for capturing voice input in your application. It uses the Web Speech API for real-time transcription in supported browsers (Chrome, Edge), and falls back to MediaRecorder with an external transcription service for browsers that don't support Web Speech API (Firefox, Safari).
 
 See `scripts/speech-input.tsx` for this example.
 
@@ -34,7 +34,7 @@ The component extends the shadcn/ui Button component, so all Button props are av
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
 | `onTranscriptionChange` | `(text: string) => void` | - | Callback fired when final transcription text is available. Only fires for completed phrases, not interim results. |
-| `onAudioRecorded` | `(audioBlob: Blob) => Promise<string>` | - | Callback for MediaRecorder fallback. Required for Firefox/Safari support. Receives recorded audio blob and should return transcribed text from an external service (e.g. OpenAI Whisper). |
+| `onAudioRecorded` | `(audioBlob: Blob) => Promise<string>` | - | Callback for MediaRecorder fallback. Required for Firefox/Safari support. Receives recorded audio blob and should return transcribed text from an external service (e.g., OpenAI Whisper). |
 | `lang` | `string` | - | Language for speech recognition. |
 | `...props` | `React.ComponentProps<typeof Button>` | - | Any other props are spread to the Button component, including variant, size, disabled, etc. |
 
@@ -99,7 +99,7 @@ The component provides cross-browser support through a two-tier system:
 | Firefox | MediaRecorder  | `onAudioRecorded` prop |
 | Safari  | MediaRecorder  | `onAudioRecorded` prop |
 
-For full cross-browser support, provide the `onAudioRecorded` callback that sends audio to a transcription service like OpenAI Whisper, Google Cloud Speech-to-Text or AssemblyAI.
+For full cross-browser support, provide the `onAudioRecorded` callback that sends audio to a transcription service like OpenAI Whisper, Google Cloud Speech-to-Text, or AssemblyAI.
 
 ## Accessibility
 

@@ -15,7 +15,7 @@ npx ai-elements@latest add snippet
 ## Features
 
 - Composable architecture with InputGroup
-- Optional prefix text (e.g. `$` for terminal commands)
+- Optional prefix text (e.g., `$` for terminal commands)
 - Built-in copy button
 - Compact design for chat/markdown
 

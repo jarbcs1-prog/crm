@@ -1,8 +1,8 @@
 # Context
 
-A compound component system for displaying AI model context window usage, token consumption and cost estimation.
+A compound component system for displaying AI model context window usage, token consumption, and cost estimation.
 
-The `Context` component provides a comprehensive view of AI model usage through a compound component system. It displays context window utilization, token consumption breakdown (input, output, reasoning, cache) and cost estimation in an interactive hover card interface.
+The `Context` component provides a comprehensive view of AI model usage through a compound component system. It displays context window utilization, token consumption breakdown (input, output, reasoning, cache), and cost estimation in an interactive hover card interface.
 
 See `scripts/context.tsx` for this example.
 
@@ -16,7 +16,7 @@ npx ai-elements@latest add context
 
 - **Compound Component Architecture**: Flexible composition of context display elements
 - **Visual Progress Indicator**: Circular SVG progress ring showing context usage percentage
-- **Token Breakdown**: Detailed view of input, output, reasoning and cached tokens
+- **Token Breakdown**: Detailed view of input, output, reasoning, and cached tokens
 - **Cost Estimation**: Real-time cost calculation using the `tokenlens` library
 - **Intelligent Formatting**: Automatic token count formatting (K, M, B suffixes)
 - **Interactive Hover Card**: Detailed information revealed on hover
@@ -34,7 +34,7 @@ npx ai-elements@latest add context
 | `maxTokens` | `number` | - | The total context window size in tokens. |
 | `usedTokens` | `number` | - | The number of tokens currently used. |
 | `usage` | `LanguageModelUsage` | - | Detailed token usage breakdown from the AI SDK (input, output, reasoning, cached tokens). |
-| `modelId` | `ModelId` | - | Model identifier for cost calculation (e.g.  |
+| `modelId` | `ModelId` | - | Model identifier for cost calculation (e.g.,  |
 | `...props` | `ComponentProps<HoverCard>` | - | Any other props are spread to the HoverCard component. |
 
 ### `<ContextTrigger />`
@@ -98,10 +98,10 @@ The Context component uses a compound component pattern with React Context for d
 
 The component uses `Intl.NumberFormat` with compact notation for automatic formatting:
 
-- Under 1,000: Shows exact count (e.g. "842")
-- 1,000+: Shows with K suffix (e.g. "32K")
-- 1,000,000+: Shows with M suffix (e.g. "1.5M")
-- 1,000,000,000+: Shows with B suffix (e.g. "2.1B")
+- Under 1,000: Shows exact count (e.g., "842")
+- 1,000+: Shows with K suffix (e.g., "32K")
+- 1,000,000+: Shows with M suffix (e.g., "1.5M")
+- 1,000,000,000+: Shows with B suffix (e.g., "2.1B")
 
 ## Cost Calculation
 

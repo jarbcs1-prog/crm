@@ -2,7 +2,7 @@
 
 Display test suite results with pass/fail/skip status and error details.
 
-The `TestResults` component displays test suite results including summary statistics, progress, individual tests and error details.
+The `TestResults` component displays test suite results including summary statistics, progress, individual tests, and error details.
 
 See `scripts/test-results.tsx` for this example.
 

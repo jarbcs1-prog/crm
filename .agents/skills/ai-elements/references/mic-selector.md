@@ -2,7 +2,7 @@
 
 A composable dropdown component for selecting audio input devices with permission handling and device change detection.
 
-The `MicSelector` component provides a flexible and composable interface for selecting microphone input devices. Built on shadcn/ui's Command and Popover components, it features automatic device detection, permission handling, dynamic device list updates and intelligent device name parsing.
+The `MicSelector` component provides a flexible and composable interface for selecting microphone input devices. Built on shadcn/ui's Command and Popover components, it features automatic device detection, permission handling, dynamic device list updates, and intelligent device name parsing.
 
 See `scripts/mic-selector.tsx` for this example.
 
@@ -153,7 +153,7 @@ export default function Example() {
 
 The component implements a two-stage permission approach:
 
-1. **Without Permission**: Initially loads devices without requesting permission. Device labels may show as generic names (e.g. "Microphone 1").
+1. **Without Permission**: Initially loads devices without requesting permission. Device labels may show as generic names (e.g., "Microphone 1").
 2. **With Permission**: When the popover is opened and permission hasn't been granted, automatically requests microphone access and displays actual device names.
 
 ### Device Label Parsing
@@ -171,7 +171,7 @@ The `MicSelectorTrigger` uses a ResizeObserver to track its width and automatica
 
 ### Device Change Detection
 
-The component listens for `devicechange` events (e.g. plugging/unplugging microphones) and automatically updates the device list in real-time.
+The component listens for `devicechange` events (e.g., plugging/unplugging microphones) and automatically updates the device list in real-time.
 
 ## Accessibility
 

@@ -7,7 +7,7 @@ tags: performance, caching, redis, optimization
 
 ## Use Caching Strategically
 
-Implement caching for expensive operations, frequently accessed data and external API calls. Use NestJS CacheModule with appropriate TTLs and cache invalidation strategies. Don't cache everything - focus on high-impact areas.
+Implement caching for expensive operations, frequently accessed data, and external API calls. Use NestJS CacheModule with appropriate TTLs and cache invalidation strategies. Don't cache everything - focus on high-impact areas.
 
 **Incorrect (no caching or caching everything):**
 

@@ -1,6 +1,6 @@
 # Sections
 
-This file defines all sections, their ordering, impact levels and descriptions.
+This file defines all sections, their ordering, impact levels, and descriptions.
 The section ID (in parentheses) is the filename prefix used to group rules.
 
 ---
@@ -8,7 +8,7 @@ The section ID (in parentheses) is the filename prefix used to group rules.
 ## 1. Parser Configuration (parser)
 
 **Impact:** CRITICAL
-**Description:** Incorrect parsers cause type mismatches, runtime errors and hydration failures. Parser selection cascades through the entire state lifecycle.
+**Description:** Incorrect parsers cause type mismatches, runtime errors, and hydration failures. Parser selection cascades through the entire state lifecycle.
 
 ## 2. Adapter & Setup (setup)
 
@@ -18,7 +18,7 @@ The section ID (in parentheses) is the filename prefix used to group rules.
 ## 3. State Management (state)
 
 **Impact:** HIGH
-**Description:** Proper use of useQueryState vs useQueryStates, default values and null handling prevents unnecessary complexity and bugs.
+**Description:** Proper use of useQueryState vs useQueryStates, default values, and null handling prevents unnecessary complexity and bugs.
 
 ## 4. Server Integration (server)
 
@@ -28,7 +28,7 @@ The section ID (in parentheses) is the filename prefix used to group rules.
 ## 5. Performance Optimization (perf)
 
 **Impact:** MEDIUM
-**Description:** Throttling, batching and update coalescing prevent browser rate-limiting and reduce unnecessary URL updates.
+**Description:** Throttling, batching, and update coalescing prevent browser rate-limiting and reduce unnecessary URL updates.
 
 ## 6. History & Navigation (history)
 
@@ -38,7 +38,7 @@ The section ID (in parentheses) is the filename prefix used to group rules.
 ## 7. Debugging & Testing (debug)
 
 **Impact:** LOW-MEDIUM
-**Description:** Debug logging, testing strategies and common error diagnosis enable faster development cycles.
+**Description:** Debug logging, testing strategies, and common error diagnosis enable faster development cycles.
 
 ## 8. Advanced Patterns (advanced)
 

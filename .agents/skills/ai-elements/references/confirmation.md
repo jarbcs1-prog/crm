@@ -1,8 +1,8 @@
 # Confirmation
 
-An alert-based component for managing tool execution approval workflows with request, accept and reject states.
+An alert-based component for managing tool execution approval workflows with request, accept, and reject states.
 
-The `Confirmation` component provides a flexible system for displaying tool approval requests and their outcomes. Perfect for showing users when AI tools require approval before execution and displaying the approval status afterward.
+The `Confirmation` component provides a flexible system for displaying tool approval requests and their outcomes. Perfect for showing users when AI tools require approval before execution, and displaying the approval status afterward.
 
 See `scripts/confirmation.tsx` for this example.
 
@@ -184,7 +184,7 @@ export async function POST(req: Request) {
 
 - Context-based state management for approval workflow
 - Conditional rendering based on approval state
-- Support for approval-requested, approval-responded, output-denied and output-available states
+- Support for approval-requested, approval-responded, output-denied, and output-available states
 - Built on shadcn/ui Alert and Button components
 - TypeScript support with comprehensive type definitions
 - Customizable styling with Tailwind CSS
@@ -218,7 +218,7 @@ See `scripts/confirmation-rejected.tsx` for this example.
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
 | `approval` | `ToolUIPart[` | - | The approval object containing the approval ID and status. If not provided or undefined, the component will not render. |
-| `state` | `ToolUIPart[` | - | The current state of the tool (input-streaming, input-available, approval-requested, approval-responded, output-denied or output-available). Will not render for input-streaming or input-available states. |
+| `state` | `ToolUIPart[` | - | The current state of the tool (input-streaming, input-available, approval-requested, approval-responded, output-denied, or output-available). Will not render for input-streaming or input-available states. |
 | `className` | `string` | - | Additional CSS classes to apply to the Alert component. |
 | `...props` | `React.ComponentProps<typeof Alert>` | - | Any other props are spread to the Alert component. |
 

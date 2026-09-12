@@ -8,7 +8,7 @@ July 2026
 
 ## Abstract
 
-Comprehensive best practices guide for nuqs (type-safe URL query state management) in Next.js and other React frameworks, designed for AI agents and LLMs. Covers nuqs v2.5–v2.9 features including limitUrlUpdates (built-in debounce/throttle), key isolation, Standard Schema integration, defaultOptions on NuqsAdapter (with history added in v2.9), processUrlSearchParams middleware (adapter and createSerializer), the createLoader server utility, the React Router v8 adapter and Next.js 16 cacheComponents compatibility. Contains 39 rules across 8 categories, prioritized by impact from critical (parser configuration, adapter setup) to incremental (advanced patterns). Each rule names the wrong default it corrects, with realistic examples and, where relevant, honest consequence-based impact notes to guide automated refactoring and code generation.
+Comprehensive best practices guide for nuqs (type-safe URL query state management) in Next.js and other React frameworks, designed for AI agents and LLMs. Covers nuqs v2.5–v2.9 features including limitUrlUpdates (built-in debounce/throttle), key isolation, Standard Schema integration, defaultOptions on NuqsAdapter (with history added in v2.9), processUrlSearchParams middleware (adapter and createSerializer), the createLoader server utility, the React Router v8 adapter, and Next.js 16 cacheComponents compatibility. Contains 39 rules across 8 categories, prioritized by impact from critical (parser configuration, adapter setup) to incremental (advanced patterns). Each rule names the wrong default it corrects, with realistic examples and, where relevant, honest consequence-based impact notes to guide automated refactoring and code generation.
 
 ---
 
@@ -33,7 +33,7 @@ Comprehensive best practices guide for nuqs (type-safe URL query state managemen
    - 3.1 [Avoid Derived State from URL Parameters](references/state-avoid-derived.md) — HIGH (prevents sync bugs and unnecessary re-renders)
    - 3.2 [Clear URL Parameters with null](references/state-clear-with-null.md) — HIGH (reduces URL clutter by removing unnecessary parameters)
    - 3.3 [Use Setter Return Value for URL Access](references/state-setter-return.md) — MEDIUM (enables accurate URL tracking for analytics/sharing without re-deriving the URL)
-   - 3.4 [Use Standard Schema for Cross-Library Validation](references/state-standard-schema.md) — MEDIUM (one parser map validates nuqs, tRPC, route validators and forms — no duplicated schema)
+   - 3.4 [Use Standard Schema for Cross-Library Validation](references/state-standard-schema.md) — MEDIUM (one parser map validates nuqs, tRPC, route validators, and forms — no duplicated schema)
    - 3.5 [Use useQueryStates for Related Parameters](references/state-use-query-states.md) — HIGH (gives a single typed object and one combined URLSearchParams flush)
    - 3.6 [Use withOptions for Parser-Level Configuration](references/state-options-inheritance.md) — MEDIUM (reduces boilerplate and ensures consistent behavior)
 4. [Server Integration](references/_sections.md#4-server-integration) — **HIGH**

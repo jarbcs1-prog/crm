@@ -7,7 +7,7 @@ tags: architecture, repository, data-access
 
 ## Use Repository Pattern for Data Access
 
-Create custom repositories to encapsulate complex queries and database logic. This keeps services focused on business logic, makes testing easier with mock repositories and allows changing database implementations without affecting business code.
+Create custom repositories to encapsulate complex queries and database logic. This keeps services focused on business logic, makes testing easier with mock repositories, and allows changing database implementations without affecting business code.
 
 **Incorrect (complex queries in services):**
 

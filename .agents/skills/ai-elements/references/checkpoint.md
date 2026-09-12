@@ -14,7 +14,7 @@ npx ai-elements@latest add checkpoint
 
 ## Features
 
-- Simple flex layout with icon, trigger and separator
+- Simple flex layout with icon, trigger, and separator
 - Visual separator line for clear conversation breaks
 - Clickable restore button for reverting to checkpoint
 - Customizable icon (defaults to BookmarkIcon)

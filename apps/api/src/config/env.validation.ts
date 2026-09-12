@@ -166,6 +166,18 @@ export class EnvironmentVariables {
 	@IsOptional()
 	@IsString()
 	REPLICATE_API_TOKEN?: string;
+
+	@IsOptional()
+	@IsString()
+	KOKORO_TTS_CACHE_DIR?: string;
+
+	@IsOptional()
+	@IsString()
+	KOKORO_TTS_VOICE?: string;
+
+	@IsOptional()
+	@IsString()
+	KOKORO_TTS_SPEED?: string;
 }
 
 export function validateEnv(

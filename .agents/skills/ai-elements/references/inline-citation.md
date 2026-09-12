@@ -165,7 +165,7 @@ export async function POST(req: Request) {
     Include:
     - A comprehensive paragraph with inline citations marked as [1], [2], etc.
     - 2-3 citations with realistic source information
-    - Each citation should have a title, URL and optional description/quote
+    - Each citation should have a title, URL, and optional description/quote
     - Make the content informative and the sources credible
     
     Format citations as numbered references within the text.`,
@@ -179,8 +179,8 @@ export async function POST(req: Request) {
 
 - Hover interaction to reveal detailed citation information
 - **Carousel navigation** for multiple citations with prev/next controls
-- **Live index tracking** showing current slide position (e.g. "1/5")
-- Support for source titles, URLs and descriptions
+- **Live index tracking** showing current slide position (e.g., "1/5")
+- Support for source titles, URLs, and descriptions
 - Optional quote blocks for relevant excerpts
 - Composable architecture for flexible citation formats
 - Accessible design with proper keyboard navigation

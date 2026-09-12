@@ -2,7 +2,7 @@
 
 A React Flow-based canvas component for building interactive node-based interfaces.
 
-The `Canvas` component provides a React Flow-based canvas for building interactive node-based interfaces. It comes pre-configured with sensible defaults for AI applications, including panning, zooming and selection behaviors.
+The `Canvas` component provides a React Flow-based canvas for building interactive node-based interfaces. It comes pre-configured with sensible defaults for AI applications, including panning, zooming, and selection behaviors.
 
 
 
@@ -30,5 +30,5 @@ npx ai-elements@latest add canvas
 
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
-| `children` | `ReactNode` | - | Child components like Background, Controls or MiniMap. |
+| `children` | `ReactNode` | - | Child components like Background, Controls, or MiniMap. |
 | `...props` | `ReactFlowProps` | - | Any other React Flow props like nodes, edges, nodeTypes, edgeTypes, onNodesChange, etc. |

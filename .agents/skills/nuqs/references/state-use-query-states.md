@@ -7,7 +7,7 @@ tags: state, useQueryStates, batching, atomic, related-params
 
 ## Use useQueryStates for Related Parameters
 
-When multiple URL parameters are logically related (coordinates, date ranges, filter sets), prefer `useQueryStates` over a tower of `useQueryState` calls. nuqs already batches sibling setter calls within the same event-loop tick into a single URL flush, so the win isn't "fewer history entries" — it's a single typed state object, a single combined update payload and a single returned `URLSearchParams` you can inspect for the merged result.
+When multiple URL parameters are logically related (coordinates, date ranges, filter sets), prefer `useQueryStates` over a tower of `useQueryState` calls. nuqs already batches sibling setter calls within the same event-loop tick into a single URL flush, so the win isn't "fewer history entries" — it's a single typed state object, a single combined update payload, and a single returned `URLSearchParams` you can inspect for the merged result.
 
 **Incorrect (one hook per parameter):**
 
@@ -68,7 +68,7 @@ setCoords(null)                           // Clear every key in the object
 ```
 
 **When NOT to use this pattern:**
-- Parameters belong to unrelated UI surfaces (e.g. a sidebar filter vs. an unrelated pagination control) — coupling them in one hook causes unnecessary re-renders of components that only need one key.
+- Parameters belong to unrelated UI surfaces (e.g., a sidebar filter vs. an unrelated pagination control) — coupling them in one hook causes unnecessary re-renders of components that only need one key.
 - Non-Next.js adapters (v2.5+) automatically scope re-renders to specific keys when you use `useQueryState`, so splitting into independent hooks can actually be faster for re-render-sensitive trees. See `perf-avoid-rerender`.
 
 Reference: [nuqs Batching](https://nuqs.dev/docs/batching)

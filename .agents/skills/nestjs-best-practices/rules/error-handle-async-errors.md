@@ -7,7 +7,7 @@ tags: error-handling, async, promises
 
 ## Handle Async Errors Properly
 
-NestJS automatically catches errors from async route handlers, but errors from background tasks, event handlers and manually created promises can crash your application. Always handle async errors explicitly and use global handlers as a safety net.
+NestJS automatically catches errors from async route handlers, but errors from background tasks, event handlers, and manually created promises can crash your application. Always handle async errors explicitly and use global handlers as a safety net.
 
 **Incorrect (fire-and-forget without error handling):**
 
