@@ -74,6 +74,41 @@ export function capabilities(): readonly Capability[] {
 			enabled: set("VOIPSTUDIO_API_KEY"),
 		},
 		{
+			env: "DEEPGRAM_API_KEY",
+			label: "Deepgram transcription",
+			gives:
+				"speech-to-text for live calls, so the agent hears what the contact says as it happens",
+			enabled: set("DEEPGRAM_API_KEY"),
+		},
+		{
+			env: "ELEVENLABS_API_KEY",
+			label: "ElevenLabs voices",
+			gives:
+				"natural text-to-speech voices for live outbound calls",
+			enabled: set("ELEVENLABS_API_KEY"),
+		},
+		{
+			env: "CARTESIA_API_KEY",
+			label: "Cartesia voices",
+			gives:
+				"ultra-low-latency text-to-speech, so live call replies start without a pause",
+			enabled: set("CARTESIA_API_KEY"),
+		},
+		{
+			env: "TWILIO_ACCOUNT_SID",
+			label: "Twilio dialing",
+			gives:
+				"outbound PSTN and SIP dialing for live cold calls, with the account SID and auth token set together",
+			enabled: set("TWILIO_ACCOUNT_SID"),
+		},
+		{
+			env: "TELNYX_API_KEY",
+			label: "Telnyx dialing",
+			gives:
+				"SIP trunking for outbound cold calls as an alternative carrier",
+			enabled: set("TELNYX_API_KEY"),
+		},
+		{
 			env: "OLLAMA_BASE_URL",
 			label: "Ollama (local LLM)",
 			gives:
@@ -91,6 +126,12 @@ export function capabilities(): readonly Capability[] {
 			label: "llama.cpp",
 			gives: "a local llama.cpp server, OpenAI-compatible",
 			enabled: set("LLAMA_CPP_BASE_URL"),
+		},
+		{
+			env: "KOBOLD_BASE_URL",
+			label: "KoboldCpp",
+			gives: "a local KoboldCpp server, OpenAI-compatible",
+			enabled: set("KOBOLD_BASE_URL"),
 		},
 		{
 			env: "OPENCODE_API_KEY",
