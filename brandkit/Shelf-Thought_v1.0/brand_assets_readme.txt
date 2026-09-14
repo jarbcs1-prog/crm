@@ -17,4 +17,4 @@ Typography recommendation:
 
 Minimum clear space: keep at least the height of the capital 'S' around the logo.
 Minimum digital width: 180 px for the full horizontal mark; 32 px for the icon.
-Do not stretch, rotate, recolor outside the palette, add effects, or place the full-color mark on busy imagery.
+Do not stretch, rotate, recolor outside the palette, add effects or place the full-color mark on busy imagery.
