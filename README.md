@@ -257,6 +257,67 @@ Scope any of them with a Turborepo filter: `bun run dev --filter=api`.
 
 Because Google is the only door, there is no way to get a session from a terminal — `dev:session` writes the rows Better Auth would have written and prints the cookie it would have set. It refuses to run with `NODE_ENV=production`.
 
+## Telegram Bot
+
+The CRM can send notifications to a Telegram channel. Set up requires three environment variables and a one-time webhook registration.
+
+### Prerequisites
+
+- A Telegram account and a bot token from [@BotFather](https://t.me/BotFather)
+- Your Telegram user ID (numeric) — get it from [@userinfobot](https://t.me/userinfobot)
+
+### Configuration
+
+Add these to `.env`:
+
+```env
+TELEGRAM_BOT_TOKEN="your-bot-token-from-botfather"
+TELEGRAM_USERID=123456789
+TELEGRAM_HOME_CHANNEL=123456789
+```
+
+The bot sends to `TELEGRAM_HOME_CHANNEL` by default. Override per-message by passing a `chatId`.
+
+### Setting the webhook
+
+The agent exposes `POST /internal/telegram/webhook`. Telegram must reach it over HTTPS.
+
+**Local development — using localtunnel:**
+
+```bash
+# Terminal 1: expose localhost:3001
+npx localtunnel --port 3001
+# Output: your url is: https://abc123.loca.lt
+
+# Terminal 2: register the webhook
+curl -X POST "https://api.telegram.org/bot<TELEGRAM_BOT_TOKEN>/setWebhook" \
+  -d "url=https://abc123.loca.lt/internal/telegram/webhook"
+```
+
+Verify it's live:
+```bash
+curl "https://api.telegram.org/bot<TELEGRAM_BOT_TOKEN>/getWebhookInfo"
+```
+
+**Production — deploy to any HTTPS host:**
+
+```bash
+curl -X POST "https://api.telegram.org/bot<TELEGRAM_BOT_TOKEN>/setWebhook" \
+  -d "url=https://your-api-host/internal/telegram/webhook"
+```
+
+**Tear down the webhook:**
+```bash
+curl -X POST "https://api.telegram.org/bot<TELEGRAM_BOT_TOKEN>/setWebhook" -d "url="
+```
+
+### How it works
+
+1. Telegram sends POST requests to `/internal/telegram/webhook`
+2. The `isAuthorized` check verifies the request came from Telegram by matching `chat_id` against `TELEGRAM_USERID`
+3. The `drain` pipeline dispatches the message to the configured channel
+4. The agent processes inbound messages and responds via `sendTelegramMessage`
+
 ## Deploying
 
 Three deployments and a Postgres: the Next.js app, the NestJS API and the agent. They are independent and the only thing they must agree on is `DATABASE_URL` and `BETTER_AUTH_SECRET` — the API mints the session cookie and the app verifies it, so a mismatch is a redirect loop rather than an error.

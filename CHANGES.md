@@ -310,12 +310,22 @@ Added Telegram bot channel infrastructure to the research agent, enabling the ag
 - `.gitignore` — Added `.opencode/goals/` to ignore session state files
 
 **Configuration:**
-- Set `TELEGRAM_BOT_TOKEN` in `.env` to enable Telegram notifications
+- Set `TELEGRAM_BOT_TOKEN`, `TELEGRAM_USERID`, `TELEGRAM_HOME_CHANNEL` in `.env` to enable Telegram notifications
 - The channel receives webhooks at `POST /internal/telegram/webhook`
 - Messages are dispatched through the existing `drainAll` pipeline
 
+**Setting up the Telegram webhook:**
+
+1. Get a bot token from [@BotFather](https://t.me/BotFather) and your numeric user ID from [@userinfobot](https://t.me/userinfobot)
+2. Add `TELEGRAM_BOT_TOKEN`, `TELEGRAM_USERID`, `TELEGRAM_HOME_CHANNEL` to `.env`
+3. Expose your API over HTTPS locally using `npx localtunnel --port 3001`
+4. Register the webhook: `curl -X POST "https://api.telegram.org/bot<TOKEN>/setWebhook" -d "url=https://<LOCALTUNNEL_URL>/internal/telegram/webhook"`
+5. Verify: `curl "https://api.telegram.org/bot<TOKEN>/getWebhookInfo"`
+6. To remove: `curl -X POST "https://api.telegram.org/bot<TOKEN>/setWebhook" -d "url="`
+
 ### Verification
-- `bun test`: 202 pass, 8 fail (pre-existing database-related failures)
+- `bun test`: 204 pass, 9 fail (pre-existing database-related failures in `claimDue`, `dispatch lanes`, `retireExhausted`)
 - `bun run build` (agent): ✓ Compiled successfully
 - `bun run build` (app): ✓ Compiled successfully
 - `bun run check-types`: ✓ Passes for agent, app, and api packages
+- `bun test test/telegram-message.spec.ts`: 4/4 pass
