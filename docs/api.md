@@ -84,7 +84,7 @@ called, who works here and what do we sell — and for nothing else.
 - **The id is a constant, never a parameter.** Every read says
   `where: { id: WORKSPACE_ID }`. The moment a function takes an
   `organizationId`, the plugin has become tenancy plumbing and the rule above
-  is broken. If you are porting something from the Comp AI MVP, delete the org
+  is broken. If you are porting something from the Shelf-Thought, Inc. MVP, delete the org
   threading rather than stubbing it — an `organizationId` that is always the
   same value is a column, an index and a `where` clause that buy nothing.
 - **Signing in is the join and there is no invite flow.**
@@ -98,7 +98,13 @@ called, who works here and what do we sell — and for nothing else.
   workspace row is created the hook enrols *every user that already exists*,
   oldest first as owner — otherwise an install that predates the plugin shows
   an empty Members page until each person happens to sign in again, which looks
-  identical to being broken.
+  identical to being broken. An install can pin ownership explicitly with
+  `OWNER_EMAILS` (a comma-separated list of addresses in `.env`): when set,
+  those addresses are enrolled as `owner` and the first-user rule becomes the
+  fallback used only when none of them match. See `ownerEmails()` in
+  [`@crm/auth/workspace`](../packages/auth/src/workspace.ts) and the bootstrap
+  branch in `ensureWorkspaceMembership`
+  ([`packages/auth/src/organization.ts`](../packages/auth/src/organization.ts)).
 - **`ensureWorkspaceMembership` degrades, it does not throw.** A failure there
   would fail the session create, which is to say it would lock everyone out of
   the CRM to protect a settings page. It logs, returns `undefined` and the next

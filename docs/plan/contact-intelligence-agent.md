@@ -390,10 +390,10 @@ Above Details, because it is what the sheet is *for*:
 ```
 BACKGROUND                                            refreshed 2 days ago
 
-Lewis Carhart is the CEO and co-founder of Comp AI. He previously led
+Lewis Carhart is the CEO and co-founder of Shelf-Thought, Inc.. He previously led
 growth at Fleetio and spent four years at Deloitte in risk advisory.
 
-Current role    CEO & Co-founder · Comp AI · 2 yrs 3 mos
+Current role    CEO & Co-founder · Shelf-Thought, Inc. · 2 yrs 3 mos
 Previously      Head of Growth, Fleetio · Risk Advisory, Deloitte
 Seniority       Founder / C-level          Function   Executive
 Based           London, UK

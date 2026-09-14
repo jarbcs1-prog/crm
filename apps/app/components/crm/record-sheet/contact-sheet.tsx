@@ -44,6 +44,7 @@ import { OwnerCell } from "@/components/crm/owner-cell";
 import { ContactSocials, hasContactLinks } from "@/components/crm/social-links";
 import { DealStageMenu } from "@/components/crm/stage-change";
 import { Timeline } from "@/components/crm/timeline/timeline";
+import { VerificationIndicator } from "@/components/crm/verification-status";
 import {
 	DetailSheetBody,
 	DetailSheetEmpty,
@@ -151,6 +152,10 @@ export function ContactSheet({ contactId }: { contactId: string }) {
 								label={`Primary contact at ${contact.company?.name ?? "this company"}`}
 							/>
 						) : null}
+						{contact.verificationStatus === "VERIFYING" ||
+						contact.verificationStatus === "NEEDS_HUMAN" ? (
+							<VerificationIndicator status={contact.verificationStatus} />
+						) : null}
 						{contact.enrichmentStatus !== "COMPLETE" ? (
 							<EnrichmentIndicator
 								status={contact.enrichmentStatus}
@@ -236,6 +241,23 @@ export function ContactSheet({ contactId }: { contactId: string }) {
 						</DetailSheetStat>
 						<DetailSheetStat label="Owner">
 							<OwnerCell owner={contact.owner} />
+						</DetailSheetStat>
+						<DetailSheetStat label="Verification">
+							<span className="flex min-w-0 flex-col gap-1">
+								<VerificationIndicator
+									status={contact.verificationStatus}
+									title={
+										contact.lastVerifiedAt
+											? `Last verified ${dateFormat.format(new Date(contact.lastVerifiedAt))}`
+											: "Never verified"
+									}
+								/>
+								<span className="truncate text-muted-foreground text-xs">
+									{contact.lastVerifiedAt
+										? dateFormat.format(new Date(contact.lastVerifiedAt))
+										: "Never verified"}
+								</span>
+							</span>
 						</DetailSheetStat>
 					</DetailSheetStats>
 				) : null

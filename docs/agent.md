@@ -331,6 +331,11 @@ Adding a fact field means adding it to `FIELDS` in `lib/facts.ts` **and** to
 `FACT_COLUMNS` in `apps/api/src/contacts/contacts.service.ts`, which is where an
 accepted proposal writes through.
 
+> **Sensitive fields are intentionally non-writable:** `email` and `phone` are not in
+> `FACT_COLUMNS` (`column: null` in `facts.ts`) and the agent may only propose them
+> via the `preamble.ts:322` policy, never write them directly. See `facts.ts` for the
+> deliberate design — adding `email` to `FACT_COLUMNS` would bypass it.
+
 ## Optional by default
 
 Every outside source is optional and the agent is designed to run with none.
