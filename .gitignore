@@ -41,3 +41,6 @@ yarn-error.log*
 # eve build output
 .eve
 .output
+
+# OpenCode session state
+.opencode/goals/
