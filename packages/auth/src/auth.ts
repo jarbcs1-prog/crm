@@ -4,7 +4,7 @@ import { type BetterAuthOptions, betterAuth } from "better-auth";
 import { prismaAdapter } from "better-auth/adapters/prisma";
 import { APIError } from "better-auth/api";
 import { organization } from "better-auth/plugins/organization";
-import { env } from "./env";
+import { env, apiUrl } from "./env";
 import { ensureWorkspaceMembership } from "./organization";
 import { SYNC_SCOPES } from "./scopes";
 import { notifySignedIn } from "./signed-in";
@@ -30,6 +30,7 @@ if (env.google) {
 
 export const auth = betterAuth({
 	appName: "CRM",
+	baseURL: apiUrl,
 
 	database: prismaAdapter(db, {
 		provider: "postgresql",
@@ -126,6 +127,18 @@ export const auth = betterAuth({
 		session: {
 			create: {
 				before: async (session) => {
+					if (hasSignInAllowList()) {
+						const user = await db.user.findUnique({
+							where: { id: session.userId },
+							select: { email: true },
+						});
+						if (!isWorkspaceEmail(user?.email)) {
+							throw new APIError("FORBIDDEN", {
+								message: "That account is no longer allowed in this workspace.",
+							});
+						}
+					}
+
 					const workspaceId = await ensureWorkspaceMembership(session.userId);
 
 					return {

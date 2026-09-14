@@ -493,7 +493,7 @@ async function seedDeals(
 					id,
 					name:
 						n === 0
-							? `${company.name} — Comp AI`
+							? `${company.name} — Shelf-Thought, Inc.`
 							: `${company.name} — expansion`,
 					companyId: company.id,
 					ownerId,

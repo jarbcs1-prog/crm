@@ -1,0 +1,53 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: crm
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    env:
+      DATABASE_URL: postgresql://postgres:postgres@localhost:5432/crm?schema=public
+      BETTER_AUTH_SECRET: ci-secret-at-least-32-characters-long
+      ALLOWED_SIGN_IN: example.com
+      TEST_RUN_ID: ci-${{ github.run_id }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: 1.4.2
+
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+
+      - name: Apply migrations
+        run: bun run db:deploy
+
+      - name: Type check
+        run: bun run check-types
+
+      - name: Lint
+        run: bun run lint
+
+      - name: Test
+        run: bun run test

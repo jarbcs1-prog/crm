@@ -1,7 +1,0 @@
-.env*.local
-node_modules
-.eve
-.next
-.output
-.nitro
-dist

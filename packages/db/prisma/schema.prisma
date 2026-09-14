@@ -152,6 +152,7 @@ model Company {
 
   industry    String?
   subIndustry String?
+  streetAddress String?
   city        String?
   stateCode   String?
   country     String?
@@ -217,7 +218,16 @@ model Contact {
   githubUrl   String?
   imageUrl    String?
 
+  streetAddress String?
+  city          String?
+  stateCode     String?
+  country       String?
+  countryCode   String?
+
   socialsCheckedAt DateTime?
+
+  verificationStatus ContactVerificationStatus @default(UNVERIFIED)
+  lastVerifiedAt     DateTime?
 
   enrichmentStatus EnrichmentStatus @default(PENDING)
   enrichedAt       DateTime?
@@ -225,6 +235,7 @@ model Contact {
 
   brief         ContactBrief?
   facts         ContactFact[]
+  methods       ContactMethod[]
   conversations AgentConversation[]
 
   companyId String?
@@ -257,6 +268,49 @@ enum FactBand {
   VERIFIED
   PROBABLE
   POSSIBLE
+}
+
+enum ContactVerificationStatus {
+  UNVERIFIED
+  VERIFYING
+  NEEDS_HUMAN
+  VERIFIED
+}
+
+enum ContactMethodKind {
+  PHONE
+  EMAIL
+}
+
+model ContactMethod {
+  id        String            @id @default(cuid())
+  contactId String
+  contact   Contact           @relation(fields: [contactId], references: [id], onDelete: Cascade)
+  kind      ContactMethodKind
+  label     String?
+  value     String
+
+  @@unique([contactId, kind, value])
+  @@map("contactMethod")
+}
+
+enum LegacyImportModel {
+  Contact
+  Company
+  ContactMethod
+  Activity
+}
+
+model LegacyImportMapping {
+  id          String            @id @default(cuid())
+  legacyTable String
+  legacyId    String
+  model       LegacyImportModel
+  crmId       String
+  createdAt   DateTime          @default(now())
+
+  @@unique([legacyTable, legacyId])
+  @@map("legacyImportMapping")
 }
 
 enum FactStatus {

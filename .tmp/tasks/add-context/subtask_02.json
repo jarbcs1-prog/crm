@@ -1,0 +1,45 @@
+{
+  "id": "add-context-02",
+  "seq": "02",
+  "title": "Draft apps/agent/agent/commands/add-context.md following the 6-question wizard spec",
+  "status": "completed",
+  "agent_id": "coder-agent",
+  "started_at": "2026-09-12T00:00:00Z",
+  "completed_at": "2026-09-12T00:00:00Z",
+  "completion_summary": "Drafted /add-context agent command with 6-question wizard, location resolution, external context detection, generation rules, and validation flow",
+  "depends_on": ["01"],
+  "parallel": false,
+  "suggested_agent": "TechnicalWriter",
+  "context_files": [
+    "/c/Users/PC Principal/.config/opencode/context/core/standards/code-quality.md",
+    "/c/Users/PC Principal/.config/opencode/context/core/standards/project-intelligence.md",
+    "/c/Users/PC Principal/.config/opencode/context/core/standards/project-intelligence-management.md",
+    "/c/Users/PC Principal/.config/opencode/context/core/context-system/standards/mvi.md",
+    "/c/Users/PC Principal/.config/opencode/context/core/context-system/guides/creation.md",
+    "/c/Users/PC Principal/.config/opencode/context/core/context-system.md"
+  ],
+  "reference_files": [
+    "F:/crm/apps/agent/agent/commands/improve-agent.md",
+    "F:/crm/apps/agent/agent/commands/multi-agent-optimize.md",
+    "F:/crm/AGENTS.md",
+    "F:/crm/package.json",
+    "/c/Users/PC Principal/.config/opencode/context/project-intelligence/technical-domain.md",
+    "/c/Users/PC Principal/.config/opencode/context/project-intelligence/navigation.md"
+  ],
+  "acceptance_criteria": [
+    "add-context.md created at apps/agent/agent/commands/add-context.md",
+    "File starts with HTML frontmatter",
+    "Includes 6-question interactive wizard specification",
+    "Includes external context detection (.tmp/ files)",
+    "Includes existing context review/update/replace flow",
+    "Includes file generation rules for technical-domain.md",
+    "Includes navigation update rules for navigation.md",
+    "Includes priority assignment and version tracking rules",
+    "File is <200 lines and scannable",
+    "Includes 📂 Codebase References section",
+    "No code comments added"
+  ],
+  "deliverables": [
+    "apps/agent/agent/commands/add-context.md"
+  ]
+}

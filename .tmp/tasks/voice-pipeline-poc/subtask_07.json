@@ -1,0 +1,33 @@
+{
+  "id": "voice-pipeline-poc-07",
+  "seq": "07",
+  "title": "Update .env.example and env.validation.ts",
+  "status": "completed",
+  "agent_id": "coder-agent",
+  "started_at": "2026-09-12T00:00:00Z",
+  "completed_at": "2026-09-12T00:00:00Z",
+  "completion_summary": "Updated .env.example with Kokoro TTS vars and removed EDGE_TTS_VOICE; added optional Kokoro declarations to env.validation.ts",
+  "depends_on": ["02", "06"],
+  "parallel": false,
+  "suggested_agent": "CoderAgent",
+  "context_files": [
+    "/c/Users/PC Principal/.config/opencode/context/core/standards/code-quality.md"
+  ],
+  "reference_files": [
+    "F:/crm/.env.example",
+    "F:/crm/apps/api/src/config/env.validation.ts",
+    "F:/crm/apps/agent/agent/scripts/kokoro-tts.py",
+    "F:/crm/apps/agent/agent/scripts/voice-pipeline/voice-pipeline.py"
+  ],
+  "acceptance_criteria": [
+    "EDGE_TTS_VOICE removed from .env.example",
+    "KOKORO_TTS_VOICE, KOKORO_TTS_SPEED, and KOKORO_TTS_CACHE_DIR added",
+    "Voice pipeline vars (e.g., LLAMA_SERVER_PATH, WHISPER_MODEL, GGUF_MODEL) added",
+    "Any API-reading vars declared in apps/api/src/config/env.validation.ts",
+    "All new variables include a short description in .env.example"
+  ],
+  "deliverables": [
+    ".env.example",
+    "apps/api/src/config/env.validation.ts"
+  ]
+}

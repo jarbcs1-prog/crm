@@ -1,0 +1,31 @@
+{
+  "id": "add-context-01",
+  "seq": "01",
+  "title": "Discover command registry and navigation structure in apps/agent/agent/commands/",
+  "status": "completed",
+  "depends_on": [],
+  "parallel": false,
+  "suggested_agent": "ContextScout",
+  "context_files": [
+    "/c/Users/PC Principal/.config/opencode/context/core/context-system/standards/mvi.md"
+  ],
+  "reference_files": [
+    "F:/crm/apps/agent/agent/commands/improve-agent.md",
+    "F:/crm/apps/agent/agent/commands/multi-agent-optimize.md",
+    "F:/crm/package.json"
+  ],
+  "acceptance_criteria": [
+    "Existing command files read and patterns documented",
+    "Command naming conventions and structure identified",
+    "Any existing registry, navigation, or index file in apps/agent/agent/commands/ located",
+    "Findings summarized in a brief discovery note"
+  ],
+  "deliverables": [
+    "Discovery notes (returned in task result)",
+    "List of existing commands and registry files"
+  ],
+  "agent_id": "coder-agent",
+  "started_at": "2026-09-12T00:00:00Z",
+  "completed_at": "2026-09-12T00:00:00Z",
+  "completion_summary": "Discovered existing agent command format and confirmed no command registry/index file exists."
+}

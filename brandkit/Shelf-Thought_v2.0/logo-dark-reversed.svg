@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 300">
+<rect width="1000" height="300" fill="#0B2D4A"/>
+<g transform="translate(35,36)">
+ <rect x="0" y="80" width="40" height="128" rx="6" fill="#00A8A8"/>
+ <rect x="58" y="48" width="40" height="160" rx="6" fill="#0B2D4A"/>
+ <rect x="116" y="16" width="48" height="192" rx="6" fill="#F5A623"/>
+ <rect x="182" y="62" width="40" height="146" rx="6" fill="#00A8A8"/>
+ <path d="M-10 224 H236" stroke="#FFFFFF" stroke-width="12" stroke-linecap="round"/>
+</g>
+<text x="305" y="130" font-family="Montserrat,Arial,sans-serif" font-size="62" font-weight="700" fill="#FFFFFF">Shelf-Thought, Inc.</text>
+<text x="310" y="178" font-family="Montserrat,Arial,sans-serif" font-size="18" letter-spacing="6" fill="#DCE8EF">SELF TAUGHT. BIGGER THINKING.</text>
+</svg>

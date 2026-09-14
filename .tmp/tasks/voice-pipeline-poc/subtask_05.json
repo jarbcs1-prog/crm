@@ -1,0 +1,33 @@
+{
+  "id": "voice-pipeline-poc-05",
+  "seq": "05",
+  "title": "Update voice-calling.md skill",
+  "status": "completed",
+  "agent_id": "coder-agent",
+  "started_at": "2026-09-12T00:00:00Z",
+  "completed_at": "2026-09-12T00:00:00Z",
+  "completion_summary": "Updated voice-calling.md with Kokoro-82M TTS, answer_call/transfer_call docs, and inbound/outbound example flows",
+  "depends_on": ["02", "03", "04"],
+  "parallel": false,
+  "suggested_agent": "TechnicalWriter",
+  "context_files": [
+    "/c/Users/PC Principal/.config/opencode/context/core/context-system/standards/mvi.md",
+    "/c/Users/PC Principal/.config/opencode/context/core/standards/code-quality.md"
+  ],
+  "reference_files": [
+    "F:/crm/apps/agent/agent/skills/voice-calling.md",
+    "F:/crm/apps/agent/agent/tools/answer_call.ts",
+    "F:/crm/apps/agent/agent/tools/transfer_call.ts",
+    "F:/crm/apps/agent/agent/lib/voice.ts",
+    "F:/crm/apps/agent/agent/tools/make_call.ts"
+  ],
+  "acceptance_criteria": [
+    "Skill file documents answer_call and transfer_call tools",
+    "Skill reflects Kokoro-82M TTS instead of edge-tts",
+    "Usage examples for new tools added",
+    "No code comments added (markdown prose is fine)"
+  ],
+  "deliverables": [
+    "apps/agent/agent/skills/voice-calling.md"
+  ]
+}

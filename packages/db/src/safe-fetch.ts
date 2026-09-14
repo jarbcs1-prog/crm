@@ -19,6 +19,9 @@ export function isBlockedAddress(ip: string): boolean {
 		}
 
 		const first = groups[0] ?? 0;
+		const second = groups[1] ?? 0;
+		if (first === 0x2002) return true;
+		if (first === 0x2001 && second === 0) return true;
 		return (
 			(first & 0xfe00) === 0xfc00 ||
 			(first & 0xffc0) === 0xfe80 ||
@@ -115,6 +118,34 @@ export async function resolvesToPublicHost(
 	}
 }
 
+async function validatedIp(
+	hostname: string,
+	timeoutMs: number,
+): Promise<string | null> {
+	const literal = hostname.replace(/^\[|\]$/g, "");
+	if (net.isIP(literal)) return isBlockedAddress(literal) ? null : literal;
+
+	let timer: ReturnType<typeof setTimeout> | undefined;
+	try {
+		const addresses = await Promise.race([
+			dns.lookup(hostname, { all: true }),
+			new Promise<never>((_, reject) => {
+				timer = setTimeout(
+					() => reject(new Error(`${hostname} did not resolve in time`)),
+					timeoutMs,
+				);
+			}),
+		]);
+		if (addresses.length === 0) return null;
+		if (addresses.some((a) => isBlockedAddress(a.address))) return null;
+		return addresses[0]?.address ?? null;
+	} catch {
+		return null;
+	} finally {
+		clearTimeout(timer);
+	}
+}
+
 export async function safeFetch(
 	url: string,
 	{
@@ -137,16 +168,24 @@ export async function safeFetch(
 	for (let hop = 0; hop <= MAX_REDIRECTS; hop += 1) {
 		if (target.protocol !== "https:" && target.protocol !== "http:")
 			return null;
-		if (!(await resolvesToPublicHost(target.hostname, timeoutMs))) return null;
+		const ip = await validatedIp(target.hostname, timeoutMs);
+		if (!ip) return null;
+
+		const fetchUrl = new URL(target.href);
+		fetchUrl.hostname = ip;
+		const hostHeader = target.port
+			? `${target.hostname}:${target.port}`
+			: target.hostname;
 
 		let response: Response;
 		try {
-			response = await fetch(target, {
+			response = await fetch(fetchUrl, {
 				method,
 				signal: AbortSignal.timeout(timeoutMs),
 				redirect: "manual",
 				headers: {
 					"user-agent": "Mozilla/5.0 (compatible; CRM/1.0)",
+					host: hostHeader,
 					...headers,
 				},
 			});

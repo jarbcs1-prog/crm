@@ -1,0 +1,42 @@
+{
+  "id": "voice-pipeline-poc",
+  "name": "Voice Pipeline POC + Kokoro TTS + Call Tools",
+  "status": "completed",
+  "objective": "Replace edge-tts with cached Kokoro-82M TTS, add answer_call and transfer_call tools, update the voice-calling skill, and build a real-time local voice pipeline POC.",
+  "context_files": [
+    "/c/Users/PC Principal/.config/opencode/context/core/standards/code-quality.md",
+    "/c/Users/PC Principal/.config/opencode/context/core/standards/project-intelligence.md",
+    "/c/Users/PC Principal/.config/opencode/context/core/context-system/standards/mvi.md"
+  ],
+  "reference_files": [
+    "F:/crm/apps/agent/agent/lib/voice.ts",
+    "F:/crm/apps/agent/agent/lib/capabilities.ts",
+    "F:/crm/apps/agent/agent/tools/make_call.ts",
+    "F:/crm/apps/agent/agent/tools/end_call.ts",
+    "F:/crm/apps/agent/agent/tools/call_status.ts",
+    "F:/crm/apps/agent/agent/channels/voice.ts",
+    "F:/crm/apps/agent/agent/skills/voice-calling.md",
+    "F:/crm/apps/agent/agent/agent.ts",
+    "F:/crm/apps/agent/agent/lib/model.ts",
+    "F:/crm/.env.example",
+    "F:/crm/packages/db/prisma/schema.prisma",
+    "F:/crm/apps/api/src/config/env.validation.ts",
+    "F:/crm/apps/api/src/settings/model-catalog.service.ts",
+    "F:/crm/apps/api/src/settings/settings.service.ts",
+    "F:/crm/apps/app/app/(app)/settings/agent-model.tsx",
+    "F:/crm/packages/db/src/settings.ts"
+  ],
+  "exit_criteria": [
+    "edge-tts replaced by Kokoro-82M in voice layer",
+    "answer_call.ts and transfer_call.ts created and follow existing tool patterns",
+    "voice-calling.md skill updated",
+    ".env.example updated with new voice vars",
+    "Voice pipeline POC script created with launcher + README",
+    "bunx tsc --noEmit passes for apps/agent",
+    "biome check passes (or formatted)"
+  ],
+  "subtask_count": 8,
+  "completed_count": 8,
+  "created_at": "2026-09-12T00:00:00Z",
+  "completed_at": "2026-09-12T00:00:00Z"
+}

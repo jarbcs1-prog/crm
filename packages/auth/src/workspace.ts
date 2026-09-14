@@ -59,3 +59,13 @@ export function isWorkspaceEmail(email: string | null | undefined): boolean {
 		(domain) => host === domain || host.endsWith(`.${domain}`),
 	);
 }
+
+export function ownerEmails(): Set<string> {
+	const raw = process.env.OWNER_EMAILS ?? "";
+	return new Set(
+		raw
+			.split(",")
+			.map((entry) => entry.trim().toLowerCase())
+			.filter(Boolean),
+	);
+}

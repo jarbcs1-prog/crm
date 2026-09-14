@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 260">
+  <rect width="900" height="260" fill="none"/>
+  <g transform="translate(35,30)">
+    <rect x="0" y="65" width="34" height="100" rx="5" fill="#111111"/>
+    <rect x="47" y="35" width="34" height="130" rx="5" fill="#111111"/>
+    <rect x="94" y="5" width="40" height="160" rx="5" fill="#111111"/>
+    <rect x="148" y="48" width="34" height="117" rx="5" fill="#111111"/>
+    <path d="M-8 176 H190" stroke="#111111" stroke-width="10" stroke-linecap="round"/>
+    <g fill="#111111">
+      <circle cx="191" cy="40" r="34"/>
+      <circle cx="224" cy="25" r="40"/>
+      <circle cx="259" cy="45" r="34"/>
+      <circle cx="222" cy="64" r="42"/>
+    </g>
+    <circle cx="266" cy="91" r="7" fill="#111111"/>
+    <circle cx="290" cy="108" r="4" fill="#111111"/>
+  </g>
+  <text x="300" y="112" font-family="Montserrat, Arial, sans-serif" font-size="52" font-weight="700" fill="#111111">Shelf-Thought, Inc.</text>
+  <text x="304" y="153" font-family="Montserrat, Arial, sans-serif" font-size="17" letter-spacing="6" fill="#374151">BETTER IDEAS. DEEPER SHELVES.</text>
+</svg>

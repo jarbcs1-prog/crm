@@ -1,6 +1,0 @@
-node_modules
-.env*
-.eve
-dist
-*.tsbuildinfo
-.DS_Store

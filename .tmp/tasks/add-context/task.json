@@ -1,0 +1,33 @@
+{
+  "id": "add-context",
+  "name": "Implement /add-context Agent Command",
+  "status": "completed",
+  "objective": "Create an interactive wizard agent command at apps/agent/agent/commands/add-context.md that generates project-intelligence context files following MVI and frontmatter standards.",
+  "context_files": [
+    "/c/Users/PC Principal/.config/opencode/context/core/standards/code-quality.md",
+    "/c/Users/PC Principal/.config/opencode/context/core/standards/project-intelligence.md",
+    "/c/Users/PC Principal/.config/opencode/context/core/standards/project-intelligence-management.md",
+    "/c/Users/PC Principal/.config/opencode/context/core/context-system/standards/mvi.md",
+    "/c/Users/PC Principal/.config/opencode/context/core/context-system/guides/creation.md",
+    "/c/Users/PC Principal/.config/opencode/context/core/context-system.md"
+  ],
+  "reference_files": [
+    "F:/crm/apps/agent/agent/commands/improve-agent.md",
+    "F:/crm/apps/agent/agent/commands/multi-agent-optimize.md",
+    "F:/crm/AGENTS.md",
+    "F:/crm/package.json",
+    "/c/Users/PC Principal/.config/opencode/context/project-intelligence/technical-domain.md",
+    "/c/Users/PC Principal/.config/opencode/context/project-intelligence/navigation.md"
+  ],
+  "exit_criteria": [
+    "apps/agent/agent/commands/add-context.md created with complete 6-question wizard workflow",
+    "Command follows existing agent command format and project rules",
+    "MVI-compliant (<200 lines, scannable, frontmatter, codebase refs)",
+    "Any command registry/navigation updated if required",
+    "No code comments added"
+  ],
+  "subtask_count": 4,
+  "completed_count": 4,
+  "created_at": "2026-09-12T00:00:00Z",
+  "completed_at": "2026-09-12T00:00:00Z"
+}

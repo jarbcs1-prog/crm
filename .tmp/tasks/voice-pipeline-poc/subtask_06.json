@@ -1,0 +1,34 @@
+{
+  "id": "voice-pipeline-poc-06",
+  "seq": "06",
+  "title": "Create real-time voice pipeline POC script + README + launcher",
+  "status": "completed",
+  "agent_id": "coder-agent",
+  "started_at": "2026-09-12T00:00:00Z",
+  "completed_at": "2026-09-12T00:00:00Z",
+  "completion_summary": "Created voice pipeline POC: Python script, PowerShell launcher, and README",
+  "depends_on": [],
+  "parallel": true,
+  "suggested_agent": "CoderAgent",
+  "context_files": [
+    "/c/Users/PC Principal/.config/opencode/context/core/standards/code-quality.md",
+    "/c/Users/PC Principal/.config/opencode/context/core/context-system/standards/mvi.md"
+  ],
+  "reference_files": [
+    "F:/crm/.env.example",
+    "F:/crm/apps/agent/agent/scripts/kokoro-tts.py",
+    "F:/crm/apps/agent/agent/lib/model.ts"
+  ],
+  "acceptance_criteria": [
+    "Python script starts llama-server with a cached GGUF model from F:\\.cache\\huggingface\\hub\\models",
+    "Script runs faster-whisper for STT and Kokoro-82M for TTS using cached checkpoints",
+    "Real-time loop reads audio, transcribes, generates response, synthesizes, plays audio",
+    "Launcher script configures paths to installed llama.cpp (F:\\llama-win-cuda-13.3, F:\\llama_cpp, F:\\llama.cpp)",
+    "README explains setup, model caching, and how to run the launcher"
+  ],
+  "deliverables": [
+    "apps/agent/agent/scripts/voice-pipeline/voice-pipeline.py",
+    "apps/agent/agent/scripts/voice-pipeline/launch-voice-pipeline.ps1",
+    "apps/agent/agent/scripts/voice-pipeline/README.md"
+  ]
+}

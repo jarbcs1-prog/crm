@@ -1,5 +1,6 @@
 import { db } from "@crm/db";
 import { WORKSPACE_ID } from "@crm/db/workspace";
+import { ownerEmails } from "./workspace";
 
 export { WORKSPACE_ID };
 
@@ -27,6 +28,44 @@ export function canChangeRole(role: WorkspaceRole | null): boolean {
 	return isWorkspaceAdmin(role);
 }
 
+export async function removeMember(
+	actingUserId: string,
+	memberId: string,
+): Promise<void> {
+	await db.$transaction(async (tx: Parameters<Parameters<typeof db.$transaction>[0]>[0]) => {
+		const acting = await tx.member.findUnique({
+			where: { organizationId_userId: { organizationId: WORKSPACE_ID, userId: actingUserId } },
+			select: { role: true },
+		});
+		if (!acting || !isWorkspaceAdmin(acting.role as WorkspaceRole)) {
+			throw new Error("Only an owner or an admin can remove a member.");
+		}
+
+		const target = await tx.member.findFirst({
+			where: { id: memberId, organizationId: WORKSPACE_ID },
+			select: { id: true, userId: true, role: true },
+		});
+		if (!target) throw new Error("That person is not in this workspace.");
+
+		if (target.role === "owner") {
+			if (acting.role !== "owner") {
+				throw new Error("Only an owner can remove another owner.");
+			}
+			const owners = await tx.$queryRaw<{ id: string }[]>`
+				SELECT id FROM "member"
+				WHERE "organizationId" = ${WORKSPACE_ID} AND role = 'owner'
+				FOR UPDATE
+			`;
+			if (owners.length <= 1) {
+				throw new Error("The workspace needs an owner. Make someone else an owner first.");
+			}
+		}
+
+		await tx.member.delete({ where: { id: target.id } });
+		await tx.session.deleteMany({ where: { userId: target.userId } });
+	});
+}
+
 export async function ensureWorkspaceMembership(
 	userId: string,
 ): Promise<string | undefined> {
@@ -49,19 +88,34 @@ export async function ensureWorkspaceMembership(
 			});
 
 			if (enrolled === 0) {
+				const owners = ownerEmails();
 				const existing = await tx.user.findMany({
-					select: { id: true },
+					select: { id: true, email: true },
 					orderBy: [{ createdAt: "asc" }, { id: "asc" }],
 				});
 
+				let members = existing.map((user: { id: string; email: string }, index: number) => ({
+					id: crypto.randomUUID(),
+					organizationId: workspace.id,
+					userId: user.id,
+					role:
+						owners.size > 0
+							? owners.has(user.email.toLowerCase())
+								? "owner"
+								: "member"
+							: index === 0
+								? "owner"
+								: "member",
+					createdAt: new Date(),
+				}));
+
+				if (owners.size > 0 && !members.some((m: { role: string }) => m.role === "owner")) {
+					const first = members[0];
+					if (first) first.role = "owner";
+				}
+
 				await tx.member.createMany({
-					data: existing.map((user, index) => ({
-						id: crypto.randomUUID(),
-						organizationId: workspace.id,
-						userId: user.id,
-						role: index === 0 ? "owner" : "member",
-						createdAt: new Date(),
-					})),
+					data: members,
 					skipDuplicates: true,
 				});
 			}

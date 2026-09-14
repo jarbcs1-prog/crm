@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1050" height="600" viewBox="0 0 1050 600">
+<rect width="1050" height="600" rx="12" fill="#0B2D4A"/>
+<image href="icon-dark-reversed.svg" x="70" y="90" width="170" height="170"/>
+<text x="280" y="160" font-family="Montserrat,Arial" font-size="46" font-weight="700" fill="#FFFFFF">Shelf-Thought, Inc.</text>
+<text x="282" y="205" font-family="Montserrat,Arial" font-size="15" letter-spacing="4" fill="#D9E0E5">SELF TAUGHT. BIGGER THINKING.</text>
+<text x="70" y="500" font-family="Inter,Arial" font-size="18" fill="#FFFFFF">YOUR NAME · TITLE</text>
+<text x="70" y="535" font-family="Inter,Arial" font-size="14" fill="#D9E0E5">email@example.com · +1 000 000 0000 · www.shelf-thought.com</text>
+<rect x="760" y="0" width="28" height="600" fill="#00A8A8"/>
+<rect x="788" y="0" width="14" height="600" fill="#F5A623"/>
+</svg>
