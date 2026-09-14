@@ -13,7 +13,7 @@ import { usMarkdown, type WorkspaceIdentity } from "../agent/lib/workspace";
 const profile: WorkspaceProfile = {
 	website: "trycomp.ai",
 	narrative:
-		"Comp AI takes a startup from nothing to a SOC 2 or ISO 27001 audit by automating the evidence collection and sells the platform on an annual subscription.",
+		"Shelf-Thought, Inc. takes a startup from nothing to a SOC 2 or ISO 27001 audit by automating the evidence collection and sells the platform on an annual subscription.",
 	sections: {
 		sells: "Compliance automation for SOC 2, ISO 27001 and GDPR",
 		sellsTo: "Series A to C startups facing their first framework audit",
@@ -24,7 +24,7 @@ const profile: WorkspaceProfile = {
 };
 
 const us: WorkspaceIdentity = {
-	name: "Comp AI",
+	name: "Shelf-Thought, Inc.",
 	website: "trycomp.ai",
 	profile,
 };
@@ -36,12 +36,12 @@ describe("who we are", () => {
 
 	it("names us and refuses to invent the rest", () => {
 		const markdown = usMarkdown({
-			name: "Comp AI",
+			name: "Shelf-Thought, Inc.",
 			website: "trycomp.ai",
 			profile: null,
 		});
 
-		expect(markdown).toContain("Comp AI");
+		expect(markdown).toContain("Shelf-Thought, Inc.");
 		expect(markdown).toContain("trycomp.ai");
 		expect(markdown).toContain("do not guess");
 	});
@@ -49,7 +49,7 @@ describe("who we are", () => {
 	it("states what we sell and who to", () => {
 		const markdown = usMarkdown(us);
 
-		expect(markdown).toContain("Comp AI");
+		expect(markdown).toContain("Shelf-Thought, Inc.");
 		expect(markdown).toContain("takes a startup from nothing");
 		expect(markdown).toContain("Compliance automation");
 		expect(markdown).toContain("Series A to C startups");

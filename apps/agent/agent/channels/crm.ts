@@ -1,4 +1,5 @@
 import { EnrichmentStatus } from "@crm/db";
+import { timingSafeEqual } from "node:crypto";
 import { defineChannel, POST } from "eve/channels";
 import { brief, drainAll, taskAuth } from "../lib/dispatch";
 import { settle } from "../lib/enrichment";
@@ -10,7 +11,14 @@ function authorised(request: Request): boolean {
 	const secret = process.env.AGENT_BRIDGE_SECRET?.trim();
 	if (!secret) return false;
 
-	return request.headers.get("authorization") === `Bearer ${secret}`;
+	const header = request.headers.get("authorization") ?? "";
+	const expected = `Bearer ${secret}`;
+	if (header.length !== expected.length) return false;
+	try {
+		return timingSafeEqual(Buffer.from(header), Buffer.from(expected));
+	} catch {
+		return false;
+	}
 }
 
 export function taskToken(taskId: string): string {

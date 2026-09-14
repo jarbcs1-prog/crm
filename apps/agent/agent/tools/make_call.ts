@@ -2,7 +2,7 @@ import { CallDirection, CallEventType, CallStatus, db, evaluateOsintRequirement 
 import { defineTool } from "eve/tools";
 import { z } from "zod";
 import { focusOn } from "../lib/focus";
-import { callerId, isVoiceConfigured, makeCall as placeCall } from "../lib/voice";
+import { callerId, isVoiceConfigured, isNonohConfigured, makeCall as placeCall, isAnyVoiceConfigured } from "../lib/voice";
 
 export default defineTool({
 	description:
@@ -13,8 +13,8 @@ export default defineTool({
 		requiresOsintCheck: z.boolean().optional().describe("Whether to check viability before calling."),
 	}),
 	async execute({ contactId, phone, requiresOsintCheck = true }) {
-		if (!isVoiceConfigured()) {
-			return { ok: false as const, reason: "Voice calling is not configured: VOIPSTUDIO_API_KEY is missing." };
+	if (!isAnyVoiceConfigured()) {
+			return { ok: false as const, reason: "Voice calling is not configured: neither VOIPSTUDIO_API_KEY nor NONOH credentials are set." };
 		}
 
 		const contact = await db.contact.findUnique({
@@ -92,7 +92,7 @@ export default defineTool({
 			callId: call.id,
 			sipCallId,
 			number,
-			pitchHint: "Lead with who you are and which company you represent, then deliver the CLID pitch.",
+			pitchHint: "Lead with who you are and which company you represent, then qualify them using the legal approach script.",
 		};
 	},
 });

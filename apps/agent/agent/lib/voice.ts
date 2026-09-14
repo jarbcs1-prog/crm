@@ -2,6 +2,7 @@ import { spawn } from "node:child_process";
 import { mkdirSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { CallStatus } from "@crm/db";
+import { nonohConfigured, nonohMakeCall, nonohHangup } from "./nonoh-sip";
 
 const DEFAULT_BASE_URL = "https://l7api.com/v1.2/voipstudio";
 
@@ -32,6 +33,14 @@ export function callerId(): string | undefined {
 
 export function isVoiceConfigured(): boolean {
 	return voiceApiKey() !== undefined;
+}
+
+export function isNonohConfigured(): boolean {
+	return nonohConfigured();
+}
+
+export function isAnyVoiceConfigured(): boolean {
+	return isVoiceConfigured() || isNonohConfigured();
 }
 
 export function voiceRecordingsDir(): string {
@@ -105,18 +114,23 @@ export async function makeCall(input: {
 	callerId?: string;
 	from?: string;
 }): Promise<{ id: string }> {
-	const made = await callApi<CallResponse>("/calls", {
-		method: "POST",
-		body: input.callerId
-			? { to: input.to, caller_id: input.callerId }
-			: input.from
-				? { to: input.to, from: input.from }
-				: { to: input.to },
-	});
-
-	const id = made?.data?.id;
-	if (!id) throw new Error("VoIPStudio returned no call id.");
-	return { id };
+	if (isVoiceConfigured()) {
+		const made = await callApi<CallResponse>("/calls", {
+			method: "POST",
+			body: input.callerId
+				? { to: input.to, caller_id: input.callerId }
+				: input.from
+					? { to: input.to, from: input.from }
+					: { to: input.to },
+		});
+		const id = made?.data?.id;
+		if (id) return { id };
+	}
+	if (isNonohConfigured()) {
+		const result = await nonohMakeCall(input.to);
+		if (result.ok && result.callId) return { id: result.callId };
+	}
+	throw new Error("No voice provider configured or call failed.");
 }
 
 export async function webcall(input: {

@@ -243,7 +243,7 @@ describe("the workspace profile session", () => {
 
 	it("sends the session to our own site and holds it to a size", async () => {
 		const { markdown } = await workspacePreamble({
-			name: "Comp AI",
+			name: "Shelf-Thought, Inc.",
 			website: "trycomp.ai",
 			profile: null,
 		});
@@ -262,7 +262,7 @@ describe("the workspace profile session", () => {
 
 	it("stops rather than sending the session at something unfetchable", async () => {
 		const { markdown } = await workspacePreamble({
-			name: "Comp AI",
+			name: "Shelf-Thought, Inc.",
 			website: "httpx://trycomp.ai",
 			profile: null,
 		});

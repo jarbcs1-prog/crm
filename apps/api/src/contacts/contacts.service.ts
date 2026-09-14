@@ -17,6 +17,7 @@ import { AgentQueueService } from "../agent/agent-queue.service";
 import { AgentTriggerService } from "../agent/agent-trigger.service";
 import { CompanyDirectoryService } from "../companies/company-directory.service";
 import { blankToNull, toCents } from "../crm/values";
+import { TtlCache } from "../crm/ttl-cache";
 import { InjectDatabase } from "../database/database.constants";
 import {
 	countsByKey,
@@ -84,6 +85,7 @@ export type ContactRow = {
 	} | null;
 	lastActivityAt: string | null;
 	createdAt: string;
+	verificationStatus: string;
 };
 
 const SORTABLE: Record<
@@ -99,9 +101,16 @@ const SORTABLE: Record<
 	lastActivity: (dir) => [{ lastActivityAt: { sort: dir, nulls: "last" } }],
 };
 
+type ContactFacetCounts = {
+	owner: Record<string, number>;
+	company: Record<string, number>;
+	source: Record<string, number>;
+};
+
 @Injectable()
 export class ContactsService {
 	private readonly logger = new Logger(ContactsService.name);
+	private readonly facetCache = new TtlCache<ContactFacetCounts>(10_000);
 
 	constructor(
 		@InjectDatabase() private readonly db: Db,
@@ -128,6 +137,7 @@ export class ContactsService {
 					title: true,
 					imageUrl: true,
 					source: true,
+					verificationStatus: true,
 					company: { select: COMPANY_SELECT },
 					owner: { select: OWNER_SELECT },
 					lastActivityAt: true,
@@ -165,6 +175,8 @@ export class ContactsService {
 				imageUrl: true,
 				enrichmentStatus: true,
 				enrichmentError: true,
+				verificationStatus: true,
+				lastVerifiedAt: true,
 				createdAt: true,
 				brief: {
 					select: {
@@ -540,6 +552,10 @@ export class ContactsService {
 	}
 
 	private async facetCounts(input: ContactListInput) {
+		const key = input.q.trim();
+		const cached = this.facetCache.get(key);
+		if (cached) return cached;
+
 		const where = this.searchFilter(input.q);
 
 		const [owners, companies, sources] = await Promise.all([
@@ -560,11 +576,13 @@ export class ContactsService {
 			}),
 		]);
 
-		return {
+		const result = {
 			owner: countsByKey(owners, "ownerId", FACET_UNASSIGNED),
 			company: countsByKey(companies, "companyId", NO_COMPANY),
 			source: countsByKey(sources, "source"),
 		};
+		this.facetCache.set(key, result);
+		return result;
 	}
 
 	private translate(error: unknown, id: string): unknown {

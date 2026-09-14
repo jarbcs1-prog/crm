@@ -80,7 +80,7 @@ It is single-tenant and internal by design. Sign-in is Google, the allow-list is
 
 ## Visual Query Builder
 
-Each list (companies, contacts, deals) includes a visual query builder for filtering. Build complex filters with AND/OR logic, field selection, and operators. The filter view is saved in the URL so you can share exact views with teammates.
+Each list (companies, contacts, deals) includes a visual query builder for filtering. Build complex filters with AND/OR logic, field selection and operators. The filter view is saved in the URL so you can share exact views with teammates.
 
 ## The agent
 

@@ -29,7 +29,7 @@ export function capabilities(): readonly Capability[] {
 			env: "EXA_API_KEY",
 			label: "Exa search",
 			gives:
-				"semantic web search and research, similar to Perplexity, with citations",
+				"semantic web search and research, with citations",
 			enabled: set("EXA_API_KEY"),
 		},
 		{
@@ -54,6 +54,13 @@ export function capabilities(): readonly Capability[] {
 			enabled: set("GOOGLE_API_KEY"),
 		},
 		{
+			env: "DUCKDUCKGO",
+			label: "DuckDuckGo",
+			gives:
+				"privacy-focused web search with no API key, used as the default fallback when no other search provider is configured",
+			enabled: true,
+		},
+		{
 			env: "CONTEXT_DEV_API_KEY",
 			label: "Company brand data",
 			gives: "a company's logo, industry, location and socials from its domain",
@@ -70,7 +77,7 @@ export function capabilities(): readonly Capability[] {
 			env: "VOIPSTUDIO_API_KEY",
 			label: "Voice calling",
 			gives:
-				"an outbound live call to a contact. The agent rings them and speaks the CLID pitch; say quietly on every call that you are an AI assistant making a cold call for the company",
+				"an outbound live call to a contact. The agent rings them and qualifies them using the legal approach script; say quietly on every call that you are an AI assistant making a cold call for the company",
 			enabled: set("VOIPSTUDIO_API_KEY"),
 		},
 		{

@@ -66,6 +66,8 @@ export async function contactPreamble(
 			lastName: true,
 			email: true,
 			title: true,
+			verificationStatus: true,
+			lastVerifiedAt: true,
 			company: { select: { id: true, name: true, domain: true } },
 			brief: { select: { refreshedAt: true } },
 			deals: {
@@ -128,6 +130,9 @@ export async function contactPreamble(
 			: "There is no background on them yet.",
 		"",
 		"Start with `read_crm_history` on this contact id.",
+		opened.kind === "verify" && contact
+			? verifyFlow(contact.verificationStatus, contact.lastVerifiedAt)
+			: "",
 		"",
 		await closing(),
 	]
@@ -291,6 +296,31 @@ export async function dealPreamble(
 	].join("\n");
 
 	return { markdown, focus: { companyId: deal.company?.id ?? null } };
+}
+
+export function verifyRecheckDays(): number {
+	const value = Number.parseInt(
+		process.env.VERIFY_RECHECK_DAYS?.trim() ?? "",
+		10,
+	);
+	return Number.isNaN(value) || value < 1 ? 30 : value;
+}
+
+function verifyFlow(status: string, lastVerifiedAt: Date | null): string {
+	const verified =
+		lastVerifiedAt != null
+			? `, last verified ${lastVerifiedAt.toDateString()}`
+			: ", never verified";
+	return [
+		"## Verification",
+		"",
+		`Current status: **${status}**${verified}. Claim it with \`set_verification_status\` before anything else.`,
+		"",
+		"Work the four phases in order: (1) presence and format audit, offline — one `record_fact` per field with `column: null` and `method: 'format-audit'`, plus one NOTE activity; (2) identity cross-reference, offline — a match writes the missing field as VERIFIED; (3) OSInt gap-fill — only for gaps and only on positive evidence, two or more independent sources to write via `set_contact_methods`, anything weaker stays PROPOSED and the contact closes as NEEDS_HUMAN; (4) close — set `lastVerifiedAt`, the final status and `schedule_recheck` in " +
+			`${verifyRecheckDays()} days.`,
+		"",
+		"Primary email and phone writes go through `set_contact_methods`, never `record_fact` — imported values are prefilled, not human-entered. Background checks only on explicit user request.",
+	].join("\n");
 }
 
 export async function noRecordPreamble(): Promise<Preamble> {

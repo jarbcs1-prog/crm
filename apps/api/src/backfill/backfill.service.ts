@@ -267,6 +267,7 @@ export class BackfillService implements OnModuleInit {
 		const checked = await this.db.agentTask.findMany({
 			where: { kind: "brand", finishedAt: { gte: since } },
 			select: { companyId: true },
+			take: 1000,
 		});
 
 		const recentlyChecked = checked
@@ -277,7 +278,7 @@ export class BackfillService implements OnModuleInit {
 			domain: { not: null },
 			logoUrl: null,
 			iconUrl: null,
-			...(recentlyChecked.length > 0 ? { id: { notIn: recentlyChecked } } : {}),
+			...(recentlyChecked.length > 0 ? { id: { notIn: recentlyChecked.slice(0, 1000) } } : {}),
 		};
 	}
 
@@ -299,12 +300,10 @@ export class BackfillService implements OnModuleInit {
 	private async contactsNeedingPhoto(): Promise<Prisma.ContactWhereInput> {
 		const since = new Date(Date.now() - RECHECK_PHOTO_AFTER_MS);
 
-		// `AgentTask.contactId` is a bare column with no Prisma relation, so this
-		// cannot be a nested `some`. Two queries and the id list is bounded by
-		// the number of contacts we have already looked for.
 		const checked = await this.db.agentTask.findMany({
 			where: { kind: "portrait", finishedAt: { gte: since } },
 			select: { contactId: true },
+			take: 1000,
 		});
 
 		const recentlyChecked = checked
@@ -313,7 +312,7 @@ export class BackfillService implements OnModuleInit {
 
 		return {
 			imageUrl: null,
-			...(recentlyChecked.length > 0 ? { id: { notIn: recentlyChecked } } : {}),
+			...(recentlyChecked.length > 0 ? { id: { notIn: recentlyChecked.slice(0, 1000) } } : {}),
 			OR: [
 				{ linkedinUrl: { not: null } },
 				{ githubUrl: { not: null } },

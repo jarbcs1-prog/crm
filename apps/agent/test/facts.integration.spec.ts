@@ -124,7 +124,7 @@ describe("recordFact", () => {
 		await recordFact({
 			contactId,
 			field: "employer",
-			value: "Comp AI",
+			value: "Shelf-Thought, Inc.",
 			evidence: [seen("linkedin.employer-and-name")],
 			method: "linkedin.profile",
 		});
@@ -136,7 +136,7 @@ describe("recordFact", () => {
 
 		expect(facts).toHaveLength(2);
 		expect(facts.find((f) => f.value === "Fleetio")?.status).toBe("SUPERSEDED");
-		expect(facts.find((f) => f.value === "Comp AI")?.status).toBe("APPLIED");
+		expect(facts.find((f) => f.value === "Shelf-Thought, Inc.")?.status).toBe("APPLIED");
 	});
 
 	it("stores the evidence, so the score can be explained later", async () => {

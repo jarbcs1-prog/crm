@@ -4,6 +4,9 @@ param(
     [string]$KokoroDir = "F:\.cache\huggingface\hub\models\Kokoro-82M\snapshots\f3ff3571791e39611d31c381e3a41a3af07b4987"
 )
 
+# Make CUDA 12 cuBLAS available to CTranslate2/faster-whisper. 
+$env:PATH = "F:\llama_cpp\llama-whisper-cublas-12.4\Release;$env:PATH"
+
 $scriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
 $voicePipeline = Join-Path $scriptDir "voice-pipeline.py"
 

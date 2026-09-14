@@ -166,18 +166,6 @@ export class EnvironmentVariables {
 	@IsOptional()
 	@IsString()
 	REPLICATE_API_TOKEN?: string;
-
-	@IsOptional()
-	@IsString()
-	KOKORO_TTS_CACHE_DIR?: string;
-
-	@IsOptional()
-	@IsString()
-	KOKORO_TTS_VOICE?: string;
-
-	@IsOptional()
-	@IsString()
-	KOKORO_TTS_SPEED?: string;
 }
 
 export function validateEnv(
@@ -187,6 +175,15 @@ export function validateEnv(
 		enableImplicitConversion: true,
 		exposeDefaultValues: true,
 	});
+
+	// This value shipped in .env.example before 2026-09-14. Anyone still running
+	// it is signing sessions with a publicly known key.
+	const KNOWN_COMPROMISED_SECRET = "MqQi8l6apIUPiyFinjGzRMGhQ4Hmhgki5c/KSO+D5Hw=";
+	if (validated.BETTER_AUTH_SECRET === KNOWN_COMPROMISED_SECRET) {
+		throw new Error(
+			"BETTER_AUTH_SECRET is set to a value that was publicly committed in this repository's .env.example. Generate a new one with: openssl rand -base64 32",
+		);
+	}
 
 	const errors = validateSync(validated, {
 		skipMissingProperties: false,

@@ -49,8 +49,10 @@ afterEach(() => {
 });
 
 describe("capabilities", () => {
-	it("reports everything off on a bare install", () => {
-		expect(capabilities().every((c) => !c.enabled)).toBe(true);
+	it("reports keyed capabilities off but DuckDuckGo always on, on a bare install", () => {
+		const keyed = capabilities().filter((c) => c.env !== "DUCKDUCKGO");
+		expect(keyed.every((c) => !c.enabled)).toBe(true);
+		expect(enabled("DUCKDUCKGO")).toBe(true);
 		expect(enabled("RAPIDAPI_KEY")).toBe(false);
 	});
 
@@ -91,11 +93,12 @@ describe("the unavailable result", () => {
 });
 
 describe("the capability briefing", () => {
-	it("tells a bare install to work from the CRM alone", () => {
+	it("lists DuckDuckGo as available on a bare install and keyed sources as not configured", () => {
 		const markdown = capabilitiesMarkdown();
 
-		expect(markdown).toContain("No outside sources are configured");
-		expect(markdown).toContain("read_crm_history");
+		expect(markdown).toContain("DuckDuckGo");
+		expect(markdown).toContain("Not configured here");
+		expect(markdown).toContain("LinkedIn");
 	});
 
 	it("lists what is on and what is off, separately", () => {

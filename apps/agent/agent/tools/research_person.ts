@@ -2,7 +2,8 @@ import { defineTool } from "eve/tools";
 import { z } from "zod";
 import { enabled, unavailable } from "../lib/capabilities";
 import { spend } from "../lib/focus";
-import { ask } from "../lib/perplexity";
+import { ask } from "../lib/web-search";
+import { guardThirdPartyQuery } from "../lib/egress-guard";
 
 function searchEnabled(): boolean {
 	return (
@@ -11,7 +12,7 @@ function searchEnabled(): boolean {
 		enabled("BRAVE_API_KEY") ||
 		enabled("FIRECRAWL_API_KEY") ||
 		enabled("GOOGLE_API_KEY") ||
-		enabled("PERPLEXITY_API_KEY")
+		true // DuckDuckGo needs no key and is always available as a fallback
 	);
 }
 
@@ -31,13 +32,20 @@ export default defineTool({
 	}),
 	async execute({ question, deep }) {
 		if (!searchEnabled())
-			return unavailable("TAVILY_API_KEY or EXA_API_KEY or BRAVE_API_KEY or FIRECRAWL_API_KEY or GOOGLE_API_KEY or PERPLEXITY_API_KEY");
+			return unavailable("TAVILY_API_KEY or EXA_API_KEY or BRAVE_API_KEY or FIRECRAWL_API_KEY or GOOGLE_API_KEY (DuckDuckGo is used as a fallback when none are set)");
 
 		const charge = spend(deep ? 2 : 1);
 		if (!charge.ok) return { ok: false as const, reason: charge.reason };
 
+		const egress = guardThirdPartyQuery(question);
+		if (!egress.ok) {
+			console.warn(
+				"[egress-guard] refused research_person query containing message/mailbox content",
+			);
+			return { ok: false as const, reason: egress.reason };
+		}
+
 		const answer = await ask(question, {
-			model: deep ? "sonar-pro" : "sonar",
 			system:
 				"You are researching for a B2B sales rep. Be specific and factual. " +
 				"State only what your sources support, prefer recent information and " +

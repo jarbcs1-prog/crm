@@ -947,13 +947,13 @@ CRON_SECRET=""
 
 ```
 DATABASE_URL="postgresql://postgres:***@localhost:5432/crm?schema=public"
-BETTER_AUTH_SECRET="MqQi8l6apIUPiyFinjGzRMGhQ4Hmhgki5c/KSO+D5Hw="
+BETTER_AUTH_SECRET=""
 ALLOWED_SIGN_IN=""
 GOOGLE_CLIENT_ID=""
 GOOGLE_CLIENT_SECRET=""
 ```
 
-The `***` in the `DATABASE_URL` password is a signal that the password must be filled in. The `BETTER_AUTH_SECRET` in `.env.example` is a generated example, not a real secret — generate your own.
+The `***` in the `DATABASE_URL` password is a signal that the password must be filled in. `BETTER_AUTH_SECRET` ships empty on purpose — generate your own with `openssl rand -base64 32` and never reuse a value that appears in this repository.
 ---
 
 ## Next Steps

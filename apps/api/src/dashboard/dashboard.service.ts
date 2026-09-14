@@ -1,6 +1,7 @@
 import { ActivityType, type Db, DealStage } from "@crm/db";
 import { Injectable } from "@nestjs/common";
 import { toCents } from "../crm/values";
+import { TtlCache } from "../crm/ttl-cache";
 import { InjectDatabase } from "../database/database.constants";
 import { OPEN_DEAL_STAGES } from "../deals/deal-stage";
 import type { DashboardSummaryInput } from "./dashboard.contracts";
@@ -30,11 +31,17 @@ function monthKey(date: Date): number {
 
 @Injectable()
 export class DashboardService {
+    private readonly summaryCache = new TtlCache<any>(30_000);
+
 	constructor(@InjectDatabase() private readonly db: Db) {}
 
-	async summary(actingUserId: string, input: DashboardSummaryInput) {
-		const mine = input.scope === "me";
-		const owned = mine ? { ownerId: actingUserId } : {};
+    async summary(actingUserId: string, input: DashboardSummaryInput) {
+        const cacheKey = `${actingUserId}:${input.scope}`;
+        const cached = this.summaryCache.get(cacheKey);
+        if (cached) return cached;
+
+        const mine = input.scope === "me";
+        const owned = mine ? { ownerId: actingUserId } : {};
 
 		const now = new Date();
 		const startOfMonth = monthStart(now, 0);
@@ -57,21 +64,22 @@ export class DashboardService {
 				_count: { _all: true },
 				_sum: { amount: true },
 			}),
-			this.db.deal.findMany({
-				where: {
-					...owned,
-					OR: [
-						{ createdAt: { gte: trendStart } },
-						{ closedAt: { gte: trendStart } },
-					],
-				},
-				select: {
-					amount: true,
-					stage: true,
-					createdAt: true,
-					closedAt: true,
-				},
-			}),
+            this.db.deal.findMany({
+                where: {
+                    ...owned,
+                    OR: [
+                        { createdAt: { gte: trendStart } },
+                        { closedAt: { gte: trendStart } },
+                    ],
+                },
+                take: 200,
+                select: {
+                    amount: true,
+                    stage: true,
+                    createdAt: true,
+                    closedAt: true,
+                },
+            }),
 			this.db.deal.aggregate({
 				where: {
 					...owned,
@@ -199,10 +207,10 @@ export class DashboardService {
 			}
 		}
 
-		const decided = wins + losses;
+        const decided = wins + losses;
 
-		return {
-			scope: input.scope,
+        const result = {
+            scope: input.scope,
 			pipeline: {
 				stages,
 				totalCents: stages.reduce((total, s) => total + s.valueCents, 0),
@@ -241,5 +249,7 @@ export class DashboardService {
 				meta: meta as Record<string, unknown> | null,
 			})),
 		};
+        this.summaryCache.set(cacheKey, result);
+        return result;
 	}
 }

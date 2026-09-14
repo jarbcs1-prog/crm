@@ -27,6 +27,10 @@ export interface ConversationSummary {
 
 const LIST_TTL_MS = 10 * 60_000;
 
+// In-memory fallback (default self-host) means multiple API instances serve divergent 10-min lists.
+// For multi-instance, configure Redis via CACHE_MANAGER or lower LIST_TTL_MS. Cache is invalidated
+// on save/remove; agent-side event writes rely on TTL (max 10 min staleness).
+
 const listKey = (userId: string, recordId: string) =>
 	`agent:conversations:${userId}:${recordId}`;
 
@@ -87,6 +91,16 @@ export class ConversationsService {
 	): Promise<{ id: string }> {
 		const recordId = this.recordId(input);
 
+		const existing = await this.db.agentConversation.findUnique({
+			where: { sessionId: input.sessionId },
+			select: { userId: true },
+		});
+		if (existing && existing.userId !== userId) {
+			throw new BadRequestException(
+				"That conversation belongs to someone else.",
+			);
+		}
+
 		const conversation = await this.db.agentConversation.upsert({
 			where: { sessionId: input.sessionId },
 			create: {
@@ -106,14 +120,8 @@ export class ConversationsService {
 				messageCount: input.messageCount ?? 0,
 				lastMessageAt: new Date(),
 			},
-			select: { id: true, userId: true },
+			select: { id: true },
 		});
-
-		if (conversation.userId !== userId) {
-			throw new BadRequestException(
-				"That conversation belongs to someone else.",
-			);
-		}
 
 		await this.cache.del(listKey(userId, recordId));
 

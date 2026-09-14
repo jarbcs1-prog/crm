@@ -15,6 +15,7 @@ import {
 import { AgentQueueService } from "../agent/agent-queue.service";
 import { AgentTriggerService } from "../agent/agent-trigger.service";
 import { blankToNull, toCents } from "../crm/values";
+import { TtlCache } from "../crm/ttl-cache";
 import { InjectDatabase } from "../database/database.constants";
 import { OPEN_DEAL_STAGES } from "../deals/deal-stage";
 import {
@@ -80,9 +81,17 @@ const SORTABLE: Record<
 	lastActivity: (dir) => ({ lastActivityAt: { sort: dir, nulls: "last" } }),
 };
 
+type CompanyFacetCounts = {
+	owner: Record<string, number>;
+	industry: Record<string, number>;
+	enrichment: Record<string, number>;
+	source: Record<string, number>;
+};
+
 @Injectable()
 export class CompaniesService {
 	private readonly logger = new Logger(CompaniesService.name);
+	private readonly facetCache = new TtlCache<CompanyFacetCounts>(10_000);
 
 	constructor(
 		@InjectDatabase() private readonly db: Db,
@@ -116,12 +125,6 @@ export class CompaniesService {
 					enrichmentStatus: true,
 					source: true,
 					owner: { select: OWNER_SELECT },
-					_count: {
-						select: {
-							contacts: true,
-							deals: { where: { stage: { in: [...OPEN_DEAL_STAGES] } } },
-						},
-					},
 					lastActivityAt: true,
 					createdAt: true,
 				},
@@ -130,7 +133,35 @@ export class CompaniesService {
 			this.facetCounts(input),
 		]);
 
-		const queued = await this.queue.queuedCompanies(rows.map((row) => row.id));
+		const ids = rows.map((row) => row.id);
+		const [contactCounts, dealCounts, queued] = await Promise.all([
+			ids.length
+				? this.db.contact.groupBy({
+						by: ["companyId"],
+						where: { companyId: { in: ids } },
+						_count: { _all: true },
+					})
+				: [],
+			ids.length
+				? this.db.deal.groupBy({
+						by: ["companyId"],
+						where: { companyId: { in: ids }, stage: { in: [...OPEN_DEAL_STAGES] } },
+						_count: { _all: true },
+					})
+				: [],
+			this.queue.queuedCompanies(ids),
+		]);
+
+		const contactsByCompany = new Map(
+			contactCounts.map((row: { companyId: string | null; _count: { _all: number } }) =>
+				[row.companyId, row._count._all] as const,
+			),
+		);
+		const dealsByCompany = new Map(
+			dealCounts.map((row: { companyId: string | null; _count: { _all: number } }) =>
+				[row.companyId, row._count._all] as const,
+			),
+		);
 
 		return {
 			rows: rows.map((row) => ({
@@ -147,8 +178,8 @@ export class CompaniesService {
 				queued: queued.has(row.id),
 				source: row.source,
 				owner: row.owner,
-				contactCount: row._count.contacts,
-				openDealCount: row._count.deals,
+				contactCount: contactsByCompany.get(row.id) ?? 0,
+				openDealCount: dealsByCompany.get(row.id) ?? 0,
 				lastActivityAt: row.lastActivityAt?.toISOString() ?? null,
 				createdAt: row.createdAt.toISOString(),
 			})),
@@ -469,6 +500,10 @@ export class CompaniesService {
 	}
 
 	private async facetCounts(input: CompanyListInput) {
+		const key = input.q.trim();
+		const cached = this.facetCache.get(key);
+		if (cached) return cached;
+
 		const where = this.searchFilter(input.q);
 
 		const [owners, industries, enrichment, sources] = await Promise.all([
@@ -494,12 +529,14 @@ export class CompaniesService {
 			}),
 		]);
 
-		return {
+		const result = {
 			owner: countsByKey(owners, "ownerId", FACET_UNASSIGNED),
 			industry: countsByKey(industries, "industry"),
 			enrichment: countsByKey(enrichment, "enrichmentStatus"),
 			source: countsByKey(sources, "source"),
 		};
+		this.facetCache.set(key, result);
+		return result;
 	}
 
 	private translate(error: unknown, id: string): unknown {

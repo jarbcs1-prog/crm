@@ -4,7 +4,7 @@ import {
 	nameMatchesLocalPart,
 	namesMatch,
 } from "./names";
-import { ask } from "./perplexity";
+import { ask } from "./web-search";
 
 export type Network = "x" | "github";
 

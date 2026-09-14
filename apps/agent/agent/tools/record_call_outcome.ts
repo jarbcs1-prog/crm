@@ -17,7 +17,7 @@ const OUTCOME_PORT: Record<string, CallOutcome> = {
 
 export default defineTool({
 	description:
-		"Records what happened on a call: the outcome, optional CLID scores between 0 and 1, and a short summary. Wrong numbers and do-not-call results also pause OSINT work for that contact.",
+		"Records what happened on a call: the outcome, optional qualification scores between 0 and 1, and a short summary. Wrong numbers and do-not-call results also pause OSINT work for that contact.",
 	inputSchema: z.object({
 		callId: z.string().min(1).describe("The CRM id of the call."),
 		outcome: z
