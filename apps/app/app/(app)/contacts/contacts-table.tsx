@@ -14,6 +14,10 @@ import { contactName } from "@/components/crm/contact-name";
 import { OwnerCell } from "@/components/crm/owner-cell";
 import { usePrefetchRecord } from "@/components/crm/record-sheet/record-prefetch";
 import { useOpenRecord } from "@/components/crm/record-sheet/record-stack";
+import {
+	VERIFICATION_FACET_OPTIONS,
+	VerificationIndicator,
+} from "@/components/crm/verification-status";
 import { ListSearch } from "@/components/data-table/list-search";
 import { useTableQuery } from "@/components/data-table/use-table-query";
 import { VisualQueryBuilder } from "@/components/data-table/visual-query-builder";
@@ -99,6 +103,14 @@ const COLUMNS: DataTableColumn<ContactRow>[] = [
 		),
 	},
 	{
+		id: "verification",
+		header: "Verification",
+		label: "Verification status",
+		defaultHidden: true,
+		width: "w-[14%]",
+		cell: (row) => <VerificationIndicator status={(row as any).verificationStatus} />,
+	},
+	{
 		id: "lastActivity",
 		header: "Last activity",
 		sortable: true,
@@ -146,6 +158,11 @@ export function ContactsTable() {
 					label: company.name,
 				})),
 			].filter((option) => (facetCounts?.company?.[option.value] ?? 0) > 0),
+		},
+		{
+			id: "verification",
+			label: "Verification",
+			options: VERIFICATION_FACET_OPTIONS,
 		},
 	];
 

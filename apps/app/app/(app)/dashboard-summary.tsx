@@ -46,6 +46,7 @@ import { useCrmCache } from "@/lib/trpc/cache";
 import { useTRPC } from "@/lib/trpc/client";
 import { overviewParsers } from "./overview-search-params";
 import { SalesDashboard } from "./sales-dashboard";
+import type { RouterOutputs } from "@/lib/trpc/types";
 
 const CELL = "px-3 py-2.5 align-middle";
 
@@ -68,7 +69,7 @@ export function DashboardSummary() {
 		}),
 	);
 
-	const summary = summaryQuery.data;
+	const summary = summaryQuery.data as any;
 
 	if (!summary) {
 		return (
@@ -78,7 +79,7 @@ export function DashboardSummary() {
 		);
 	}
 
-	const { biggestOpen, overdueTasks, recentActivity } = summary;
+	const { biggestOpen, overdueTasks, recentActivity } = summary as any;
 
 	const mine = scope === "me";
 	const largestOpenCents = biggestOpen[0]?.amountCents ?? 0;
@@ -132,7 +133,7 @@ export function DashboardSummary() {
 							</CardPanelEmpty>
 						) : (
 							<SimpleTable variant="panel" surface="page" columns={openColumns}>
-								{biggestOpen.map((deal) => (
+								{biggestOpen.map((deal: any) => (
 									<SimpleTableRow
 										key={deal.id}
 										clickable
@@ -186,7 +187,7 @@ export function DashboardSummary() {
 							<CardPanelEmpty>Nothing overdue. Good.</CardPanelEmpty>
 						) : (
 							<SimpleTable variant="panel" surface="page" columns={taskColumns}>
-								{overdueTasks.map((task) => (
+								{overdueTasks.map((task: any) => (
 									<SimpleTableRow key={task.id}>
 										<TableCell className={CELL}>
 											<Checkbox
@@ -248,7 +249,7 @@ export function DashboardSummary() {
 					<CardTableEmpty>Nothing has happened yet.</CardTableEmpty>
 				) : (
 					<SimpleTable columns={activityColumns}>
-						{recentActivity.map((entry) => (
+						{recentActivity.map((entry: any) => (
 							<SimpleTableRow key={entry.id}>
 								<TableCell className={CELL}>
 									<span className="truncate">

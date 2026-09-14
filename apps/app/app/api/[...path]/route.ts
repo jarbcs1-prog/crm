@@ -48,12 +48,12 @@ async function handler(request: Request): Promise<Response> {
 		upstream = await fetch(target, init);
 	} catch (error) {
 		console.error(
-			`API proxy: ${API_URL} is not reachable for ${request.method} ${url.pathname}.`,
+			`API proxy is not reachable for ${request.method} ${url.pathname}.`,
 			error,
 		);
 
 		return Response.json(
-			{ error: `The API at ${API_URL} is not reachable.` },
+			{ error: "The API is not reachable." },
 			{ status: 502 },
 		);
 	}
