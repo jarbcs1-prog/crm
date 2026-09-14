@@ -289,3 +289,33 @@ Before pushing to GitHub:
 ---
 
 *End of changes document.*
+
+---
+
+## 13. Telegram Channel Integration (2026-09-14)
+
+### What changed
+
+Added Telegram bot channel infrastructure to the research agent, enabling the agent to receive and respond to Telegram messages.
+
+**New files:**
+- `apps/agent/agent/channels/telegram.ts` — Telegram webhook channel using `defineChannel` with `POST /internal/telegram/webhook` route
+- `apps/agent/agent/tools/send_telegram_message.ts` — Tool to send Telegram messages via the Bot API (`sendMessage` endpoint)
+- `apps/agent/test/telegram-message.spec.ts` — Tests for `sendTelegramMessage` (3 tests: missing token, API error, success)
+
+**Modified files:**
+- `apps/agent/agent/tools/schedule_calls.ts` — Now imports `LEGAL_APPROACH_SCRIPT` and uses it as the default call reason instead of a hardcoded string
+- `.env` — Added `TELEGRAM_BOT_TOKEN=""`
+- `.env.example` — Added `TELEGRAM_BOT_TOKEN=""` documentation
+- `.gitignore` — Added `.opencode/goals/` to ignore session state files
+
+**Configuration:**
+- Set `TELEGRAM_BOT_TOKEN` in `.env` to enable Telegram notifications
+- The channel receives webhooks at `POST /internal/telegram/webhook`
+- Messages are dispatched through the existing `drainAll` pipeline
+
+### Verification
+- `bun test`: 202 pass, 8 fail (pre-existing database-related failures)
+- `bun run build` (agent): ✓ Compiled successfully
+- `bun run build` (app): ✓ Compiled successfully
+- `bun run check-types`: ✓ Passes for agent, app, and api packages

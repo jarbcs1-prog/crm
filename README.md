@@ -89,7 +89,8 @@ handles the durable part: sessions that survive a redeploy, work that resumes wh
 
 | | |
 | --- | --- |
-| **18 authored tools** | `read_crm_history`, `search_crm`, `identify_contact`, `research_person`, `enrich_company`, `record_fact`, `schedule_recheck`… |
+| **20 authored tools** | `read_crm_history`, `search_crm`, `identify_contact`, `research_person`, `enrich_company`, `record_fact`, `schedule_recheck`, `find_swedish_contacts`, `send_telegram_message`… |
+| **5 channels** | `crm`, `eve`, `voice`, `telegram` — webhook integrations for dispatching and receiving |
 | **4 skills** | `evidence.md`, `identity-matching.md`, `data-boundaries.md`, `writing-a-brief.md` — prose the agent reads, versioned like code |
 | **1 schedule** | `dispatch.ts`, which decides nothing. It leases what is due and starts a session per row. |
 | **A sandbox** | `bash`, `grep`, `glob` and a `/workspace`, with **`deny-all` egress** |
