@@ -19,6 +19,7 @@ import {
 	Logger,
 } from "@nestjs/common";
 import { APIError } from "better-auth/api";
+import { resolvesToPublicHost } from "@crm/db/safe-fetch";
 import { InjectDatabase } from "../database/database.constants";
 import { type ListResult, paginate, resolveOrderBy } from "../trpc/list-input";
 import type {
@@ -188,6 +189,21 @@ export class SsoService {
 			throw new BadRequestException(
 				"Give the email domain your people sign in with, for example acme.com.",
 			);
+		}
+
+		try {
+			const issuerUrl = new URL(input.issuer);
+			if (issuerUrl.protocol !== "https:" && issuerUrl.protocol !== "http:") {
+				throw new BadRequestException("Issuer must be https:// or http://");
+			}
+			if (!(await resolvesToPublicHost(issuerUrl.hostname))) {
+				throw new BadRequestException(
+					"That issuer points at a private address and cannot be used.",
+				);
+			}
+		} catch (error) {
+			if (error instanceof BadRequestException) throw error;
+			throw new BadRequestException("That issuer is not a valid URL.");
 		}
 
 		await this.call(() =>

@@ -13,6 +13,7 @@ import {
 } from "@nestjs/common";
 import { ActivityStampService } from "../crm/activity-stamp.service";
 import { fromCents, toCents } from "../crm/values";
+import { TtlCache } from "../crm/ttl-cache";
 import { InjectDatabase } from "../database/database.constants";
 import {
 	countsByKey,
@@ -70,9 +71,17 @@ const SORTABLE: Record<
 	lastActivity: (dir) => [{ lastActivityAt: { sort: dir, nulls: "last" } }],
 };
 
+type DealFacetCounts = {
+	status: { open: number; closed: number };
+	owner: Record<string, number>;
+	stage: Record<string, number>;
+	closing: Record<string, number>;
+};
+
 @Injectable()
 export class DealsService {
 	private readonly logger = new Logger(DealsService.name);
+	private readonly facetCache = new TtlCache<DealFacetCounts>(10_000);
 
 	constructor(
 		@InjectDatabase() private readonly db: Db,
@@ -346,6 +355,10 @@ export class DealsService {
 	}
 
 	private async facetCounts(input: DealListInput) {
+		const key = input.q.trim();
+		const cached = this.facetCache.get(key);
+		if (cached) return cached;
+
 		const where = this.searchFilter(input.q);
 
 		const [owners, stages, ...closingCounts] = await Promise.all([
@@ -366,7 +379,7 @@ export class DealsService {
 			0,
 		);
 
-		return {
+		const result = {
 			status: { open: openCount, closed: closedCount },
 			owner: countsByKey(owners, "ownerId", FACET_UNASSIGNED),
 			stage: stageCounts,
@@ -377,6 +390,8 @@ export class DealsService {
 				]),
 			),
 		};
+		this.facetCache.set(key, result);
+		return result;
 	}
 
 	private translate(error: unknown, id: string): unknown {
