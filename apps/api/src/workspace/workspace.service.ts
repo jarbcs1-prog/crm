@@ -191,6 +191,47 @@ export class WorkspaceService {
 		};
 	}
 
+	async removeMember(userId: string, memberId: string): Promise<void> {
+		const role = await this.roleOf(userId);
+
+		if (!canChangeRole(role)) {
+			throw new ForbiddenException("Only an owner or an admin can remove a member.");
+		}
+
+		await this.db.$transaction(async (tx: Parameters<Parameters<typeof this.db.$transaction>[0]>[0]) => {
+			const target = await tx.member.findFirst({
+				where: { id: memberId, organizationId: WORKSPACE_ID },
+				select: { id: true, userId: true, role: true },
+			});
+
+			if (!target) {
+				throw new NotFoundException("That person is not in this workspace.");
+			}
+
+			if (target.role === "owner") {
+				if (role !== "owner") {
+					throw new ForbiddenException("Only an owner can remove another owner.");
+				}
+				const owners = await tx.$queryRaw<{ id: string }[]>`
+					SELECT id FROM "member"
+					WHERE "organizationId" = ${WORKSPACE_ID} AND role = 'owner'
+					FOR UPDATE
+				`;
+
+				if (owners.length <= 1) {
+					throw new ForbiddenException(
+						"The workspace needs an owner. Make someone else an owner first.",
+					);
+				}
+			}
+
+			await tx.member.delete({ where: { id: target.id } });
+			await tx.session.deleteMany({ where: { userId: target.userId } });
+		});
+
+		this.logger.log({ message: "Workspace member removed", userId, memberId });
+	}
+
 	async setMemberRole(
 		userId: string,
 		input: SetMemberRoleInput,
@@ -203,9 +244,10 @@ export class WorkspaceService {
 			);
 		}
 
-		const updated = await this.db.$transaction(async (tx) => {
-			const target = await tx.member.findFirst({
-				where: { id: input.memberId, organizationId: WORKSPACE_ID },
+		const updated = await this.db.$transaction(
+			async (tx: Parameters<Parameters<typeof this.db.$transaction>[0]>[0]) => {
+				const target = await tx.member.findFirst({
+					where: { id: input.memberId, organizationId: WORKSPACE_ID },
 				select: { id: true, role: true },
 			});
 
@@ -214,6 +256,9 @@ export class WorkspaceService {
 			}
 
 			if (target.role === "owner" && input.role !== "owner") {
+				if (role !== "owner") {
+					throw new ForbiddenException("Only an owner can demote another owner.");
+				}
 				const owners = await tx.$queryRaw<{ id: string }[]>`
 					SELECT id FROM "member"
 					WHERE "organizationId" = ${WORKSPACE_ID} AND role = 'owner'
