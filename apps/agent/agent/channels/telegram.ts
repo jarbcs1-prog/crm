@@ -1,6 +1,9 @@
 import { defineChannel, POST } from "eve/channels";
 import { brief, drainAll, taskAuth } from "../lib/dispatch";
 
+const TELEGRAM_USER_ID = process.env.TELEGRAM_USERID ?? "";
+const TELEGRAM_HOME_CHANNEL = process.env.TELEGRAM_HOME_CHANNEL ?? "";
+
 export default defineChannel({
 	routes: [
 		POST("/internal/telegram/webhook", async (request, { send, waitUntil }) => {
@@ -10,6 +13,12 @@ export default defineChannel({
 				if (!message) {
 					return new Response("OK", { status: 200 });
 				}
+
+				if (!isAuthorized(message.chatId)) {
+					return new Response("Unauthorized", { status: 403 });
+				}
+
+				const targetChannel = TELEGRAM_HOME_CHANNEL || message.chatId;
 
 				waitUntil(
 					drainAll((task) =>
@@ -46,6 +55,11 @@ export default defineChannel({
 		});
 	},
 });
+
+function isAuthorized(chatId: string): boolean {
+	if (!TELEGRAM_USER_ID) return true;
+	return chatId === TELEGRAM_USER_ID;
+}
 
 function extractMessage(body: unknown): { chatId: string; text: string } | null {
 	if (
