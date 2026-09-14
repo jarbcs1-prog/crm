@@ -1,3 +1,4 @@
+import { LEGAL_APPROACH_SCRIPT } from "../lib/legal-approach";
 import { PRIORITY } from "@crm/db/agent-tasks";
 import { db } from "@crm/db";
 import { defineTool } from "eve/tools";
@@ -52,7 +53,7 @@ export default defineTool({
 				await scheduleTask({
 					contactId,
 					kind: "call",
-					reason: reason ?? "CLID pitch call",
+					reason: reason ?? LEGAL_APPROACH_SCRIPT,
 					dueAt: parsedDueAt,
 					budget: 5,
 					priority: PRIORITY.call,
