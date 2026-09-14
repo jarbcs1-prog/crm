@@ -311,12 +311,35 @@ curl -X POST "https://api.telegram.org/bot<TELEGRAM_BOT_TOKEN>/setWebhook" \
 curl -X POST "https://api.telegram.org/bot<TELEGRAM_BOT_TOKEN>/setWebhook" -d "url="
 ```
 
+### Bot commands
+
+Send any of these to the bot in Telegram to control the CRM from your phone:
+
+| Command | Action |
+| --- | --- |
+| `/start` or `/help` | List all available commands |
+| `/status` | Show bot token status, user ID, home channel |
+| `/test` | Send a test message to verify the bot is alive |
+| `/send <message>` | Send a message to the home channel |
+| `/queue` | Check dispatch queue status |
+| `/config` | Show bot configuration (token is masked) |
+| `/webhook` | Show webhook endpoint info |
+
+Example usage in Telegram:
+```
+/status
+/test
+/send Hello from my phone
+/config
+```
+
 ### How it works
 
 1. Telegram sends POST requests to `/internal/telegram/webhook`
 2. The `isAuthorized` check verifies the request came from Telegram by matching `chat_id` against `TELEGRAM_USERID`
-3. The `drain` pipeline dispatches the message to the configured channel
-4. The agent processes inbound messages and responds via `sendTelegramMessage`
+3. If the message starts with `/`, the command parser handles it directly via `sendTelegramMessage`
+4. Otherwise, the `drain` pipeline dispatches the message to the configured channel
+5. The agent processes inbound messages and responds via `sendTelegramMessage`
 
 ## Deploying
 
