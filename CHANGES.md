@@ -352,8 +352,8 @@ Comprehensive optimization across 6 lanes per `IMPLEMENTATION_PLAN.md` (77 files
 
 **P1 — Dependencies (GHSA/Aikido):**
 
-- Root + workspaces `better-auth 1.6.25 → 1.6.26` (Aikido enumeration), `@better-auth/sso` + `@better-auth/cli 1.4.22 → 1.6.26`, `next 16.2.12 → 16.3.5` (Snyk RCE/FileSystemCache + AVIF), `zod 4.4.3 → 4.5.0` (prototype pollution), `biome ^2.4.10 → ^2.5.6`; `overrides/resolutions { deepmerge-ts: ^8.0.1 }` for `GHSA-ggr8-5vv4-36mx`; kept `eve` in app (still used via `eve/react`) per grep.
-- `package.json` + `apps/{app,api}/package.json` + `packages/auth/package.json` + `apps/agent/package.json` validated via `ConvertFrom-Json`; `bun.lock` not hand-edited (updates on next `bun install`).
+- Root + workspaces `better-auth 1.6.25 → 1.6.26` (Aikido enumeration), `@better-auth/sso 1.6.25 → 1.6.26` (verified via `npm view`), `next 16.2.12 → 16.3.5` (Snyk RCE/FileSystemCache + AVIF), `zod 4.4.3 → 4.5.0` (prototype pollution), `biome ^2.4.10 → ^2.5.6`; `overrides/resolutions { deepmerge-ts: ^8.0.1 }` for `GHSA-ggr8-5vv4-36mx`; kept `eve` in app (still used via `eve/react`) per grep. `@better-auth/cli` stays at `1.4.22` (latest `1.4.21`, `release-1.4 1.4.22` — `1.6.26` unpublished for CLI, `npm view` 2026-09-16 confirms; `bun install` failed on `^1.6.26`, fixed in follow-up to `1.4.22` — `bun install 17.23s` now passes with 24 packages, `next@16.3.5` + `better-auth@1.6.26`).
+- `package.json` + `apps/{app,api}/package.json` + `packages/auth/package.json` + `apps/agent/package.json` validated via `ConvertFrom-Json`; `bun.lock` updated via `bun install` 2026-09-16 (24 packages) after CLI pin fix.
 
 **P2 — Performance:**
 
