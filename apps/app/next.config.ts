@@ -25,7 +25,6 @@ const nextConfig: NextConfig = {
 	},
 
 	experimental: {
-		viewTransition: true,
 		optimizePackageImports: ["@carbon/icons-react", "recharts"],
 	},
 
