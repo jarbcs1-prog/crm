@@ -17,7 +17,7 @@
 		"clean": "rm -rf .turbo node_modules"
 	},
 	"dependencies": {
-		"@better-auth/sso": "^1.6.26",
+		"@better-auth/sso": "1.6.26",
 		"@crm/db": "workspace:*",
 		"@crm/env": "workspace:*",
 		"better-auth": "^1.6.26"

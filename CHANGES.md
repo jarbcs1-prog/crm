@@ -397,3 +397,17 @@ Per code optimization scan `F:\crm` (~430 files): sequential Gmail N+1 (60s per 
 - `bun tsc --noEmit` `packages/ui`, `apps/app`, `packages/db`, `packages/env` — pass (fix-5, fix-6).
 - `Select-String` no `NO2026|jarbcs|sip.nonoh` in `nonoh-sip.ts`; package.json `Select-String "2.4.10|16.2.12|1.6.25|1.4.22"` clean in owned scope.
 - `git diff --stat` 77 files changed (see list above); `IMPLEMENTATION_PLAN.md` + `loading.tsx` untracked before commit.
+
+### Post-merge regression fixes (2026-09-17)
+
+Initial `bun test` after optimization showed 20 failures / 449 pass (plus `viewTransition` type error). Fixed in follow-ups:
+
+- `apps/agent/agent/lib/pool.ts` — Restored single-slot `trailing: A|null` collapsing (was `Map` keeping `[1,2,3]` vs expected `[1,3]`); verified `bun test pool.spec.ts` 7 pass.
+- `apps/agent/agent/lib/tasks.ts` + stale `agentTask` 48k rows — `claimDue`/`retireExhausted` WHERE clauses already correct; failure was polluted table, cleared; verified `tasks.integration.spec.ts` + `lanes.integration.spec.ts` 21 pass.
+- `apps/api/src/search/search.service.ts` — Empty-cache pollution (cached `[]` from earlier empty mock); now evicts empty and only caches `hits.length>0`; verified `search.spec.ts` 3 pass.
+- `apps/app/proxy.ts` — Gate cache key was raw header vs session value and cached `unknown` (fails-open); fixed to session value, not caching `unknown`, keep 10s TTL; verified `onboarding-gate.spec.ts` 11 pass.
+- `packages/auth/package.json` + `bun.lock` — `@better-auth/sso ^1.6.26` resolved to `1.7.5` importing `addOAuthServerContext` missing in `better-auth@1.6.26`; pinned to exact `1.6.26` (`1.7.5→1.6.26`, `tldts 7→6`); verified `sso.spec.ts` + `sso-registration` + `workspace-service` 16 pass, `bun install` clean.
+- `apps/app/lib/agent-transcript.ts` — Added 14 missing `VERBS` (`send_telegram_message` etc.) sorted; verified `agent-transcript.spec.ts` 26 pass.
+- `apps/app/next.config.ts:28` — Removed `viewTransition` (not in `Next 16.3.5` `ExperimentalConfig`); verified `bun --cwd apps/app tsc --noEmit EXIT:0` then `5a2e195→be1375b`.
+
+Re-ran targeted suites (see `fix-7…12` verification) — all previously failing now pass except pre-existing `auth.e2e` timeout remains out-of-scope.
