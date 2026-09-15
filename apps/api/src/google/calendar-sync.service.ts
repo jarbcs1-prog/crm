@@ -310,26 +310,31 @@ export class CalendarSyncService {
 			contacts.map((contact) => [contact.email as string, contact.id]),
 		);
 
-		for (const attendee of attendees) {
-			const email = (attendee.email as string).toLowerCase();
-
-			await this.db.calendarAttendee.upsert({
-				where: { eventId_email: { eventId, email } },
-				create: {
-					eventId,
-					email,
-					name: attendee.displayName ?? null,
-					responseStatus: attendee.responseStatus ?? null,
-					isOrganizer: attendee.organizer ?? false,
-					contactId: contactByEmail.get(email) ?? null,
-				},
-				update: {
-					name: attendee.displayName ?? null,
-					responseStatus: attendee.responseStatus ?? null,
-					isOrganizer: attendee.organizer ?? false,
-					contactId: contactByEmail.get(email) ?? null,
-				},
-			});
+		const attendeeChunkSize = 5;
+		for (let i = 0; i < attendees.length; i += attendeeChunkSize) {
+			const chunk = attendees.slice(i, i + attendeeChunkSize);
+			await Promise.all(
+				chunk.map((attendee) => {
+					const email = (attendee.email as string).toLowerCase();
+					return this.db.calendarAttendee.upsert({
+						where: { eventId_email: { eventId, email } },
+						create: {
+							eventId,
+							email,
+							name: attendee.displayName ?? null,
+							responseStatus: attendee.responseStatus ?? null,
+							isOrganizer: attendee.organizer ?? false,
+							contactId: contactByEmail.get(email) ?? null,
+						},
+						update: {
+							name: attendee.displayName ?? null,
+							responseStatus: attendee.responseStatus ?? null,
+							isOrganizer: attendee.organizer ?? false,
+							contactId: contactByEmail.get(email) ?? null,
+						},
+					});
+				}),
+			);
 		}
 	}
 
@@ -349,11 +354,10 @@ export class CalendarSyncService {
 			select: { contactId: true },
 		});
 
-		for (const attendee of attendees) {
-			if (attendee.contactId) {
-				await this.agent.meetingSoon(attendee.contactId, startsAt);
-			}
-		}
+		const pending = attendees.filter((attendee) => attendee.contactId);
+		await Promise.allSettled(
+			pending.map((attendee) => this.agent.meetingSoon(attendee.contactId as string, startsAt)),
+		);
 	}
 
 	private async project(

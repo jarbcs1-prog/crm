@@ -496,9 +496,6 @@ function useSavedConversation({
 
 	const isNew = conversation === null || conversation.sessionId !== sessionId;
 
-	const latest = useRef({ save, queryClient, trpc, opening });
-	latest.current = { save, queryClient, trpc, opening };
-
 	const written = useRef<string | null>(null);
 
 	useEffect(() => {
@@ -508,14 +505,7 @@ function useSavedConversation({
 		if (written.current === cursor) return;
 		written.current = cursor;
 
-		const {
-			save: mutation,
-			queryClient: cache,
-			trpc: api,
-			opening: title,
-		} = latest.current;
-
-		mutation.mutate(
+		save.mutate(
 			{
 				...(contactId ? { contactId } : {}),
 				...(companyId ? { companyId } : {}),
@@ -524,13 +514,13 @@ function useSavedConversation({
 				continuationToken: token,
 				streamIndex,
 				messageCount: messages,
-				...(isNew ? { title: title.current ?? undefined } : {}),
+				...(isNew ? { title: opening.current ?? undefined } : {}),
 			},
 			{
 				onSuccess: () => {
 					if (!isNew) return;
-					void cache.invalidateQueries({
-						queryKey: api.conversations.list.pathKey(),
+					void queryClient.invalidateQueries({
+						queryKey: trpc.conversations.list.pathKey(),
 					});
 				},
 			},
@@ -544,5 +534,9 @@ function useSavedConversation({
 		companyId,
 		dealId,
 		isNew,
+		save,
+		queryClient,
+		trpc,
+		opening,
 	]);
 }

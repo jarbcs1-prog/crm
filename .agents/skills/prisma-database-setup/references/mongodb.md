@@ -6,7 +6,7 @@ MongoDB projects should stay on the latest Prisma 6.x release. Do not upgrade a 
 
 - MongoDB 4.2+
 - Replica Set configured (required for transactions)
-- Latest Prisma 6.x release, or your team's pinned Prisma 6 version
+- Latest Prisma 6.x release or your team's pinned Prisma 6 version
 - Node.js 20.19.0+
 - TypeScript 5.4.0+
 

@@ -200,7 +200,7 @@ Displays keyboard shortcuts for voice items.
 
 ### `<VoiceSelectorPreview />`
 
-A button that allows users to preview/play a voice sample before selecting it. Shows play, pause, or loading icons based on state.
+A button that allows users to preview/play a voice sample before selecting it. Shows play, pause or loading icons based on state.
 
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|

@@ -122,7 +122,9 @@ async function fromEmployerSite(
 			const parsed = new URL(photo);
 			if (parsed.protocol !== "https:" && parsed.protocol !== "http:") continue;
 			return { source: "employer-site", url: parsed.toString() };
-		} catch {}
+		} catch (error) {
+			console.warn({ message: "invalid portrait photoUrl", error, photo });
+		}
 	}
 
 	return null;

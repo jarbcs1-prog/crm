@@ -29,7 +29,8 @@ function isWorkspaceRoot(directory: string): boolean {
 			"workspaces" in parsed &&
 			parsed.workspaces !== undefined
 		);
-	} catch {
+	} catch (error) {
+		console.warn({ message: "Failed to parse package.json", error, manifest });
 		return false;
 	}
 }
@@ -86,7 +87,9 @@ export function loadRootEnv(): void {
 
 		try {
 			Object.assign(merged, parseEnv(readFileSync(path, "utf8")));
-		} catch {}
+		} catch (error) {
+			console.warn({ message: "Failed to parse env file", error, path });
+		}
 	}
 
 	for (const [key, value] of Object.entries(merged)) {

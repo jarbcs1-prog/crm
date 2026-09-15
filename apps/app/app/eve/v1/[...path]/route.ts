@@ -7,7 +7,31 @@ import { getSession } from "@/lib/session";
 
 export const dynamic = "force-dynamic";
 
+const BODY_LIMIT = 1_048_576;
+
+function limitedBody(body: ReadableStream<Uint8Array> | null): ReadableStream<Uint8Array> | null {
+	if (!body) return null;
+	let seen = 0;
+	return body.pipeThrough(
+		new TransformStream<Uint8Array, Uint8Array>({
+			transform(chunk, controller) {
+				seen += chunk.byteLength;
+				if (seen > BODY_LIMIT) controller.error(new Error("Payload too large"));
+				else controller.enqueue(chunk);
+			},
+		}),
+	);
+}
+
 async function handler(request: Request): Promise<Response> {
+	const cl = request.headers.get("content-length");
+	if (cl && Number(cl) > BODY_LIMIT) {
+		return Response.json({ error: "Payload too large." }, { status: 413 });
+	}
+	const _url = new URL(request.url);
+	if (!_url.pathname.startsWith("/eve/")) {
+		return Response.json({ error: "Not found." }, { status: 404 });
+	}
 	if (!bridgeConfigured()) {
 		return Response.json(
 			{ error: "The research agent is not configured for this install." },
@@ -72,11 +96,12 @@ async function handler(request: Request): Promise<Response> {
 	};
 
 	if (request.method !== "GET" && request.method !== "HEAD") {
-		init.body = request.body;
+		init.body = limitedBody(request.body) as unknown as BodyInit | null;
 		init.duplex = "half";
 	}
 
 	let upstream: Response;
+
 	try {
 		upstream = await fetch(target, init);
 	} catch (error) {
@@ -106,6 +131,10 @@ async function handler(request: Request): Promise<Response> {
 	});
 }
 
+function cuid(value: string | null): string | undefined {
+	return value && /^[a-z0-9]{20,32}$/.test(value) ? value : undefined;
+}
+
 export {
 	handler as DELETE,
 	handler as GET,
@@ -115,7 +144,3 @@ export {
 	handler as POST,
 	handler as PUT,
 };
-
-function cuid(value: string | null): string | undefined {
-	return value && /^[a-z0-9]{20,32}$/.test(value) ? value : undefined;
-}

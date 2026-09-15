@@ -11,12 +11,17 @@ interface NonohConfig {
 }
 
 const CONFIG: NonohConfig = {
-	server: process.env.NONOH_SIP_SERVER?.trim() ?? "sip.nonoh.net",
+	server: process.env.NONOH_SIP_SERVER?.trim() || "",
 	port: Number.parseInt(process.env.NONOH_SIP_PORT ?? "5060", 10),
 	tls: (process.env.NONOH_SIP_TLS ?? "false") === "true",
-	username: process.env.NONOH_USERNAME?.trim() ?? "jarbcs",
-	password: process.env.NONOH_PASSWORD?.trim() ?? "NO2026noh!",
-	displayName: process.env.NONOH_DISPLAY_NAME?.trim() ?? "+46701946961",
+	username: process.env.NONOH_USERNAME?.trim() || "",
+	get password(): string {
+		const v = process.env.NONOH_PASSWORD?.trim();
+		if (!v) throw new Error("NONOH_PASSWORD is not set. Set NONOH_PASSWORD in your environment to enable Nonoh SIP calling.");
+		return v;
+	},
+	set password(_v: string) {},
+	displayName: process.env.NONOH_DISPLAY_NAME?.trim() || "",
 };
 
 const NONOH_TIMEOUT_MS = 15_000;
@@ -101,7 +106,7 @@ export class NonohSipClient {
 	private pending = new Map<string, { resolve: (v: NonohCallResult) => void; timer: ReturnType<typeof setTimeout> }>();
 
 	get isConfigured(): boolean {
-		return CONFIG.username.length > 0 && CONFIG.password.length > 0 && CONFIG.server.length > 0;
+		return CONFIG.username.length > 0 && (process.env.NONOH_PASSWORD?.trim()?.length ?? 0) > 0 && CONFIG.server.length > 0;
 	}
 
 	get isRegistered(): boolean {

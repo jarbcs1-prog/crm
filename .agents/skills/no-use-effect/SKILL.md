@@ -3,13 +3,13 @@ name: no-use-effect
 description: >-
   Enforce the no-useEffect rule when writing or reviewing React code.
   ACTIVATE when writing React components, refactoring existing useEffect calls,
-  reviewing PRs with useEffect, or when an agent adds useEffect "just in case."
+  reviewing PRs with useEffect or when an agent adds useEffect "just in case."
   Provides the five replacement patterns and the useMountEffect escape hatch.
 ---
 
 # No useEffect
 
-Never call `useEffect` directly. Use derived state, event handlers, data-fetching libraries, or `useMountEffect` instead.
+Never call `useEffect` directly. Use derived state, event handlers, data-fetching libraries or `useMountEffect` instead.
 
 ## Quick Reference
 
@@ -36,7 +36,7 @@ Never call `useEffect` directly. Use derived state, event handlers, data-fetchin
 
 ### 1. Identify the useEffect
 
-Determine what the effect is doing -- deriving state, fetching data, responding to an event, syncing with an external system, or resetting state.
+Determine what the effect is doing -- deriving state, fetching data, responding to an event, syncing with an external system or resetting state.
 
 ### 2. Apply the Correct Replacement Pattern
 
@@ -87,7 +87,7 @@ function ProductList() {
 }
 ```
 
-**Smell test:** You are about to write `useEffect(() => setX(deriveFromY(y)), [y])`, or you have state that only mirrors other state or props.
+**Smell test:** You are about to write `useEffect(() => setX(deriveFromY(y)), [y])` or you have state that only mirrors other state or props.
 
 ### Rule 2: Use data-fetching libraries
 
@@ -111,7 +111,7 @@ function ProductPage({ productId }) {
 }
 ```
 
-**Smell test:** Your effect does `fetch(...)` and then `setState(...)`, or you are re-implementing caching, retries, cancellation, or stale handling.
+**Smell test:** Your effect does `fetch(...)` and then `setState(...)` or you are re-implementing caching, retries, cancellation or stale handling.
 
 ### Rule 3: Event handlers, not effects
 
@@ -138,7 +138,7 @@ function LikeButton() {
 }
 ```
 
-**Smell test:** State is used as a flag so an effect can do the real action, or you are building "set flag -> effect runs -> reset flag" mechanics.
+**Smell test:** State is used as a flag so an effect can do the real action or you are building "set flag -> effect runs -> reset flag" mechanics.
 
 ### Rule 4: useMountEffect for one-time external sync
 
@@ -204,7 +204,7 @@ function VideoPlayerWrapper({ videoId }) {
 }
 ```
 
-**Smell test:** You are writing an effect whose only job is to reset local state when an ID/prop changes, or you want the component to behave like a brand-new instance for each entity.
+**Smell test:** You are writing an effect whose only job is to reset local state when an ID/prop changes or you want the component to behave like a brand-new instance for each entity.
 
 ## Component Structure Convention
 

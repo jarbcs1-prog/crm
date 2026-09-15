@@ -10,35 +10,96 @@ function displayCurrencyCode(currency: string): string {
 		: "USD";
 }
 
-export function formatMoney(cents: number, currency = "usd"): string {
-	return new Intl.NumberFormat(undefined, {
-		style: "currency",
-		currency: displayCurrencyCode(currency),
-		minimumFractionDigits: cents % 100 === 0 ? 0 : 2,
-	}).format(cents / 100);
-}
+const NF_PCT = new Intl.NumberFormat(undefined, {
+	style: "percent",
+	maximumFractionDigits: 0,
+});
 
-export function formatMoneyCompact(cents: number, currency = "usd"): string {
-	return new Intl.NumberFormat(undefined, {
-		style: "currency",
-		currency: displayCurrencyCode(currency),
-		notation: "compact",
-		maximumFractionDigits: cents % 100_000 === 0 ? 0 : 1,
-	}).format(cents / 100);
-}
-
-export function formatPercent(rate: number): string {
-	return new Intl.NumberFormat(undefined, {
-		style: "percent",
-		maximumFractionDigits: 0,
-	}).format(rate);
-}
-
-const dayFormat = new Intl.DateTimeFormat(undefined, {
+const DF = new Intl.DateTimeFormat(undefined, {
 	month: "short",
 	day: "numeric",
 	year: "numeric",
 });
+
+const DF_SHORT = new Intl.DateTimeFormat(undefined, {
+	month: "short",
+	day: "numeric",
+});
+
+const NF_USD = new Intl.NumberFormat(undefined, {
+	style: "currency",
+	currency: "USD",
+	minimumFractionDigits: 0,
+});
+
+const NF_USD_F2 = new Intl.NumberFormat(undefined, {
+	style: "currency",
+	currency: "USD",
+	minimumFractionDigits: 2,
+});
+
+const NF_USD_COMPACT = new Intl.NumberFormat(undefined, {
+	style: "currency",
+	currency: "USD",
+	notation: "compact",
+	maximumFractionDigits: 0,
+});
+
+const NF_USD_COMPACT_F1 = new Intl.NumberFormat(undefined, {
+	style: "currency",
+	currency: "USD",
+	notation: "compact",
+	maximumFractionDigits: 1,
+});
+
+const moneyCache = new Map<string, Intl.NumberFormat>();
+
+function getMoneyFormatter(currency: string, fractionDigits: number): Intl.NumberFormat {
+	const key = `${currency}:${fractionDigits}`;
+	let f = moneyCache.get(key);
+	if (!f) {
+		f = new Intl.NumberFormat(undefined, {
+			style: "currency",
+			currency,
+			minimumFractionDigits: fractionDigits,
+		});
+		moneyCache.set(key, f);
+	}
+	return f;
+}
+
+function getMoneyCompactFormatter(currency: string, fractionDigits: number): Intl.NumberFormat {
+	const key = `${currency}:compact:${fractionDigits}`;
+	let f = moneyCache.get(key);
+	if (!f) {
+		f = new Intl.NumberFormat(undefined, {
+			style: "currency",
+			currency,
+			notation: "compact",
+			maximumFractionDigits: fractionDigits,
+		});
+		moneyCache.set(key, f);
+	}
+	return f;
+}
+
+export function formatMoney(cents: number, currency = "usd"): string {
+	const code = displayCurrencyCode(currency);
+	const fractionDigits = cents % 100 === 0 ? 0 : 2;
+	if (code === "USD") return (fractionDigits === 0 ? NF_USD : NF_USD_F2).format(cents / 100);
+	return getMoneyFormatter(code, fractionDigits).format(cents / 100);
+}
+
+export function formatMoneyCompact(cents: number, currency = "usd"): string {
+	const code = displayCurrencyCode(currency);
+	const fractionDigits = cents % 100_000 === 0 ? 0 : 1;
+	if (code === "USD") return (fractionDigits === 0 ? NF_USD_COMPACT : NF_USD_COMPACT_F1).format(cents / 100);
+	return getMoneyCompactFormatter(code, fractionDigits).format(cents / 100);
+}
+
+export function formatPercent(rate: number): string {
+	return NF_PCT.format(rate);
+}
 
 function pad(value: number): string {
 	return String(value).padStart(2, "0");
@@ -58,7 +119,7 @@ export function fromDay(value: string | null | undefined): Date | undefined {
 
 export function formatDay(value: string | null | undefined): string {
 	const date = fromDay(value);
-	return date ? dayFormat.format(date) : (value ?? "—");
+	return date ? DF.format(date) : (value ?? "—");
 }
 
 export function relativeTimeFromIso(iso: string | null | undefined): string {
@@ -80,10 +141,7 @@ export function relativeTimeFromIso(iso: string | null | undefined): string {
 					? `${Math.round(abs / day)}d`
 					: null;
 	if (distance === null) {
-		return new Date(iso).toLocaleDateString(undefined, {
-			month: "short",
-			day: "numeric",
-		});
+		return DF_SHORT.format(new Date(iso));
 	}
 	return diff < 0 ? `in ${distance}` : `${distance} ago`;
 }

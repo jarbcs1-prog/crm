@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { CloseReasonDialog } from "@/components/crm/stage-change";
 import { DetailSheet } from "@/components/detail-sheet";
 import { CompanySheet } from "./company-sheet";
@@ -12,9 +12,9 @@ export function RecordSheetHost() {
 	const { stack, top, closeAll } = useRecordStack();
 
 	const [shown, setShown] = useState<RecordRef | null>(top);
-	if (top && (!shown || recordKey(shown) !== recordKey(top))) {
-		setShown(top);
-	}
+	useEffect(() => {
+		if (top) setShown(top);
+	}, [top]);
 
 	return (
 		<>

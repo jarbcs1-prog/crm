@@ -7,7 +7,7 @@ tags: security, xss, sanitization, html
 
 ## Sanitize Output to Prevent XSS
 
-While NestJS APIs typically return JSON (which browsers don't execute), XSS risks exist when rendering HTML, storing user content, or when frontend frameworks improperly handle API responses. Sanitize user-generated content before storage and use proper Content-Type headers.
+While NestJS APIs typically return JSON (which browsers don't execute), XSS risks exist when rendering HTML, storing user content or when frontend frameworks improperly handle API responses. Sanitize user-generated content before storage and use proper Content-Type headers.
 
 **Incorrect (storing raw HTML without sanitization):**
 

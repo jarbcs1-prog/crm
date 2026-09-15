@@ -2,7 +2,7 @@
 
 A comprehensive queue component system for displaying message lists, todos, and collapsible task sections in AI applications.
 
-The `Queue` component provides a flexible system for displaying lists of messages, todos, attachments, and collapsible sections. Perfect for showing AI workflow progress, pending tasks, message history, or any structured list of items in your application.
+The `Queue` component provides a flexible system for displaying lists of messages, todos, attachments, and collapsible sections. Perfect for showing AI workflow progress, pending tasks, message history or any structured list of items in your application.
 
 See `scripts/queue.tsx` for this example.
 

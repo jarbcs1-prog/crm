@@ -5,6 +5,8 @@ const MAX_REDIRECTS = 3;
 
 const DEFAULT_TIMEOUT_MS = 5_000;
 
+const MAX_BYTES = 3 * 1024 * 1024;
+
 export function isBlockedAddress(ip: string): boolean {
 	const groups = ip.includes(":") ? expandIPv6(ip) : null;
 
@@ -202,6 +204,12 @@ export async function safeFetch(
 				return null;
 			}
 			continue;
+		}
+
+		const declared = Number(response.headers.get("content-length"));
+		if (Number.isFinite(declared) && declared > MAX_BYTES) {
+			await response.body?.cancel();
+			return null;
 		}
 
 		return { response, url: target };

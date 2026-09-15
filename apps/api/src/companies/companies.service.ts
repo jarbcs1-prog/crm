@@ -500,7 +500,7 @@ export class CompaniesService {
 	}
 
 	private async facetCounts(input: CompanyListInput) {
-		const key = input.q.trim();
+		const key = JSON.stringify({ q: input.q.trim(), industry: input.industry, owner: input.owner, enrichment: input.enrichment, source: input.source });
 		const cached = this.facetCache.get(key);
 		if (cached) return cached;
 

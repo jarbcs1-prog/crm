@@ -4,7 +4,7 @@ Configure Prisma with Microsoft SQL Server.
 
 ## Prerequisites
 
-- SQL Server 2017, 2019, 2022, or Azure SQL
+- SQL Server 2017, 2019, 2022 or Azure SQL
 - TCP/IP enabled
 
 ## 1. Schema Configuration

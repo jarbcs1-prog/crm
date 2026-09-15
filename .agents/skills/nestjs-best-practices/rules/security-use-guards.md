@@ -7,7 +7,7 @@ tags: security, guards, authentication, authorization
 
 ## Use Guards for Authentication and Authorization
 
-Guards determine whether a request should be handled based on authentication state, roles, permissions, or other conditions. They run after middleware but before pipes and interceptors, making them ideal for access control. Use guards instead of manual checks in controllers.
+Guards determine whether a request should be handled based on authentication state, roles, permissions or other conditions. They run after middleware but before pipes and interceptors, making them ideal for access control. Use guards instead of manual checks in controllers.
 
 **Incorrect (manual auth checks in every handler):**
 

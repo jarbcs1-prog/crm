@@ -117,6 +117,12 @@ export async function noteSession(
 	});
 }
 
+export function jitteredBackoffMs(attempt: number): number {
+	const base = 1000 * Math.pow(2, attempt);
+	const jitter = 0.85 + Math.random() * 0.3;
+	return Math.round(base * jitter);
+}
+
 export async function scheduleTask(input: {
 	contactId?: string | null;
 	companyId?: string | null;
@@ -126,36 +132,61 @@ export async function scheduleTask(input: {
 	priority?: number;
 	budget?: number;
 }): Promise<{ id: string }> {
-	const existing = await db.agentTask.findFirst({
-		where: {
-			kind: input.kind,
-			finishedAt: null,
-			contactId: input.contactId ?? undefined,
-			companyId: input.companyId ?? undefined,
-		},
-		select: { id: true },
-	});
-
-	if (existing) {
-		await db.agentTask.update({
-			where: { id: existing.id },
-			data: { dueAt: input.dueAt, reason: input.reason },
+	try {
+		const existing = await db.agentTask.findFirst({
+			where: {
+				kind: input.kind,
+				finishedAt: null,
+				contactId: input.contactId ?? undefined,
+				companyId: input.companyId ?? undefined,
+			},
+			select: { id: true },
 		});
-		return existing;
-	}
 
-	return db.agentTask.create({
-		data: {
-			contactId: input.contactId ?? null,
-			companyId: input.companyId ?? null,
-			kind: input.kind,
-			reason: input.reason,
-			dueAt: input.dueAt,
-			priority: input.priority ?? 0,
-			budget: input.budget ?? 4,
-		},
-		select: { id: true },
-	});
+		if (existing) {
+			await db.agentTask.update({
+				where: { id: existing.id },
+				data: { dueAt: input.dueAt, reason: input.reason },
+			});
+			return existing;
+		}
+
+		return await db.agentTask.create({
+			data: {
+				contactId: input.contactId ?? null,
+				companyId: input.companyId ?? null,
+				kind: input.kind,
+				reason: input.reason,
+				dueAt: input.dueAt,
+				priority: input.priority ?? 0,
+				budget: input.budget ?? 4,
+			},
+			select: { id: true },
+		});
+	} catch (error) {
+		if (
+			error instanceof Prisma.PrismaClientKnownRequestError &&
+			error.code === "P2002"
+		) {
+			const existing = await db.agentTask.findFirst({
+				where: {
+					kind: input.kind,
+					finishedAt: null,
+					contactId: input.contactId ?? undefined,
+					companyId: input.companyId ?? undefined,
+				},
+				select: { id: true },
+			});
+			if (existing) {
+				await db.agentTask.update({
+					where: { id: existing.id },
+					data: { dueAt: input.dueAt, reason: input.reason },
+				});
+				return existing;
+			}
+		}
+		throw error;
+	}
 }
 
 export async function lastDecision(contactId: string) {

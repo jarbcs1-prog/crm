@@ -21,7 +21,7 @@
 		"@crm/env": "workspace:*",
 		"context.dev": "^2.7.0",
 		"eve": "^0.29.4",
-		"zod": "^4.4.3"
+		"zod": "^4.5.0"
 	},
 	"devDependencies": {
 		"@crm/typescript-config": "workspace:*",

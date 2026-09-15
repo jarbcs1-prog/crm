@@ -99,7 +99,7 @@ The component provides cross-browser support through a two-tier system:
 | Firefox | MediaRecorder  | `onAudioRecorded` prop |
 | Safari  | MediaRecorder  | `onAudioRecorded` prop |
 
-For full cross-browser support, provide the `onAudioRecorded` callback that sends audio to a transcription service like OpenAI Whisper, Google Cloud Speech-to-Text, or AssemblyAI.
+For full cross-browser support, provide the `onAudioRecorded` callback that sends audio to a transcription service like OpenAI Whisper, Google Cloud Speech-to-Text or AssemblyAI.
 
 ## Accessibility
 

@@ -7,7 +7,7 @@ tags: performance, lazy-loading, modules, optimization
 
 ## Use Lazy Loading for Large Modules
 
-NestJS supports lazy-loading modules, which defers initialization until first use. This is valuable for large applications where some features are rarely used, serverless deployments where cold start time matters, or when certain modules have heavy initialization costs.
+NestJS supports lazy-loading modules, which defers initialization until first use. This is valuable for large applications where some features are rarely used, serverless deployments where cold start time matters or when certain modules have heavy initialization costs.
 
 **Incorrect (loading everything eagerly):**
 

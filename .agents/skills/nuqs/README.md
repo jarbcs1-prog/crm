@@ -78,8 +78,8 @@ Reference: [Link](url)
 
 | Level | Description |
 |-------|-------------|
-| CRITICAL | Causes build failures, runtime errors, or major performance issues |
-| HIGH | Significant bugs, performance degradation, or maintenance problems |
+| CRITICAL | Causes build failures, runtime errors or major performance issues |
+| HIGH | Significant bugs, performance degradation or maintenance problems |
 | MEDIUM | Noticeable issues or suboptimal patterns |
 | LOW-MEDIUM | Minor improvements or edge case handling |
 | LOW | Nice-to-have optimizations or advanced patterns |

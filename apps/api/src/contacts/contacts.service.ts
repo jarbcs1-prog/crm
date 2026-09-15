@@ -552,7 +552,7 @@ export class ContactsService {
 	}
 
 	private async facetCounts(input: ContactListInput) {
-		const key = input.q.trim();
+		const key = JSON.stringify({ q: input.q.trim(), company: input.company, owner: input.owner, source: input.source });
 		const cached = this.facetCache.get(key);
 		if (cached) return cached;
 

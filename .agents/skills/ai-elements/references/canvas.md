@@ -30,5 +30,5 @@ npx ai-elements@latest add canvas
 
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
-| `children` | `ReactNode` | - | Child components like Background, Controls, or MiniMap. |
+| `children` | `ReactNode` | - | Child components like Background, Controls or MiniMap. |
 | `...props` | `ReactFlowProps` | - | Any other React Flow props like nodes, edges, nodeTypes, edgeTypes, onNodesChange, etc. |

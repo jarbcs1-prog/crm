@@ -1,4 +1,5 @@
 import { CallEventType, CallStatus, Prisma, db } from "@crm/db";
+import { timingSafeEqual } from "node:crypto";
 import { defineChannel, POST } from "eve/channels";
 import { callCode, isTerminalStatus } from "../lib/voice";
 
@@ -89,7 +90,14 @@ function authorised(request: Request): boolean {
 	const secret = process.env.AGENT_BRIDGE_SECRET?.trim();
 	if (!secret) return false;
 
-	return request.headers.get("authorization") === `Bearer ${secret}`;
+	const header = request.headers.get("authorization") ?? "";
+	const expected = `Bearer ${secret}`;
+	if (header.length !== expected.length) return false;
+	try {
+		return timingSafeEqual(Buffer.from(header), Buffer.from(expected));
+	} catch {
+		return false;
+	}
 }
 
 function normalize(value: string): string {

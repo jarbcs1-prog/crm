@@ -101,7 +101,30 @@ export class EnvironmentVariables {
 
 	@IsOptional()
 	@IsString()
+	@MinLength(32, {
+		message:
+			"AGENT_BRIDGE_SECRET must be at least 32 characters. Generate one with: openssl rand -base64 32",
+	})
 	AGENT_BRIDGE_SECRET?: string;
+
+	@IsOptional()
+	@IsString()
+	NONOH_SIP_SERVER?: string;
+
+	@IsOptional()
+	@IsString()
+	NONOH_USERNAME?: string;
+
+	@IsOptional()
+	@IsString()
+	@MinLength(16, {
+		message: "NONOH_PASSWORD must be at least 16 characters.",
+	})
+	NONOH_PASSWORD?: string;
+
+	@IsOptional()
+	@IsString()
+	NONOH_DISPLAY_NAME?: string;
 
 	@IsOptional()
 	@IsUrl({ require_tld: false, require_protocol: true })

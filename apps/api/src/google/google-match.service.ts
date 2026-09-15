@@ -4,6 +4,7 @@ import { Injectable, Logger } from "@nestjs/common";
 import { AgentTriggerService } from "../agent/agent-trigger.service";
 import { CompanyDirectoryService } from "../companies/company-directory.service";
 import { EnrichmentLogService } from "../crm/enrichment-log.service";
+import { TtlCache } from "../crm/ttl-cache";
 import { InjectDatabase } from "../database/database.constants";
 import {
 	dominantDomain,
@@ -40,6 +41,7 @@ export type MatchRequest = {
 @Injectable()
 export class GoogleMatchService {
 	private readonly logger = new Logger(GoogleMatchService.name);
+	private readonly identityCache = new TtlCache<{ addresses: Set<string>; domains: Set<string> }>(300_000);
 
 	constructor(
 		@InjectDatabase() private readonly db: Db,
@@ -52,6 +54,8 @@ export class GoogleMatchService {
 		addresses: Set<string>;
 		domains: Set<string>;
 	}> {
+		const cached = this.identityCache.get("internalIdentity:emails");
+		if (cached) return cached;
 		const users = await this.db.user.findMany({ select: { email: true } });
 
 		const addresses = new Set<string>();
@@ -65,7 +69,9 @@ export class GoogleMatchService {
 			if (domain) domains.add(domain);
 		}
 
-		return { addresses, domains };
+		const result = { addresses, domains };
+		this.identityCache.set("internalIdentity:emails", result);
+		return result;
 	}
 
 	async suppressedDomains(): Promise<Set<string>> {

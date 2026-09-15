@@ -27,16 +27,21 @@ export async function retireAbandoned(): Promise<void> {
 
 	try {
 		abandoned = await retireExhausted();
-	} catch {
+	} catch (error) {
+		console.warn({ message: "retireExhausted failed", error });
 		return;
 	}
 
 	for (const task of abandoned) {
-		await settle(
-			task,
-			EnrichmentStatus.FAILED,
-			"Research was attempted several times and never completed.",
-		).catch(() => {});
+		try {
+			await settle(
+				task,
+				EnrichmentStatus.FAILED,
+				"Research was attempted several times and never completed.",
+			);
+		} catch (error) {
+			console.warn({ message: "settle abandoned task failed", error });
+		}
 	}
 }
 
@@ -87,7 +92,11 @@ async function runDirect(task: LeasedTask): Promise<void> {
 		await completeTask(task.id, "The record this names is gone.");
 	} catch (error) {
 		const reason = error instanceof Error ? error.message : String(error);
-		await settle(task, EnrichmentStatus.FAILED, reason).catch(() => {});
+		try {
+			await settle(task, EnrichmentStatus.FAILED, reason);
+		} catch (e) {
+			console.warn({ message: "settle direct task failed", error: e });
+		}
 	}
 }
 
@@ -109,7 +118,11 @@ export async function runResearchLane(
 				await noteSession(task.id, session.id);
 			} catch (error) {
 				const reason = error instanceof Error ? error.message : String(error);
-				await settle(task, EnrichmentStatus.FAILED, reason).catch(() => {});
+				try {
+					await settle(task, EnrichmentStatus.FAILED, reason);
+				} catch (e) {
+					console.warn({ message: "settle research task failed", error: e });
+				}
 			}
 		}),
 	);

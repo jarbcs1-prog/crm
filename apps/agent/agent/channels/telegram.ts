@@ -154,7 +154,7 @@ async function getStatus(): Promise<string> {
 }
 
 function isAuthorized(chatId: string): boolean {
-	if (!TELEGRAM_USER_ID) return true;
+	if (!TELEGRAM_USER_ID) return false;
 	return chatId === TELEGRAM_USER_ID;
 }
 

@@ -45,6 +45,11 @@ async function readPage(url: URL): Promise<{ body: string; url: URL } | null> {
 		await response.body?.cancel();
 		return null;
 	}
+	const declared = Number(response.headers.get("content-length"));
+	if (Number.isFinite(declared) && declared > MAX_HTML_BYTES) {
+		await response.body?.cancel();
+		return null;
+	}
 	if (!response.body) return null;
 
 	const reader = response.body.getReader();

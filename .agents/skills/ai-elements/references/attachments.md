@@ -105,7 +105,7 @@ Individual attachment item wrapper.
 
 ### `<AttachmentPreview />`
 
-Displays the media preview (image, video, or icon).
+Displays the media preview (image, video or icon).
 
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|

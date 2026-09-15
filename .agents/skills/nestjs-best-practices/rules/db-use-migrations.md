@@ -16,7 +16,7 @@ Never use `synchronize: true` in production. Use migrations for all schema chang
 TypeOrmModule.forRoot({
   type: 'postgres',
   synchronize: true, // DANGEROUS in production!
-  // Can drop columns, tables, or data
+  // Can drop columns, tables or data
 });
 
 // Manual SQL in production

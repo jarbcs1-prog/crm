@@ -1,8 +1,8 @@
 # Artifact
 
-A container component for displaying generated content like code, documents, or other outputs with built-in actions.
+A container component for displaying generated content like code, documents or other outputs with built-in actions.
 
-The `Artifact` component provides a structured container for displaying generated content like code, documents, or other outputs with built-in header actions.
+The `Artifact` component provides a structured container for displaying generated content like code, documents or other outputs with built-in header actions.
 
 See `scripts/artifact.tsx` for this example.
 

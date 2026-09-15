@@ -1,6 +1,6 @@
 ---
 name: better-auth-best-practices
-description: Configure Better Auth server and client, set up database adapters, manage sessions, add plugins, and handle environment variables. Use when users mention Better Auth, betterauth, auth.ts, or need to set up TypeScript authentication with email/password, OAuth, or plugin configuration.
+description: Configure Better Auth server and client, set up database adapters, manage sessions, add plugins, and handle environment variables. Use when users mention Better Auth, betterauth, auth.ts or need to set up TypeScript authentication with email/password, OAuth or plugin configuration.
 ---
 
 # Better Auth Integration Guide
@@ -42,7 +42,7 @@ When planning an upgrade, separate guidance for the currently installed version 
 Only define `baseURL`/`secret` in config if env vars are NOT set.
 
 ### File Location
-CLI looks for `auth.ts` in: `./`, `./lib`, `./utils`, or under `./src`. Use `--config` for custom path.
+CLI looks for `auth.ts` in: `./`, `./lib`, `./utils` or under `./src`. Use `--config` for custom path.
 
 ### CLI Commands
 - `npx auth@latest migrate` - Apply schema (built-in adapter)
@@ -72,7 +72,7 @@ CLI looks for `auth.ts` in: `./`, `./lib`, `./utils`, or under `./src`. Use `--c
 
 ## Database
 
-**Direct connections:** Pass `pg.Pool`, `mysql2` pool, `better-sqlite3`, or `bun:sqlite` instance. For Postgres, also supports `postgres` (postgres.js) and `@neondatabase/serverless`.
+**Direct connections:** Pass `pg.Pool`, `mysql2` pool, `better-sqlite3` or `bun:sqlite` instance. For Postgres, also supports `postgres` (postgres.js) and `@neondatabase/serverless`.
 
 **ORM adapters:** Import from `better-auth/adapters/drizzle`, `better-auth/adapters/prisma`, `better-auth/adapters/mongodb`.
 

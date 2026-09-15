@@ -185,7 +185,9 @@ export class WorkspaceService {
 		]);
 
 		return {
-			rows: rows.map((row) => this.toMember(row, userId)),
+			rows: rows
+				.map((row) => this.toMember(row, userId))
+				.filter((member) => member !== null),
 			total,
 			facetCounts: { role: countsByKey(roles, "role") },
 		};
@@ -215,6 +217,7 @@ export class WorkspaceService {
 				const owners = await tx.$queryRaw<{ id: string }[]>`
 					SELECT id FROM "member"
 					WHERE "organizationId" = ${WORKSPACE_ID} AND role = 'owner'
+					ORDER BY id
 					FOR UPDATE
 				`;
 
@@ -262,6 +265,7 @@ export class WorkspaceService {
 				const owners = await tx.$queryRaw<{ id: string }[]>`
 					SELECT id FROM "member"
 					WHERE "organizationId" = ${WORKSPACE_ID} AND role = 'owner'
+					ORDER BY id
 					FOR UPDATE
 				`;
 
@@ -286,10 +290,22 @@ export class WorkspaceService {
 			role: input.role,
 		});
 
-		return this.toMember(updated, userId);
+		const member = this.toMember(updated, userId);
+		if (!member) {
+			throw new NotFoundException("That person is not in this workspace.");
+		}
+		return member;
 	}
 
-	private toMember(row: MemberRow, userId: string): WorkspaceMember {
+	private toMember(row: MemberRow, userId: string): WorkspaceMember | null {
+		if (!row.user) {
+			this.logger.warn({
+				message: "Member row has no user; skipping",
+				memberId: row.id,
+				memberUserId: row.userId,
+			});
+			return null;
+		}
 		return {
 			id: row.id,
 			userId: row.userId,

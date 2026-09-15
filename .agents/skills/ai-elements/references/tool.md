@@ -225,7 +225,7 @@ See `scripts/tool-output-error.tsx` for this example.
 |------|------|---------|-------------|
 | `title` | `string` | - | Custom title to display instead of the derived tool name. |
 | `type` | `ToolUIPart[` | Required | The type/name of the tool. |
-| `state` | `ToolUIPart[` | Required | The current state of the tool (input-streaming, input-available, output-available, or output-error). |
+| `state` | `ToolUIPart[` | Required | The current state of the tool (input-streaming, input-available, output-available or output-error). |
 | `toolName` | `string` | - | Required when type is  |
 | `className` | `string` | - | Additional CSS classes to apply to the header. |
 | `...props` | `React.ComponentProps<typeof CollapsibleTrigger>` | - | Any other props are spread to the CollapsibleTrigger. |

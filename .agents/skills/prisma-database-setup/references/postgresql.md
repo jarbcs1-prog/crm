@@ -53,7 +53,7 @@ postgresql://USER:PASSWORD@HOST:PORT/DATABASE?schema=SCHEMA
 
 - **USER**: Database user
 - **PASSWORD**: Password (URL encoded if special chars)
-- **HOST**: Hostname (localhost, IP, or domain)
+- **HOST**: Hostname (localhost, IP or domain)
 - **PORT**: Port (default 5432)
 - **DATABASE**: Database name
 - **SCHEMA**: Schema name (default `public`)

@@ -5,7 +5,24 @@ import {
 	ONBOARDING_PATH,
 	readOnboardingGate,
 	settleOnboarding,
+	type OnboardingGate,
 } from "@/lib/onboarding";
+
+const GATE_TTL_MS = 10_000;
+const gateCache = new Map<string, { value: OnboardingGate; at: number }>();
+
+async function getCachedGate(request: NextRequest): Promise<OnboardingGate> {
+	const key = request.headers.get("cookie") ?? "__no_cookie__";
+	const hit = gateCache.get(key);
+	if (hit && Date.now() - hit.at < GATE_TTL_MS) return hit.value;
+	const value = await readOnboardingGate(request);
+	gateCache.set(key, { value, at: Date.now() });
+	if (gateCache.size > 500) {
+		const oldest = gateCache.keys().next().value as string | undefined;
+		if (oldest) gateCache.delete(oldest);
+	}
+	return value;
+}
 
 const SIGN_IN_PATH = "/sign-in";
 
@@ -24,7 +41,7 @@ export async function proxy(request: NextRequest) {
 
 	if (request.cookies.has(ONBOARDING_COOKIE)) return beyondOnboarding(request);
 
-	const gate = await readOnboardingGate(request);
+	const gate = await getCachedGate(request);
 
 	if (gate === "unknown") return NextResponse.next();
 

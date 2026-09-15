@@ -329,3 +329,71 @@ Added Telegram bot channel infrastructure to the research agent, enabling the ag
 - `bun run build` (app): ✓ Compiled successfully
 - `bun run check-types`: ✓ Passes for agent, app, and api packages
 - `bun test test/telegram-message.spec.ts`: 4/4 pass
+
+---
+
+## 14. Performance & Security Optimization (2026-09-16)
+
+### What changed
+
+Comprehensive optimization across 6 lanes per `IMPLEMENTATION_PLAN.md` (77 files, 634+/248-). Executed via parallel fixer agents under workflow manager.
+
+**P1 — Security & Correctness:**
+
+- `apps/agent/agent/lib/nonoh-sip.ts:13` — Removed hardcoded fallback `NO2026noh!` / `jarbcs` / `sip.nonoh.net`; password now throws `NONOH_PASSWORD is not set` if not configured; `isConfigured` checks env directly.
+- `apps/api/src/config/env.validation.ts:102` — `AGENT_BRIDGE_SECRET` now `@MinLength(32)` with message `openssl rand -base64 32`; added `NONOH_SIP_SERVER`, `NONOH_USERNAME`, `NONOH_PASSWORD @MinLength(16)`, `NONOH_DISPLAY_NAME`.
+- `apps/agent/agent/channels/voice.ts:88` — Replaced `=== Bearer` with `timingSafeEqual` constant-time; fail-closed when secret unset.
+- `apps/api/src/google/sync.controller.ts:55` — Constant-time `timingSafeEqual` with dummy equal-length call on length mismatch (no length oracle).
+- `apps/agent/agent/channels/crm.ts:17` + `eve.ts:44` — Unified fail-closed; `eve.ts` trims secret.
+- `apps/app/app/api/[...path]/route.ts:14` + `apps/app/app/eve/v1/[...path]/route.ts` — Allow-list `/api/` / `/eve/` (404 otherwise), 1 MB `BODY_LIMIT` + `limitedBody` TransformStream streaming guard, `request.signal` passthrough, `console.warn` instead of `console.error`.
+- `apps/api/src/create-app.ts:18` — `helmet({ contentSecurityPolicy: { defaultSrc ["'none'"], frameAncestors ["'none'"] }, crossOriginResourcePolicy: { policy: "cross-origin" }, hsts: production })`.
+- `apps/api/src/app.module.ts:28` — `ThrottlerModule.forRoot([{ ttl: 60000, limit: 30 }])` + `APP_GUARD ThrottlerGuard` (global, `@SkipThrottle` for `/internal/sync/*`).
+- `apps/app/next.config.ts:11` — `images.formats ["image/avif","image/webp"]`, `experimental.optimizePackageImports ["@carbon/icons-react","recharts"]`, `async headers()` CSP `default-src 'self'` + `frame-ancestors 'none'`, `X-Frame-Options DENY`, `X-Content-Type-Options nosniff`, etc.
+
+**P1 — Dependencies (GHSA/Aikido):**
+
+- Root + workspaces `better-auth 1.6.25 → 1.6.26` (Aikido enumeration), `@better-auth/sso` + `@better-auth/cli 1.4.22 → 1.6.26`, `next 16.2.12 → 16.3.5` (Snyk RCE/FileSystemCache + AVIF), `zod 4.4.3 → 4.5.0` (prototype pollution), `biome ^2.4.10 → ^2.5.6`; `overrides/resolutions { deepmerge-ts: ^8.0.1 }` for `GHSA-ggr8-5vv4-36mx`; kept `eve` in app (still used via `eve/react`) per grep.
+- `package.json` + `apps/{app,api}/package.json` + `packages/auth/package.json` + `apps/agent/package.json` validated via `ConvertFrom-Json`; `bun.lock` not hand-edited (updates on next `bun install`).
+
+**P2 — Performance:**
+
+- `apps/api/src/google/gmail-sync.service.ts:237` — Chunked `Promise.all(5)` fetch + `Promise.allSettled(5)` store with warn logging (was sequential 120×7 DB ops).
+- `apps/api/src/google/calendar-sync.service.ts:313/352` — Attendee upserts chunked 5-concurrency + `Promise.allSettled` `meetingSoon`.
+- `apps/api/src/search/search.service.ts:18` — `length <3` guard + 10s `Map` TTL (200-entry LRU) cache.
+- `apps/api/src/google/google-match.service.ts:44` — `TtlCache 300s` for `internalIdentity()`.
+- `apps/api/src/trpc/list-input.ts:21` — `Math.min(page,100)` cap.
+- `apps/api/src/companies/companies.service.ts:503` / `contacts:555` / `deals:358` — Facet cache key composite `JSON.stringify({q, filters})`.
+- `apps/api/src/dashboard/dashboard.service.ts:39` + `ttl-cache.ts:20` — `delete(key)` + `invalidateSummary(scope)` per-user:scope.
+- `packages/ui/src/lib/format.ts:7` — Module singletons `NF_USD`, `DF`, `NF_PCT` + `moneyCache` (was per-call `new Intl.*`).
+- `apps/app/components/crm/record-sheet/record-sheet-host.tsx:14` — `setShown` moved to `useEffect`.
+- `packages/ui/src/hooks/use-mobile.ts:1` — `useSyncExternalStore` (no hydration flicker).
+- `packages/ui/src/components/chart.tsx:9` — `sanitizeColor` allow-list before `dangerouslySetInnerHTML`.
+
+**P3 — Reliability:**
+
+- `apps/api/src/deals/deals.service.ts:336` — `FACET_UNASSIGNED` now `ownerId=null` (was `in:[]` → 0 rows).
+- `apps/api/src/workspace/workspace.service.ts:217,264` — `ORDER BY id FOR UPDATE` deterministic locking.
+- `apps/agent/agent/lib/tasks.ts:62` — `jitteredBackoffMs` 0.85-1.15 + P2002 duplicate catch retry as update.
+- `apps/agent/agent/lib/pool.ts:5` — `Map<string,A>` Set queue (all distinct `drainAll` args kept) + `console.warn` on catchUp.
+- `apps/agent/agent/lib/dispatch.ts:25/88` + `portrait-sources.ts:125` — Structured `console.warn` (no silent swallow).
+- `apps/agent/agent/channels/telegram.ts:156` — Fail-closed `return false` when `TELEGRAM_USERID` unset.
+- `packages/db/src/favicon.ts:45` + `safe-fetch.ts:200` — `content-length` abort > `MAX_BYTES` (512KB / 3MB) before buffering; `safe-fetch` `MAX_BYTES=3MB`.
+- `apps/app/proxy.ts:1` — 10s `gateCache Map` for `readOnboardingGate` (500-entry eviction).
+- `apps/app/app/(app)/loading.tsx:1` — Streaming boundary skeleton.
+- `packages/env/src/index.ts:32` — Warn on parse failures (not silent).
+
+**Artifacts:**
+
+- `IMPLEMENTATION_PLAN.md` — Full plan with lanes, evidence index (`gmail-sync:239`, `search:26`, etc.), verification gates.
+- `apps/app/app/(app)/loading.tsx` — New.
+
+### Why
+
+Per code optimization scan `F:\crm` (~430 files): sequential Gmail N+1 (60s per tick), `contains insensitve` scans per keystroke, offset pagination, full user-table scan, per-call `Intl`, divergent dashboard cache, unbounded relations, hardcoded SIP secret, open proxy, missing rate-limit/CSP, weak bridge secret, timing oracle, CSS injection via `chart.tsx`, facet cache keyed only on `q`, `deals:336` `in:[]` bug.
+
+### Verification
+
+- `bun --filter=api check-types` / `--filter=agent` — pass (fix-1, fix-2, fix-6).
+- `bun tsc --noEmit` `packages/ui`, `apps/app`, `packages/db`, `packages/env` — pass (fix-5, fix-6).
+- `Select-String` no `NO2026|jarbcs|sip.nonoh` in `nonoh-sip.ts`; package.json `Select-String "2.4.10|16.2.12|1.6.25|1.4.22"` clean in owned scope.
+- `git diff --stat` 77 files changed (see list above); `IMPLEMENTATION_PLAN.md` + `loading.tsx` untracked before commit.

@@ -15,7 +15,18 @@ export async function createApp(): Promise<NestExpressApplication> {
 		{ bodyParser: false, logger: new ContextLogger() },
 	);
 
-	app.use(helmet());
+	const isProd = process.env.NODE_ENV === "production";
+	app.use(
+		helmet({
+			contentSecurityPolicy: {
+				directives: { defaultSrc: ["'none'"], frameAncestors: ["'none'"] },
+			},
+			crossOriginResourcePolicy: { policy: "cross-origin" },
+			hsts: isProd
+				? { maxAge: 31536000, includeSubDomains: true, preload: true }
+				: false,
+		}),
+	);
 	app.useGlobalPipes(
 		new ValidationPipe({
 			whitelist: true,

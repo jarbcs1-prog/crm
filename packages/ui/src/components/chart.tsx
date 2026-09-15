@@ -7,6 +7,12 @@ import * as RechartsPrimitive from "recharts";
 
 const THEMES = { light: "", dark: ".dark" } as const;
 
+const COLOR_RE = /^#[0-9a-fA-F]{6}$|^hsl\(.*\)$|^rgb\(.*\)$/;
+
+function sanitizeColor(value: string): string {
+	return COLOR_RE.test(value) ? value : "#000";
+}
+
 const INITIAL_DIMENSION = { width: 320, height: 200 } as const;
 type TooltipNameType = number | string;
 
@@ -95,11 +101,12 @@ const ChartStyle = ({ id, config }: { id: string; config: ChartConfig }) => {
 					.map(
 						([theme, prefix]) => `
 ${prefix} [data-chart=${id}] {
-${colorConfig
+ ${colorConfig
 	.map(([key, itemConfig]) => {
-		const color =
+		const raw =
 			itemConfig.theme?.[theme as keyof typeof itemConfig.theme] ??
 			itemConfig.color;
+		const color = raw ? sanitizeColor(raw) : null;
 		return color ? `  --color-${key}: ${color};` : null;
 	})
 	.join("\n")}

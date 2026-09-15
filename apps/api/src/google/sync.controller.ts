@@ -9,6 +9,7 @@ import {
 } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
 import { AllowAnonymous } from "@thallesp/nestjs-better-auth";
+import { timingSafeEqual } from "node:crypto";
 import type { EnvironmentVariables } from "../config/env.validation";
 import { GoogleSyncService } from "./google-sync.service";
 
@@ -53,12 +54,18 @@ export class SyncController {
 }
 
 function timingSafeEquals(a: string, b: string): boolean {
-	if (a.length !== b.length) return false;
-
-	let mismatch = 0;
-	for (let index = 0; index < a.length; index += 1) {
-		mismatch |= a.charCodeAt(index) ^ b.charCodeAt(index);
+	const bufA = Buffer.from(a);
+	const bufB = Buffer.from(b);
+	if (bufA.length !== bufB.length) {
+		const dummy = Buffer.alloc(Math.max(bufA.length, bufB.length));
+		try {
+			timingSafeEqual(dummy, dummy);
+		} catch {}
+		return false;
 	}
-
-	return mismatch === 0;
+	try {
+		return timingSafeEqual(bufA, bufB);
+	} catch {
+		return false;
+	}
 }

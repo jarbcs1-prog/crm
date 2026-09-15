@@ -41,7 +41,7 @@ export function repFromCrm(secret: string): AuthFn<Request> {
 	);
 }
 
-const secret = process.env.AGENT_BRIDGE_SECRET;
+const secret = process.env.AGENT_BRIDGE_SECRET?.trim() || undefined;
 
 export default eveChannel({
 	auth: [...(secret ? [repFromCrm(secret)] : []), vercelOidc(), localDev()],

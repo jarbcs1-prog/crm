@@ -234,14 +234,43 @@ export class GmailSyncService {
 			suppressedDomains,
 		};
 
+		const chunkSize = 5;
+		const fetched: GmailMessage[] = [];
+		for (let i = 0; i < batch.length; i += chunkSize) {
+			const chunk = batch.slice(i, i + chunkSize);
+			const results = await Promise.all(
+				chunk.map(async (id) => {
+					const message = await this.gmail.getMessage(accessToken, id);
+					if (message.outcome !== "ok") {
+						this.logger.warn({
+							message: "Gmail getMessage failed",
+							id,
+							reason: message.reason,
+						});
+						return null;
+					}
+					return message.data;
+				}),
+			);
+			for (const data of results) if (data) fetched.push(data);
+		}
+
 		let written = 0;
-
-		for (const id of batch) {
-			const message = await this.gmail.getMessage(accessToken, id);
-			if (message.outcome !== "ok") continue;
-
-			const stored = await this.store(row, mailbox, message.data, context);
-			if (stored) written += 1;
+		const storeChunkSize = 5;
+		for (let i = 0; i < fetched.length; i += storeChunkSize) {
+			const chunk = fetched.slice(i, i + storeChunkSize);
+			const results = await Promise.allSettled(
+				chunk.map((data) => this.store(row, mailbox, data, context)),
+			);
+			for (const result of results) {
+				if (result.status === "fulfilled" && result.value) written += 1;
+				if (result.status === "rejected") {
+					this.logger.warn({
+						message: "Gmail store failed",
+						error: result.reason instanceof Error ? result.reason.message : String(result.reason),
+					});
+				}
+			}
 		}
 
 		return { written, remaining };

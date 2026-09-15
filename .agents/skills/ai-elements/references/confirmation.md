@@ -218,7 +218,7 @@ See `scripts/confirmation-rejected.tsx` for this example.
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
 | `approval` | `ToolUIPart[` | - | The approval object containing the approval ID and status. If not provided or undefined, the component will not render. |
-| `state` | `ToolUIPart[` | - | The current state of the tool (input-streaming, input-available, approval-requested, approval-responded, output-denied, or output-available). Will not render for input-streaming or input-available states. |
+| `state` | `ToolUIPart[` | - | The current state of the tool (input-streaming, input-available, approval-requested, approval-responded, output-denied or output-available). Will not render for input-streaming or input-available states. |
 | `className` | `string` | - | Additional CSS classes to apply to the Alert component. |
 | `...props` | `React.ComponentProps<typeof Alert>` | - | Any other props are spread to the Alert component. |
 

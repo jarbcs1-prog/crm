@@ -333,8 +333,8 @@ export class DealsService {
 		const where: Prisma.DealWhereInput = this.searchFilter(input.q);
 
 		if (input.owner !== FACET_ALL) {
-			where.ownerId =
-				input.owner === FACET_UNASSIGNED ? { in: [] } : input.owner;
+			(where as Record<string, unknown>).ownerId =
+				input.owner === FACET_UNASSIGNED ? null : input.owner;
 		}
 
 		if (input.status === "open") {
@@ -355,7 +355,7 @@ export class DealsService {
 	}
 
 	private async facetCounts(input: DealListInput) {
-		const key = input.q.trim();
+		const key = JSON.stringify({ q: input.q.trim(), owner: input.owner, status: input.status, stage: input.stage, closing: input.closing });
 		const cached = this.facetCache.get(key);
 		if (cached) return cached;
 

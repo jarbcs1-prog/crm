@@ -22,8 +22,9 @@ export function paginate(input: Pick<ListInput, "page" | "pageSize">): {
 	skip: number;
 	take: number;
 } {
+	const page = Math.min(input.page, 100);
 	return {
-		skip: (input.page - 1) * input.pageSize,
+		skip: (page - 1) * input.pageSize,
 		take: input.pageSize,
 	};
 }

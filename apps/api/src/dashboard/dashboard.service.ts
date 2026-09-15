@@ -35,6 +35,19 @@ export class DashboardService {
 
 	constructor(@InjectDatabase() private readonly db: Db) {}
 
+	invalidateSummary(actingUserId?: string, scope?: string): void {
+		if (actingUserId && scope) {
+			this.summaryCache.delete(`${actingUserId}:${scope}`);
+			return;
+		}
+		if (actingUserId) {
+			this.summaryCache.delete(`${actingUserId}:me`);
+			this.summaryCache.delete(`${actingUserId}:team`);
+			return;
+		}
+		this.summaryCache.clear();
+	}
+
     async summary(actingUserId: string, input: DashboardSummaryInput) {
         const cacheKey = `${actingUserId}:${input.scope}`;
         const cached = this.summaryCache.get(cacheKey);

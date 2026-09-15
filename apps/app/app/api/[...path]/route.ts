@@ -1,6 +1,9 @@
 import { brotliDecompressSync, gunzipSync, inflateSync } from "node:zlib";
 import { API_URL } from "@/lib/env";
 
+const BODY_LIMIT = 1_048_576;
+const ALLOWED_PREFIXES = ["/api/"];
+
 function decode(buf: Buffer, encoding: string | null): Buffer {
 	const enc = (encoding ?? "").toLowerCase();
 	try {
@@ -11,8 +14,32 @@ function decode(buf: Buffer, encoding: string | null): Buffer {
 	return buf;
 }
 
+function limitedBody(body: ReadableStream<Uint8Array> | null): ReadableStream<Uint8Array> | null {
+	if (!body) return null;
+	let seen = 0;
+	return body.pipeThrough(
+		new TransformStream<Uint8Array, Uint8Array>({
+			transform(chunk, controller) {
+				seen += chunk.byteLength;
+				if (seen > BODY_LIMIT) controller.error(new Error("Payload too large"));
+				else controller.enqueue(chunk);
+			},
+		}),
+	);
+}
+
 async function handler(request: Request): Promise<Response> {
 	const url = new URL(request.url);
+
+	if (!ALLOWED_PREFIXES.some((p) => url.pathname.startsWith(p))) {
+		return Response.json({ error: "Not found." }, { status: 404 });
+	}
+
+	const contentLength = request.headers.get("content-length");
+	if (contentLength && Number(contentLength) > BODY_LIMIT) {
+		return Response.json({ error: "Payload too large." }, { status: 413 });
+	}
+
 	const target = `${API_URL}${url.pathname}${url.search}`;
 
 	const headers = new Headers(request.headers);
@@ -35,10 +62,11 @@ async function handler(request: Request): Promise<Response> {
 		method: request.method,
 		headers,
 		redirect: "manual",
+		signal: request.signal,
 	};
 
 	if (request.method !== "GET" && request.method !== "HEAD") {
-		init.body = request.body;
+		init.body = limitedBody(request.body) as BodyInit | null;
 		init.duplex = "half";
 	}
 
@@ -47,10 +75,7 @@ async function handler(request: Request): Promise<Response> {
 	try {
 		upstream = await fetch(target, init);
 	} catch (error) {
-		console.error(
-			`API proxy is not reachable for ${request.method} ${url.pathname}.`,
-			error,
-		);
+		console.warn(`API proxy is not reachable for ${request.method} ${url.pathname}.`, error);
 
 		return Response.json(
 			{ error: "The API is not reachable." },
