@@ -1,9 +1,14 @@
 import { describe, expect, it } from "bun:test";
-import { guardThirdPartyQuery, looksLikeMessageContent } from "../agent/lib/egress-guard";
+import {
+	guardThirdPartyQuery,
+	looksLikeMessageContent,
+} from "../agent/lib/egress-guard";
 
 describe("egress guard", () => {
 	it("allows a derived public question", () => {
-		expect(guardThirdPartyQuery("What has Acme announced in 2026?").ok).toBe(true);
+		expect(guardThirdPartyQuery("What has Acme announced in 2026?").ok).toBe(
+			true,
+		);
 	});
 
 	it("allows a name and email (derived query, not message text)", () => {
@@ -32,12 +37,14 @@ describe("egress guard", () => {
 	});
 
 	it("refuses a quoted reply block", () => {
-		const q = "> I think we should ship it\n> The client agreed on the call\n> Let me know if you disagree";
+		const q =
+			"> I think we should ship it\n> The client agreed on the call\n> Let me know if you disagree";
 		expect(guardThirdPartyQuery(q).ok).toBe(false);
 	});
 
 	it("refuses an 'On ... wrote:' attribution", () => {
-		const q = "On Mon, Sep 14, 2026, Jane Doe wrote:\nCan you send the contract?";
+		const q =
+			"On Mon, Sep 14, 2026, Jane Doe wrote:\nCan you send the contract?";
 		expect(guardThirdPartyQuery(q).ok).toBe(false);
 	});
 

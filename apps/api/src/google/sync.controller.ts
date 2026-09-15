@@ -1,3 +1,4 @@
+import { timingSafeEqual } from "node:crypto";
 import {
 	Controller,
 	ForbiddenException,
@@ -9,7 +10,6 @@ import {
 } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
 import { AllowAnonymous } from "@thallesp/nestjs-better-auth";
-import { timingSafeEqual } from "node:crypto";
 import type { EnvironmentVariables } from "../config/env.validation";
 import { GoogleSyncService } from "./google-sync.service";
 

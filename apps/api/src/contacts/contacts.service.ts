@@ -16,8 +16,8 @@ import {
 import { AgentQueueService } from "../agent/agent-queue.service";
 import { AgentTriggerService } from "../agent/agent-trigger.service";
 import { CompanyDirectoryService } from "../companies/company-directory.service";
-import { blankToNull, toCents } from "../crm/values";
 import { TtlCache } from "../crm/ttl-cache";
+import { blankToNull, toCents } from "../crm/values";
 import { InjectDatabase } from "../database/database.constants";
 import {
 	countsByKey,
@@ -552,7 +552,12 @@ export class ContactsService {
 	}
 
 	private async facetCounts(input: ContactListInput) {
-		const key = JSON.stringify({ q: input.q.trim(), company: input.company, owner: input.owner, source: input.source });
+		const key = JSON.stringify({
+			q: input.q.trim(),
+			company: input.company,
+			owner: input.owner,
+			source: input.source,
+		});
 		const cached = this.facetCache.get(key);
 		if (cached) return cached;
 

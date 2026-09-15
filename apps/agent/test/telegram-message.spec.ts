@@ -1,4 +1,4 @@
-import { describe, expect, it, afterEach } from "bun:test";
+import { afterEach, describe, expect, it } from "bun:test";
 
 const originalFetch = global.fetch;
 const originalEnv = {
@@ -27,8 +27,8 @@ describe("send_telegram_message", () => {
 	it("returns an error when TELEGRAM_BOT_TOKEN is not set", async () => {
 		process.env.TELEGRAM_BOT_TOKEN = "";
 
-		const result = await import("../agent/tools/send_telegram_message").then((m) =>
-			m.sendTelegramMessage({ text: "Hello" }),
+		const result = await import("../agent/tools/send_telegram_message").then(
+			(m) => m.sendTelegramMessage({ text: "Hello" }),
 		);
 
 		expect(result.ok).toBe(false);
@@ -39,8 +39,8 @@ describe("send_telegram_message", () => {
 		process.env.TELEGRAM_BOT_TOKEN = "test-token-123";
 		process.env.TELEGRAM_HOME_CHANNEL = "";
 
-		const result = await import("../agent/tools/send_telegram_message").then((m) =>
-			m.sendTelegramMessage({ text: "Hello" }),
+		const result = await import("../agent/tools/send_telegram_message").then(
+			(m) => m.sendTelegramMessage({ text: "Hello" }),
 		);
 
 		expect(result.ok).toBe(false);
@@ -52,8 +52,8 @@ describe("send_telegram_message", () => {
 		process.env.TELEGRAM_HOME_CHANNEL = "12345";
 		mockFetch({ ok: false, description: "Bad Request: chat not found" });
 
-		const result = await import("../agent/tools/send_telegram_message").then((m) =>
-			m.sendTelegramMessage({ text: "Hello" }),
+		const result = await import("../agent/tools/send_telegram_message").then(
+			(m) => m.sendTelegramMessage({ text: "Hello" }),
 		);
 
 		expect(result.ok).toBe(false);
@@ -65,8 +65,8 @@ describe("send_telegram_message", () => {
 		process.env.TELEGRAM_HOME_CHANNEL = "12345";
 		mockFetch({ ok: true, result: { message_id: 42 } });
 
-		const result = await import("../agent/tools/send_telegram_message").then((m) =>
-			m.sendTelegramMessage({ text: "Hello Shelf-Thought" }),
+		const result = await import("../agent/tools/send_telegram_message").then(
+			(m) => m.sendTelegramMessage({ text: "Hello Shelf-Thought" }),
 		);
 
 		expect(result.ok).toBe(true);

@@ -278,7 +278,9 @@ export class BackfillService implements OnModuleInit {
 			domain: { not: null },
 			logoUrl: null,
 			iconUrl: null,
-			...(recentlyChecked.length > 0 ? { id: { notIn: recentlyChecked.slice(0, 1000) } } : {}),
+			...(recentlyChecked.length > 0
+				? { id: { notIn: recentlyChecked.slice(0, 1000) } }
+				: {}),
 		};
 	}
 
@@ -312,7 +314,9 @@ export class BackfillService implements OnModuleInit {
 
 		return {
 			imageUrl: null,
-			...(recentlyChecked.length > 0 ? { id: { notIn: recentlyChecked.slice(0, 1000) } } : {}),
+			...(recentlyChecked.length > 0
+				? { id: { notIn: recentlyChecked.slice(0, 1000) } }
+				: {}),
 			OR: [
 				{ linkedinUrl: { not: null } },
 				{ githubUrl: { not: null } },

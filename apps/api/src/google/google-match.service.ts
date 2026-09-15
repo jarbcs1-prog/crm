@@ -41,7 +41,10 @@ export type MatchRequest = {
 @Injectable()
 export class GoogleMatchService {
 	private readonly logger = new Logger(GoogleMatchService.name);
-	private readonly identityCache = new TtlCache<{ addresses: Set<string>; domains: Set<string> }>(300_000);
+	private readonly identityCache = new TtlCache<{
+		addresses: Set<string>;
+		domains: Set<string>;
+	}>(300_000);
 
 	constructor(
 		@InjectDatabase() private readonly db: Db,

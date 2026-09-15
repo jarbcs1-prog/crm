@@ -1,9 +1,9 @@
 import { defineTool } from "eve/tools";
 import { z } from "zod";
 import { enabled, unavailable } from "../lib/capabilities";
+import { guardThirdPartyQuery } from "../lib/egress-guard";
 import { spend } from "../lib/focus";
 import { ask } from "../lib/web-search";
-import { guardThirdPartyQuery } from "../lib/egress-guard";
 
 function searchEnabled(): boolean {
 	return (
@@ -32,7 +32,9 @@ export default defineTool({
 	}),
 	async execute({ question, deep }) {
 		if (!searchEnabled())
-			return unavailable("TAVILY_API_KEY or EXA_API_KEY or BRAVE_API_KEY or FIRECRAWL_API_KEY or GOOGLE_API_KEY (DuckDuckGo is used as a fallback when none are set)");
+			return unavailable(
+				"TAVILY_API_KEY or EXA_API_KEY or BRAVE_API_KEY or FIRECRAWL_API_KEY or GOOGLE_API_KEY (DuckDuckGo is used as a fallback when none are set)",
+			);
 
 		const charge = spend(deep ? 2 : 1);
 		if (!charge.ok) return { ok: false as const, reason: charge.reason };

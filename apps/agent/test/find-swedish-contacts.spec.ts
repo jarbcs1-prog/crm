@@ -46,7 +46,9 @@ describe("find_swedish_contacts", () => {
 		const ids = result.contacts.map((c: { id: string }) => c.id);
 
 		expect(ids).toContain(s.id);
-		expect(result.contacts.every((c: { country: string }) => c.country === "Sweden")).toBe(true);
+		expect(
+			result.contacts.every((c: { country: string }) => c.country === "Sweden"),
+		).toBe(true);
 	});
 
 	it("excludes contacts without a phone when requirePhone is true", async () => {
@@ -63,7 +65,10 @@ describe("find_swedish_contacts", () => {
 			select: { id: true },
 		});
 
-		const result = await findSwedishContacts({ limit: 1000, requirePhone: true });
+		const result = await findSwedishContacts({
+			limit: 1000,
+			requirePhone: true,
+		});
 		const ids = result.contacts.map((c: { id: string }) => c.id);
 
 		expect(ids).toContain(withPhone.id);
@@ -84,7 +89,10 @@ describe("find_swedish_contacts", () => {
 			select: { id: true },
 		});
 
-		const result = await findSwedishContacts({ limit: 1000, requirePhone: false });
+		const result = await findSwedishContacts({
+			limit: 1000,
+			requirePhone: false,
+		});
 		const ids = result.contacts.map((c: { id: string }) => c.id);
 
 		expect(ids).toContain(withPhone.id);

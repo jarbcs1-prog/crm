@@ -1,8 +1,8 @@
-import { LEGAL_APPROACH_SCRIPT } from "../lib/legal-approach";
-import { PRIORITY } from "@crm/db/agent-tasks";
 import { db } from "@crm/db";
+import { PRIORITY } from "@crm/db/agent-tasks";
 import { defineTool } from "eve/tools";
 import { z } from "zod";
+import { LEGAL_APPROACH_SCRIPT } from "../lib/legal-approach";
 import { scheduleTask } from "../lib/tasks";
 
 interface CallScheduleResult {
@@ -16,9 +16,20 @@ export default defineTool({
 	description:
 		"Schedules outbound pitch calls for a batch of contacts, skipping any without a phone number and any already queued for a call.",
 	inputSchema: z.object({
-		contactIds: z.array(z.string().min(1)).min(1).describe("The contacts to schedule calls for."),
-		dueAt: z.string().optional().describe("ISO timestamp for when the calls should happen; defaults to fifteen minutes from now."),
-		reason: z.string().optional().describe("Why these calls are being scheduled."),
+		contactIds: z
+			.array(z.string().min(1))
+			.min(1)
+			.describe("The contacts to schedule calls for."),
+		dueAt: z
+			.string()
+			.optional()
+			.describe(
+				"ISO timestamp for when the calls should happen; defaults to fifteen minutes from now.",
+			),
+		reason: z
+			.string()
+			.optional()
+			.describe("Why these calls are being scheduled."),
 	}),
 	async execute({ contactIds, dueAt, reason }) {
 		const results: CallScheduleResult[] = [];
@@ -29,11 +40,19 @@ export default defineTool({
 				select: { id: true, phone: true },
 			});
 			if (!contact) {
-				results.push({ contactId, scheduled: false, reason: "No such contact." });
+				results.push({
+					contactId,
+					scheduled: false,
+					reason: "No such contact.",
+				});
 				continue;
 			}
 			if (!contact.phone) {
-				results.push({ contactId, scheduled: false, reason: "This contact has no phone number on file." });
+				results.push({
+					contactId,
+					scheduled: false,
+					reason: "This contact has no phone number on file.",
+				});
 				continue;
 			}
 
@@ -41,7 +60,11 @@ export default defineTool({
 			if (dueAt) {
 				const parsed = new Date(dueAt);
 				if (Number.isNaN(parsed.getTime())) {
-					results.push({ contactId, scheduled: false, reason: `Not a valid dueAt: ${dueAt}` });
+					results.push({
+						contactId,
+						scheduled: false,
+						reason: `Not a valid dueAt: ${dueAt}`,
+					});
 					continue;
 				}
 				parsedDueAt = parsed;
@@ -58,7 +81,11 @@ export default defineTool({
 					budget: 5,
 					priority: PRIORITY.call,
 				});
-				results.push({ contactId, scheduled: true, dueAt: parsedDueAt.toISOString() });
+				results.push({
+					contactId,
+					scheduled: true,
+					dueAt: parsedDueAt.toISOString(),
+				});
 			} catch (error) {
 				results.push({ contactId, scheduled: false, reason: String(error) });
 			}

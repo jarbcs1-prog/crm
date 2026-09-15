@@ -136,7 +136,9 @@ describe("recordFact", () => {
 
 		expect(facts).toHaveLength(2);
 		expect(facts.find((f) => f.value === "Fleetio")?.status).toBe("SUPERSEDED");
-		expect(facts.find((f) => f.value === "Shelf-Thought, Inc.")?.status).toBe("APPLIED");
+		expect(facts.find((f) => f.value === "Shelf-Thought, Inc.")?.status).toBe(
+			"APPLIED",
+		);
 	});
 
 	it("stores the evidence, so the score can be explained later", async () => {

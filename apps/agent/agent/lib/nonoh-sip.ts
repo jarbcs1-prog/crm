@@ -17,7 +17,10 @@ const CONFIG: NonohConfig = {
 	username: process.env.NONOH_USERNAME?.trim() || "",
 	get password(): string {
 		const v = process.env.NONOH_PASSWORD?.trim();
-		if (!v) throw new Error("NONOH_PASSWORD is not set. Set NONOH_PASSWORD in your environment to enable Nonoh SIP calling.");
+		if (!v)
+			throw new Error(
+				"NONOH_PASSWORD is not set. Set NONOH_PASSWORD in your environment to enable Nonoh SIP calling.",
+			);
 		return v;
 	},
 	set password(_v: string) {},
@@ -30,7 +33,12 @@ function nonce(): string {
 	return randomUUID().replace(/-/g, "").slice(0, 8);
 }
 
-function parseSipMessage(raw: string): { status: number; first: string; headers: Record<string, string>; body: string } {
+function parseSipMessage(raw: string): {
+	status: number;
+	first: string;
+	headers: Record<string, string>;
+	body: string;
+} {
 	const lines = raw.split(/\r?\n/);
 	const first = lines[0] ?? "";
 	const headers: Record<string, string> = {};
@@ -41,10 +49,21 @@ function parseSipMessage(raw: string): { status: number; first: string; headers:
 		}
 	}
 	const match = first.match(/^SIP\/2\.0\s+(\d+)/);
-	return { status: match ? Number(match[1]) : 0, first, headers, body: lines.slice(lines.indexOf("") + 1).join("\n") };
+	return {
+		status: match ? Number(match[1]) : 0,
+		first,
+		headers,
+		body: lines.slice(lines.indexOf("") + 1).join("\n"),
+	};
 }
 
-function buildInvite(toNumber: string, callId: string, localTag: string, remoteTag: string, cseq: number): string {
+function buildInvite(
+	toNumber: string,
+	callId: string,
+	localTag: string,
+	remoteTag: string,
+	cseq: number,
+): string {
 	const sdp = [
 		"v=0",
 		`o=${CONFIG.username} ${nonce()} IN IP4 ${CONFIG.server}`,
@@ -103,10 +122,20 @@ export class NonohSipClient {
 	private socket: Socket | null = null;
 	private registered = false;
 	private registeredAt = 0;
-	private pending = new Map<string, { resolve: (v: NonohCallResult) => void; timer: ReturnType<typeof setTimeout> }>();
+	private pending = new Map<
+		string,
+		{
+			resolve: (v: NonohCallResult) => void;
+			timer: ReturnType<typeof setTimeout>;
+		}
+	>();
 
 	get isConfigured(): boolean {
-		return CONFIG.username.length > 0 && (process.env.NONOH_PASSWORD?.trim()?.length ?? 0) > 0 && CONFIG.server.length > 0;
+		return (
+			CONFIG.username.length > 0 &&
+			(process.env.NONOH_PASSWORD?.trim()?.length ?? 0) > 0 &&
+			CONFIG.server.length > 0
+		);
 	}
 
 	get isRegistered(): boolean {
@@ -122,7 +151,10 @@ export class NonohSipClient {
 			const callId = randomUUID();
 			const cseq = Math.floor(Math.random() * 1000) + 1;
 			const msg = buildRegister(cseq, callId);
-			const timer = setTimeout(() => { this.registered = false; resolve(false); }, NONOH_TIMEOUT_MS);
+			const timer = setTimeout(() => {
+				this.registered = false;
+				resolve(false);
+			}, NONOH_TIMEOUT_MS);
 			this.send(msg, (response) => {
 				const parsed = parseSipMessage(response);
 				if (parsed.status === 200) {
@@ -139,7 +171,8 @@ export class NonohSipClient {
 	}
 
 	async makeCall(toNumber: string): Promise<NonohCallResult> {
-		if (!this.isConfigured) return { ok: false, reason: "Nonoh SIP not configured." };
+		if (!this.isConfigured)
+			return { ok: false, reason: "Nonoh SIP not configured." };
 		if (!this.isRegistered) {
 			const ok = await this.register();
 			if (!ok) return { ok: false, reason: "Nonoh SIP registration failed." };
@@ -154,7 +187,13 @@ export class NonohSipClient {
 				this.pending.delete(callId);
 				resolve({ ok: false, reason: "Call timed out waiting for response." });
 			}, NONOH_TIMEOUT_MS);
-			this.pending.set(callId, { resolve: (v) => { clearTimeout(timer); resolve(v); }, timer });
+			this.pending.set(callId, {
+				resolve: (v) => {
+					clearTimeout(timer);
+					resolve(v);
+				},
+				timer,
+			});
 			const msg = buildInvite(toNumber, callId, localTag, nonce(), cseq);
 			this.send(msg, (response) => {
 				const parsed = parseSipMessage(response);
@@ -166,9 +205,15 @@ export class NonohSipClient {
 				} else if (parsed.status === 404) {
 					resolve({ ok: false, reason: "Subscriber not found." });
 				} else if (parsed.status >= 400) {
-					resolve({ ok: false, reason: `Nonoh SIP responded with ${parsed.status}.` });
+					resolve({
+						ok: false,
+						reason: `Nonoh SIP responded with ${parsed.status}.`,
+					});
 				} else {
-					resolve({ ok: false, reason: `Unexpected response: ${parsed.first}` });
+					resolve({
+						ok: false,
+						reason: `Unexpected response: ${parsed.first}`,
+					});
 				}
 			});
 		});
@@ -190,7 +235,10 @@ export class NonohSipClient {
 	private send(msg: string, callback: (response: string) => void): void {
 		try {
 			const sock = this.getSocket();
-			if (!sock) { callback(""); return; }
+			if (!sock) {
+				callback("");
+				return;
+			}
 			const buf = Buffer.from(msg, "utf8");
 			sock.send(buf, CONFIG.port, CONFIG.server);
 			const handler = (data: Buffer) => {
@@ -219,8 +267,18 @@ export class NonohSipClient {
 
 const client = new NonohSipClient();
 
-export function nonohConfigured(): boolean { return client.isConfigured; }
-export async function nonohRegister(): Promise<boolean> { return client.register(); }
-export async function nonohMakeCall(toNumber: string): Promise<NonohCallResult> { return client.makeCall(toNumber); }
-export async function nonohHangup(sipCallId: string): Promise<void> { return client.hangup(sipCallId); }
+export function nonohConfigured(): boolean {
+	return client.isConfigured;
+}
+export async function nonohRegister(): Promise<boolean> {
+	return client.register();
+}
+export async function nonohMakeCall(
+	toNumber: string,
+): Promise<NonohCallResult> {
+	return client.makeCall(toNumber);
+}
+export async function nonohHangup(sipCallId: string): Promise<void> {
+	return client.hangup(sipCallId);
+}
 export const NONOH_CONFIG = CONFIG;

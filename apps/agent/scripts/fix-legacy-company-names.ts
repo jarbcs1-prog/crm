@@ -1,5 +1,5 @@
-import { db } from "@crm/db";
 import { writeFileSync } from "node:fs";
+import { db } from "@crm/db";
 
 const URL_RE = /https?:\/\/[^\s;]+/i;
 
@@ -14,7 +14,7 @@ function extractDomain(blob: string): string | null {
 function extractPhones(blob: string): string[] {
 	// phones live in the fields AFTER the address (field 0), before the URL
 	const afterAddress = blob.split(";").slice(1).join(";").replace(URL_RE, " ");
-	const matches = afterAddress.match(/\+?[\d][\d\s().\-]{5,}/g) ?? [];
+	const matches = afterAddress.match(/\+?[\d][\d\s().-]{5,}/g) ?? [];
 	return matches
 		.map((p) => p.replace(/\s{2,}/g, " ").trim())
 		.filter((p) => (p.match(/\d/g)?.length ?? 0) >= 7)
@@ -62,12 +62,14 @@ async function main() {
 	const apply = process.env.APPLY === "1";
 	let updated = 0;
 	let domainCollisions = 0;
-	let sampled: unknown[] = [];
+	const sampled: unknown[] = [];
 
 	for (const row of rows) {
 		const blob = row.name.slice("Company ".length);
 		const { domain, phones, address } = parse(blob);
-		const name = domain ? humanizeDomain(domain) : address || "Unknown legacy company";
+		const name = domain
+			? humanizeDomain(domain)
+			: address || "Unknown legacy company";
 		const phone = phones[0] ?? null;
 
 		const data: Record<string, unknown> = { enrichmentStatus: "PENDING" };

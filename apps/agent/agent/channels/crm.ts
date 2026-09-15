@@ -1,5 +1,5 @@
-import { EnrichmentStatus } from "@crm/db";
 import { timingSafeEqual } from "node:crypto";
+import { EnrichmentStatus } from "@crm/db";
 import { defineChannel, POST } from "eve/channels";
 import { brief, drainAll, taskAuth } from "../lib/dispatch";
 import { settle } from "../lib/enrichment";

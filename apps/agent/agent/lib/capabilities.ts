@@ -28,29 +28,25 @@ export function capabilities(): readonly Capability[] {
 		{
 			env: "EXA_API_KEY",
 			label: "Exa search",
-			gives:
-				"semantic web search and research, with citations",
+			gives: "semantic web search and research, with citations",
 			enabled: set("EXA_API_KEY"),
 		},
 		{
 			env: "BRAVE_API_KEY",
 			label: "Brave Search",
-			gives:
-				"privacy-focused web search results with content snippets",
+			gives: "privacy-focused web search results with content snippets",
 			enabled: set("BRAVE_API_KEY"),
 		},
 		{
 			env: "FIRECRAWL_API_KEY",
 			label: "Firecrawl",
-			gives:
-				"scraping and extracting content from websites for research",
+			gives: "scraping and extracting content from websites for research",
 			enabled: set("FIRECRAWL_API_KEY"),
 		},
 		{
 			env: "GOOGLE_API_KEY",
 			label: "Google Search",
-			gives:
-				"traditional web search via Google Custom Search API",
+			gives: "traditional web search via Google Custom Search API",
 			enabled: set("GOOGLE_API_KEY"),
 		},
 		{
@@ -90,8 +86,7 @@ export function capabilities(): readonly Capability[] {
 		{
 			env: "ELEVENLABS_API_KEY",
 			label: "ElevenLabs voices",
-			gives:
-				"natural text-to-speech voices for live outbound calls",
+			gives: "natural text-to-speech voices for live outbound calls",
 			enabled: set("ELEVENLABS_API_KEY"),
 		},
 		{
@@ -111,8 +106,7 @@ export function capabilities(): readonly Capability[] {
 		{
 			env: "TELNYX_API_KEY",
 			label: "Telnyx dialing",
-			gives:
-				"SIP trunking for outbound cold calls as an alternative carrier",
+			gives: "SIP trunking for outbound cold calls as an alternative carrier",
 			enabled: set("TELNYX_API_KEY"),
 		},
 		{

@@ -10,6 +10,7 @@ import {
 	type WorkspaceRole,
 } from "@crm/auth";
 import type { Db, Prisma } from "@crm/db";
+import { resolvesToPublicHost } from "@crm/db/safe-fetch";
 import {
 	BadRequestException,
 	ForbiddenException,
@@ -19,7 +20,6 @@ import {
 	Logger,
 } from "@nestjs/common";
 import { APIError } from "better-auth/api";
-import { resolvesToPublicHost } from "@crm/db/safe-fetch";
 import { InjectDatabase } from "../database/database.constants";
 import { type ListResult, paginate, resolveOrderBy } from "../trpc/list-input";
 import type {

@@ -1,5 +1,5 @@
-import { CallEventType, CallStatus, Prisma, db } from "@crm/db";
 import { timingSafeEqual } from "node:crypto";
+import { CallEventType, CallStatus, db, type Prisma } from "@crm/db";
 import { defineChannel, POST } from "eve/channels";
 import { callCode, isTerminalStatus } from "../lib/voice";
 
@@ -101,7 +101,10 @@ function authorised(request: Request): boolean {
 }
 
 function normalize(value: string): string {
-	return value.trim().toLowerCase().replace(/[\s_-]+/g, "");
+	return value
+		.trim()
+		.toLowerCase()
+		.replace(/[\s_-]+/g, "");
 }
 
 function decimal(value: unknown): number | null {
@@ -111,16 +114,20 @@ function decimal(value: unknown): number | null {
 }
 
 function inferEventType(body: Record<string, unknown>): VoiceEvent {
-	const rawEvent = typeof body.event === "string" ? normalize(body.event) : null;
-	if (rawEvent && rawEvent in EVENT_TOKEN) return EVENT_TOKEN[rawEvent]!;
+	const rawEvent =
+		typeof body.event === "string" ? normalize(body.event) : null;
+	if (rawEvent && rawEvent in EVENT_TOKEN)
+		return (EVENT_TOKEN[rawEvent] ?? "HANGUP") as VoiceEvent;
 
 	const numeric = decimal(body.code) ?? decimal(body.status);
 	if (numeric !== null) {
 		return EVENT_FOR_STATUS[callCode(numeric, numeric).status];
 	}
 
-	const rawStatus = typeof body.status === "string" ? normalize(body.status) : null;
-	if (rawStatus && rawStatus in EVENT_TOKEN) return EVENT_TOKEN[rawStatus]!;
+	const rawStatus =
+		typeof body.status === "string" ? normalize(body.status) : null;
+	if (rawStatus && rawStatus in EVENT_TOKEN)
+		return (EVENT_TOKEN[rawStatus] ?? "HANGUP") as VoiceEvent;
 
 	return "HANGUP";
 }
@@ -191,7 +198,11 @@ export default defineChannel({
 			await db.$transaction([
 				db.call.update({ where: { id: call.id }, data: update }),
 				db.callEvent.create({
-					data: { callId: call.id, type: eventType, payload: record as Prisma.InputJsonValue },
+					data: {
+						callId: call.id,
+						type: eventType,
+						payload: record as Prisma.InputJsonValue,
+					},
 				}),
 			]);
 

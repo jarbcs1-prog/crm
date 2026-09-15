@@ -25,7 +25,12 @@ export default defineTool({
 	}),
 	async execute({ email, companyName }) {
 		if (!searchEnabled()) {
-			return { candidateSlugs: [], ...unavailable("TAVILY_API_KEY or EXA_API_KEY or BRAVE_API_KEY or FIRECRAWL_API_KEY or GOOGLE_API_KEY or PERPLEXITY_API_KEY") };
+			return {
+				candidateSlugs: [],
+				...unavailable(
+					"TAVILY_API_KEY or EXA_API_KEY or BRAVE_API_KEY or FIRECRAWL_API_KEY or GOOGLE_API_KEY or PERPLEXITY_API_KEY",
+				),
+			};
 		}
 
 		const charge = spend();

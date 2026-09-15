@@ -12,7 +12,13 @@ export default defineTool({
 	async execute({ callId }) {
 		const call = await db.call.findUnique({
 			where: { id: callId },
-			select: { id: true, status: true, sipCallId: true, startedAt: true, answeredAt: true },
+			select: {
+				id: true,
+				status: true,
+				sipCallId: true,
+				startedAt: true,
+				answeredAt: true,
+			},
 		});
 		if (!call) return { ok: false as const, reason: "No such call." };
 
@@ -37,8 +43,15 @@ export default defineTool({
 						: undefined;
 				const providerStatus = nested?.status ?? provider?.status;
 				const providerCode =
-					typeof nested?.code === "number" ? nested.code : typeof provider?.code === "number" ? provider.code : null;
-				const mapped = callCode(providerStatus as string | number | undefined, providerCode);
+					typeof nested?.code === "number"
+						? nested.code
+						: typeof provider?.code === "number"
+							? provider.code
+							: null;
+				const mapped = callCode(
+					providerStatus as string | number | undefined,
+					providerCode,
+				);
 
 				status = mapped.status;
 				codephrase = mapped.codephrase;
@@ -50,17 +63,24 @@ export default defineTool({
 							where: { id: call.id },
 							data: { status: CallStatus.IN_PROGRESS, answeredAt: now },
 						});
-						await db.callEvent.create({ data: { callId: call.id, type: CallEventType.ANSWER } });
+						await db.callEvent.create({
+							data: { callId: call.id, type: CallEventType.ANSWER },
+						});
 					} else if (isTerminalStatus(mapped.status)) {
 						const anchor = call.answeredAt ?? call.startedAt;
 						const durationSecs = anchor
-							? Math.max(0, Math.round((now.getTime() - anchor.getTime()) / 1000))
+							? Math.max(
+									0,
+									Math.round((now.getTime() - anchor.getTime()) / 1000),
+								)
 							: null;
 						await db.call.update({
 							where: { id: call.id },
 							data: { status: mapped.status, endedAt: now, durationSecs },
 						});
-						await db.callEvent.create({ data: { callId: call.id, type: CallEventType.HANGUP } });
+						await db.callEvent.create({
+							data: { callId: call.id, type: CallEventType.HANGUP },
+						});
 					}
 				}
 			} catch (error) {

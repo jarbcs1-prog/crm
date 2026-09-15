@@ -11,8 +11,16 @@ function dec(dollars: number) {
 
 function dashboardDb(overrides: Partial<Record<string, unknown>> = {}) {
 	const openByStage = [
-		{ stage: DealStage.DEMO_BOOKED, _count: { _all: 2 }, _sum: { amount: dec(100) } },
-		{ stage: DealStage.CONTRACT_SENT, _count: { _all: 1 }, _sum: { amount: dec(200) } },
+		{
+			stage: DealStage.DEMO_BOOKED,
+			_count: { _all: 2 },
+			_sum: { amount: dec(100) },
+		},
+		{
+			stage: DealStage.CONTRACT_SENT,
+			_count: { _all: 1 },
+			_sum: { amount: dec(200) },
+		},
 	];
 	const now = new Date();
 	const trendStart = new Date(now.getFullYear(), now.getMonth() - 5, 1);
@@ -33,11 +41,18 @@ function dashboardDb(overrides: Partial<Record<string, unknown>> = {}) {
 	const db = {
 		deal: {
 			groupBy: async () => openByStage,
-			findMany: async (args: { where?: unknown; orderBy?: unknown; take?: number }) => {
+			findMany: async (args: {
+				where?: unknown;
+				orderBy?: unknown;
+				take?: number;
+			}) => {
 				if (args.take === 6) return [];
 				return recentDeals;
 			},
-			aggregate: async () => ({ _count: { _all: 1 }, _sum: { amount: dec(50) } }),
+			aggregate: async () => ({
+				_count: { _all: 1 },
+				_sum: { amount: dec(50) },
+			}),
 		},
 		activity: {
 			findMany: async () => [],
@@ -61,7 +76,11 @@ describe("DashboardService KPI math", () => {
 
 		expect(result.pipeline.totalDeals).toBe(3);
 		expect(result.pipeline.totalCents).toBe(30000);
-		expect(result.pipeline.stages.find((s: { stage: DealStage }) => s.stage === DealStage.DEMO_BOOKED)?.count).toBe(2);
+		expect(
+			result.pipeline.stages.find(
+				(s: { stage: DealStage }) => s.stage === DealStage.DEMO_BOOKED,
+			)?.count,
+		).toBe(2);
 	});
 
 	it("computes win rate and averages over 90-day window", async () => {
@@ -82,7 +101,10 @@ describe("DashboardService KPI math", () => {
 			deal: {
 				groupBy: async () => [],
 				findMany: async () => [],
-				aggregate: async () => ({ _count: { _all: 0 }, _sum: { amount: null } }),
+				aggregate: async () => ({
+					_count: { _all: 0 },
+					_sum: { amount: null },
+				}),
 			},
 			activity: { findMany: async () => [] },
 		} as unknown as Db;
@@ -104,7 +126,10 @@ describe("DashboardService KPI math", () => {
 					return [];
 				},
 				findMany: async () => [],
-				aggregate: async () => ({ _count: { _all: 0 }, _sum: { amount: null } }),
+				aggregate: async () => ({
+					_count: { _all: 0 },
+					_sum: { amount: null },
+				}),
 			},
 			activity: { findMany: async () => [] },
 		} as unknown as Db;

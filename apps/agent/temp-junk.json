@@ -1,402 +1,402 @@
 [
-  {
-    "id": "legacy_company_Boston, MA 02109-1650;;;;http://www.premiereassetmanagement.com/;;2.6;0;2006-04-27 23:30:42;0000-00-00 00:00:00;191;0;company;0;;;11;crm\r",
-    "name": "Company Boston, MA 02109-1650;;;;http://www.premiereassetmanagement.com/;;2.6;0;2006-04-27 23:30:42;0000-00-00 00:00:00;191;0;company;0;;;11;crm\r",
-    "domain": null
-  },
-  {
-    "id": "legacy_company_Durham, NC 27713-5272;;;;http://www.cathayam.com/;;2.6;0;2006-06-01 23:30:42;0000-00-00 00:00:00;191;0;company;0;;;22;crm\r",
-    "name": "Company Durham, NC 27713-5272;;;;http://www.cathayam.com/;;2.6;0;2006-06-01 23:30:42;0000-00-00 00:00:00;191;0;company;0;;;22;crm\r",
-    "domain": null
-  },
-  {
-    "id": "legacy_company_;;;;http://www.fwmna.com/;;2.6;0;2006-08-17 04:54:00;0000-00-00 00:00:00;191;0;company;0;;;25;crm\r",
-    "name": "Company ;;;;http://www.fwmna.com/;;2.6;0;2006-08-17 04:54:00;0000-00-00 00:00:00;191;0;company;0;;;25;crm\r",
-    "domain": null
-  },
-  {
-    "id": "legacy_company_Houston, TX 77027;;;;http://www.nfinancialgroup.com/;;2.6;0;0000-00-00 00:00:00;0000-00-00 00:00:00;191;0;company;0;;;29;crm\r",
-    "name": "Company Houston, TX 77027;;;;http://www.nfinancialgroup.com/;;2.6;0;0000-00-00 00:00:00;0000-00-00 00:00:00;191;0;company;0;;;29;crm\r",
-    "domain": null
-  },
-  {
-    "id": "legacy_company_Salt Lake City, UT 84101, United States;;;;http://www.olsenacquisitions.com/;;2.6;0;2007-09-28 02:30:00;0000-00-00 00:00:00;191;0;company;0;;;49;crm\r",
-    "name": "Company Salt Lake City, UT 84101, United States;;;;http://www.olsenacquisitions.com/;;2.6;0;2007-09-28 02:30:00;0000-00-00 00:00:00;191;0;company;0;;;49;crm\r",
-    "domain": null
-  },
-  {
-    "id": "legacy_company_�???�??�?½eletavsk�???�??�?¡ 9, 140 00 Praha 4, \r\r",
-    "name": "Company �???�??�?½eletavsk�???�??�?¡ 9, 140 00 Praha 4, \r\r",
-    "domain": null
-  },
-  {
-    "id": "legacy_company_Praha, Czech Republic;;;;http://www.equitytmgmt.com/;;1.5;0;2009-11-23 17:53:00;0000-00-00 00:00:00;47;0;company;0;;;81;crm\r",
-    "name": "Company Praha, Czech Republic;;;;http://www.equitytmgmt.com/;;1.5;0;2009-11-23 17:53:00;0000-00-00 00:00:00;47;0;company;0;;;81;crm\r",
-    "domain": null
-  },
-  {
-    "id": "legacy_company_4-4-7 Imabashi Chuo-ku, Osaka, Japan, 541-0042;;;;http://www.lexiconma.com/;;1.5;0;2011-04-15 00:00:00;0000-00-00 00:00:00;85;0;company;0;;;109;crm\r",
-    "name": "Company 4-4-7 Imabashi Chuo-ku, Osaka, Japan, 541-0042;;;;http://www.lexiconma.com/;;1.5;0;2011-04-15 00:00:00;0000-00-00 00:00:00;85;0;company;0;;;109;crm\r",
-    "domain": null
-  },
-  {
-    "id": "legacy_company_Minato-ku, Tokyo, 105-0022, Japan;;;;http://www.primemarket-am.com/;;1.5;0;2012-07-27 23:14:00;0000-00-00 00:00:00;85;0;company;0;;;144;crm\r",
-    "name": "Company Minato-ku, Tokyo, 105-0022, Japan;;;;http://www.primemarket-am.com/;;1.5;0;2012-07-27 23:14:00;0000-00-00 00:00:00;85;0;company;0;;;144;crm\r",
-    "domain": null
-  },
-  {
-    "id": "legacy_company_Tokyo 100-0004, Japan;;;;http://www.directmergersacq.com/;;1.5;0;2012-09-12 21:14:00;0000-00-00 00:00:00;85;0;company;0;;;147;crm\r",
-    "name": "Company Tokyo 100-0004, Japan;;;;http://www.directmergersacq.com/;;1.5;0;2012-09-12 21:14:00;0000-00-00 00:00:00;85;0;company;0;;;147;crm\r",
-    "domain": null
-  },
-  {
-    "id": "legacy_company_Shinjuku-ku, Tokyo, 160-0023;+81 3 4578 0402;+81 3 4333 0394 ;;http://www.aaoc.jp;2014-09-30;1;0;0000-00-00 00:00:00;2015-02-19 17:02:38;0;0;company;0;;;235;crm\r",
-    "name": "Company Shinjuku-ku, Tokyo, 160-0023;+81 3 4578 0402;+81 3 4333 0394 ;;http://www.aaoc.jp;2014-09-30;1;0;0000-00-00 00:00:00;2015-02-19 17:02:38;0;0;company;0;;;235;crm\r",
-    "domain": null
-  },
-  {
-    "id": "legacy_company_ZIP 102-0094;81345781758;81345895377;;http://jma-gov.org/;;;0;2014-05-18 13:33:15;2014-09-23 16:19:37;85;0;registry;25;Mr. Ronald Lewis;;49;crm_2\r",
-    "name": "Company ZIP 102-0094;81345781758;81345895377;;http://jma-gov.org/;;;0;2014-05-18 13:33:15;2014-09-23 16:19:37;85;0;registry;25;Mr. Ronald Lewis;;49;crm_2\r",
-    "domain": null
-  },
-  {
-    "id": "legacy_company_Georgia 30326;;;;http://www.americanmaservices.com/;;2.6;0;2006-04-27 23:30:42;0000-00-00 00:00:00;191;0;company;0;;;4;crm\r",
-    "name": "Company Georgia 30326;;;;http://www.americanmaservices.com/;;2.6;0;2006-04-27 23:30:42;0000-00-00 00:00:00;191;0;company;0;;;4;crm\r",
-    "domain": null
-  },
-  {
-    "id": "legacy_company_Suite 1300 Cleveland\r\r",
-    "name": "Company Suite 1300 Cleveland\r\r",
-    "domain": null
-  },
-  {
-    "id": "legacy_company_Ohio 44114\r\r",
-    "name": "Company Ohio 44114\r\r",
-    "domain": null
-  },
-  {
-    "id": "legacy_company_;;;;http://www.chabertam.com/;;2.6;0;2006-04-27 23:30:42;0000-00-00 00:00:00;191;0;company;0;;;5;crm\r",
-    "name": "Company ;;;;http://www.chabertam.com/;;2.6;0;2006-04-27 23:30:42;0000-00-00 00:00:00;191;0;company;0;;;5;crm\r",
-    "domain": null
-  },
-  {
-    "id": "legacy_company_Minneapolis, MN 55408;;;;http://www.mullerschmidt.com/;;2.6;0;2006-04-27 23:30:42;0000-00-00 00:00:00;191;0;company;0;;;7;crm\r",
-    "name": "Company Minneapolis, MN 55408;;;;http://www.mullerschmidt.com/;;2.6;0;2006-04-27 23:30:42;0000-00-00 00:00:00;191;0;company;0;;;7;crm\r",
-    "domain": null
-  },
-  {
-    "id": "legacy_company_4th Floor\r\r",
-    "name": "Company 4th Floor\r\r",
-    "domain": null
-  },
-  {
-    "id": "legacy_company_Boston, MA 02210\r\r",
-    "name": "Company Boston, MA 02210\r\r",
-    "domain": null
-  },
-  {
-    "id": "legacy_company_;;;;http://www.youngleeassociates.com/;;2.6;0;2006-04-27 23:30:42;0000-00-00 00:00:00;191;0;company;0;;;8;crm\r",
-    "name": "Company ;;;;http://www.youngleeassociates.com/;;2.6;0;2006-04-27 23:30:42;0000-00-00 00:00:00;191;0;company;0;;;8;crm\r",
-    "domain": null
-  },
-  {
-    "id": "legacy_company_Houston, TX 77002-2761 \r\r",
-    "name": "Company Houston, TX 77002-2761 \r\r",
-    "domain": null
-  },
-  {
-    "id": "legacy_company_United States of America;;;;http://www.oxleyma.com/;;2.6;0;2006-04-27 23:30:42;0000-00-00 00:00:00;191;0;company;0;;;12;crm\r",
-    "name": "Company United States of America;;;;http://www.oxleyma.com/;;2.6;0;2006-04-27 23:30:42;0000-00-00 00:00:00;191;0;company;0;;;12;crm\r",
-    "domain": null
-  },
-  {
-    "id": "legacy_company_Memphis, TN 38120-1431\r\r",
-    "name": "Company Memphis, TN 38120-1431\r\r",
-    "domain": null
-  },
-  {
-    "id": "legacy_company_United States Of America;;;;http://www.suninternationalma.com/;;2.6;0;2006-04-27 23:30:42;0000-00-00 00:00:00;191;0;company;0;;;13;crm\r",
-    "name": "Company United States Of America;;;;http://www.suninternationalma.com/;;2.6;0;2006-04-27 23:30:42;0000-00-00 00:00:00;191;0;company;0;;;13;crm\r",
-    "domain": null
-  },
-  {
-    "id": "legacy_company_Chicago, IL 60602-4270\r\r",
-    "name": "Company Chicago, IL 60602-4270\r\r",
-    "domain": null
-  },
-  {
-    "id": "legacy_company_;;;;http://www.whitmanlloyds.com/;;2.6;0;2006-04-27 23:30:42;0000-00-00 00:00:00;191;0;company;0;;;14;crm\r",
-    "name": "Company ;;;;http://www.whitmanlloyds.com/;;2.6;0;2006-04-27 23:30:42;0000-00-00 00:00:00;191;0;company;0;;;14;crm\r",
-    "domain": null
-  },
-  {
-    "id": "legacy_company_1170 Peachtree Street N.E.\r\r",
-    "name": "Company 1170 Peachtree Street N.E.\r\r",
-    "domain": null
-  },
-  {
-    "id": "legacy_company_Atlanta, GA 30309;;;;http://www.deltatradefinancial.com/;;2.6;0;2006-04-27 23:30:42;0000-00-00 00:00:00;191;0;company;0;;;16;crm\r",
-    "name": "Company Atlanta, GA 30309;;;;http://www.deltatradefinancial.com/;;2.6;0;2006-04-27 23:30:42;0000-00-00 00:00:00;191;0;company;0;;;16;crm\r",
-    "domain": null
-  },
-  {
-    "id": "legacy_company_Cleveland, OH 44114-1724\r\r",
-    "name": "Company Cleveland, OH 44114-1724\r\r",
-    "domain": null
-  },
-  {
-    "id": "legacy_company_United States;;;;http://www.linkmna.com/;;2.6;0;2006-04-27 23:30:42;0000-00-00 00:00:00;191;0;company;0;;;18;crm\r",
-    "name": "Company United States;;;;http://www.linkmna.com/;;2.6;0;2006-04-27 23:30:42;0000-00-00 00:00:00;191;0;company;0;;;18;crm\r",
-    "domain": null
-  },
-  {
-    "id": "legacy_company_San Francisco, CA 94108-2728\r\r",
-    "name": "Company San Francisco, CA 94108-2728\r\r",
-    "domain": null
-  },
-  {
-    "id": "legacy_company_United States;;;;http://www.harborcapitalmgm.com/;;2.6;0;2006-04-27 23:30:42;0000-00-00 00:00:00;191;0;company;0;;;19;crm\r",
-    "name": "Company United States;;;;http://www.harborcapitalmgm.com/;;2.6;0;2006-04-27 23:30:42;0000-00-00 00:00:00;191;0;company;0;;;19;crm\r",
-    "domain": null
-  },
-  {
-    "id": "legacy_company_Amsterdam 1014 BM\r\r",
-    "name": "Company Amsterdam 1014 BM\r\r",
-    "domain": null
-  },
-  {
-    "id": "legacy_company_Netherlands;;;;http://www.vandenbergam.com/;;2.6;0;2006-04-27 23:30:42;0000-00-00 00:00:00;191;0;company;0;;;20;crm\r",
-    "name": "Company Netherlands;;;;http://www.vandenbergam.com/;;2.6;0;2006-04-27 23:30:42;0000-00-00 00:00:00;191;0;company;0;;;20;crm\r",
-    "domain": null
-  },
-  {
-    "id": "legacy_company_Chicago, IL 60659\r\r",
-    "name": "Company Chicago, IL 60659\r\r",
-    "domain": null
-  },
-  {
-    "id": "legacy_company_United States;;;;http://www.firstamericanam.com/;;2.6;0;0000-00-00 00:00:00;0000-00-00 00:00:00;191;0;company;0;;;21;crm\r",
-    "name": "Company United States;;;;http://www.firstamericanam.com/;;2.6;0;0000-00-00 00:00:00;0000-00-00 00:00:00;191;0;company;0;;;21;crm\r",
-    "domain": null
-  },
-  {
-    "id": "legacy_company_Salt Lake City, UT 84121-7060\r\r",
-    "name": "Company Salt Lake City, UT 84121-7060\r\r",
-    "domain": null
-  },
-  {
-    "id": "legacy_company_United States;;;;http://www.crownfinancialmgmt.com/;;2.6;0;2006-07-24 22:20:00;0000-00-00 00:00:00;191;0;company;0;;;23;crm\r",
-    "name": "Company United States;;;;http://www.crownfinancialmgmt.com/;;2.6;0;2006-07-24 22:20:00;0000-00-00 00:00:00;191;0;company;0;;;23;crm\r",
-    "domain": null
-  },
-  {
-    "id": "legacy_company_North East Columbus\r\r",
-    "name": "Company North East Columbus\r\r",
-    "domain": null
-  },
-  {
-    "id": "legacy_company_Columbia, SC 29223-7222\r\r",
-    "name": "Company Columbia, SC 29223-7222\r\r",
-    "domain": null
-  },
-  {
-    "id": "legacy_company_United States;;;;http://www.southerncrossma.com/;;2.6;0;2006-07-24 22:20:00;0000-00-00 00:00:00;191;0;company;0;;;24;crm\r",
-    "name": "Company United States;;;;http://www.southerncrossma.com/;;2.6;0;2006-07-24 22:20:00;0000-00-00 00:00:00;191;0;company;0;;;24;crm\r",
-    "domain": null
-  },
-  {
-    "id": "legacy_company_Houston, TX 77042 - 3000\r\r",
-    "name": "Company Houston, TX 77042 - 3000\r\r",
-    "domain": null
-  },
-  {
-    "id": "legacy_company_Madison, WI 53703\r\r",
-    "name": "Company Madison, WI 53703\r\r",
-    "domain": null
-  },
-  {
-    "id": "legacy_company_;;;;http://www.lowelane.com/;;2.6;0;2006-08-17 05:03:03;0000-00-00 00:00:00;191;0;company;0;;;26;crm\r",
-    "name": "Company ;;;;http://www.lowelane.com/;;2.6;0;2006-08-17 05:03:03;0000-00-00 00:00:00;191;0;company;0;;;26;crm\r",
-    "domain": null
-  },
-  {
-    "id": "legacy_company_San Francisco, CA 94107-1243\r\r",
-    "name": "Company San Francisco, CA 94107-1243\r\r",
-    "domain": null
-  },
-  {
-    "id": "legacy_company_;;;;http://www.wakefieldpartners.com/;;2.6;0;0000-00-00 00:00:00;0000-00-00 00:00:00;191;0;company;0;;;27;crm\r",
-    "name": "Company ;;;;http://www.wakefieldpartners.com/;;2.6;0;0000-00-00 00:00:00;0000-00-00 00:00:00;191;0;company;0;;;27;crm\r",
-    "domain": null
-  },
-  {
-    "id": "legacy_company_Salt Lake City - UT 84107;;;;http://www.cloverma.com/;;2.6;0;0000-00-00 00:00:00;2006-09-29 02:09:51;191;0;company;0;;;28;crm\r",
-    "name": "Company Salt Lake City - UT 84107;;;;http://www.cloverma.com/;;2.6;0;0000-00-00 00:00:00;2006-09-29 02:09:51;191;0;company;0;;;28;crm\r",
-    "domain": null
-  },
-  {
-    "id": "legacy_company_Med Center\r\r",
-    "name": "Company Med Center\r\r",
-    "domain": null
-  },
-  {
-    "id": "legacy_company_Phoenix, AZ 85016\r\r",
-    "name": "Company Phoenix, AZ 85016\r\r",
-    "domain": null
-  },
-  {
-    "id": "legacy_company_United States of America;;;;http://www.lincolnellisam.com/;;2.6;0;2006-10-17 01:06:38;2006-10-19 22:57:35;191;0;company;0;;;30;crm\r",
-    "name": "Company United States of America;;;;http://www.lincolnellisam.com/;;2.6;0;2006-10-17 01:06:38;2006-10-19 22:57:35;191;0;company;0;;;30;crm\r",
-    "domain": null
-  },
-  {
-    "id": "legacy_company_Indianapolis, IN\r\r",
-    "name": "Company Indianapolis, IN\r\r",
-    "domain": null
-  },
-  {
-    "id": "legacy_company_46222 - 5917;;;;http://www.heronassetmgmt.com/;;2.6;0;2006-10-17 01:10:00;2006-10-31 07:31:52;191;0;company;0;;;31;crm\r",
-    "name": "Company 46222 - 5917;;;;http://www.heronassetmgmt.com/;;2.6;0;2006-10-17 01:10:00;2006-10-31 07:31:52;191;0;company;0;;;31;crm\r",
-    "domain": null
-  },
-  {
-    "id": "legacy_company_Houston, TX, 77079-1175;;;;http://www.phoenixacquisitions.com/;;2.6;0;2006-10-17 01:13:58;2006-11-16 06:37:35;191;0;company;0;;;32;crm\r",
-    "name": "Company Houston, TX, 77079-1175;;;;http://www.phoenixacquisitions.com/;;2.6;0;2006-10-17 01:13:58;2006-11-16 06:37:35;191;0;company;0;;;32;crm\r",
-    "domain": null
-  },
-  {
-    "id": "legacy_company_Cleveland,\r\r",
-    "name": "Company Cleveland,\r\r",
-    "domain": null
-  },
-  {
-    "id": "legacy_company_OH 44114;;;;http://www.winstonpartnersco.com/;;2.6;0;2006-10-17 01:15:37;2006-11-17 06:57:53;191;0;company;0;;;33;crm\r",
-    "name": "Company OH 44114;;;;http://www.winstonpartnersco.com/;;2.6;0;2006-10-17 01:15:37;2006-11-17 06:57:53;191;0;company;0;;;33;crm\r",
-    "domain": null
-  },
-  {
-    "id": "legacy_company_Minneapolis, MN\r\r",
-    "name": "Company Minneapolis, MN\r\r",
-    "domain": null
-  },
-  {
-    "id": "legacy_company_55402-8773;;;;http://www.griffinma.com/;;2.6;0;2006-10-17 01:17:30;2007-02-06 13:01:13;191;0;company;0;;;34;crm\r",
-    "name": "Company 55402-8773;;;;http://www.griffinma.com/;;2.6;0;2006-10-17 01:17:30;2007-02-06 13:01:13;191;0;company;0;;;34;crm\r",
-    "domain": null
-  },
-  {
-    "id": "legacy_company_Hartford, CT 06103, United States;;;;http://www.ashleypartners.com/;;2.6;0;2007-09-28 02:30:00;0000-00-00 00:00:00;191;0;company;0;;;50;crm\r",
-    "name": "Company Hartford, CT 06103, United States;;;;http://www.ashleypartners.com/;;2.6;0;2007-09-28 02:30:00;0000-00-00 00:00:00;191;0;company;0;;;50;crm\r",
-    "domain": null
-  },
-  {
-    "id": "legacy_company_Minato-ku, Tokyo, Japan;;;;http://www.orionacquisitions.com/;;2.6;0;2008-05-07 03:13:00;0000-00-00 00:00:00;191;0;company;0;;;56;crm\r",
-    "name": "Company Minato-ku, Tokyo, Japan;;;;http://www.orionacquisitions.com/;;2.6;0;2008-05-07 03:13:00;0000-00-00 00:00:00;191;0;company;0;;;56;crm\r",
-    "domain": null
-  },
-  {
-    "id": "legacy_company_Kuala Lumpur\r\r",
-    "name": "Company Kuala Lumpur\r\r",
-    "domain": null
-  },
-  {
-    "id": "legacy_company_Malaysia;;;;http://omegacm.com/;;2.6;0;2008-06-27 03:11:00;0000-00-00 00:00:00;191;0;company;0;;;59;crm\r",
-    "name": "Company Malaysia;;;;http://omegacm.com/;;2.6;0;2008-06-27 03:11:00;0000-00-00 00:00:00;191;0;company;0;;;59;crm\r",
-    "domain": null
-  },
-  {
-    "id": "legacy_company_Kuala Lumpur ZIP 50250;;;;http://www.morgancp.com/;;2.6;0;2008-09-08 18:20:00;0000-00-00 00:00:00;191;0;company;0;;;64;crm\r",
-    "name": "Company Kuala Lumpur ZIP 50250;;;;http://www.morgancp.com/;;2.6;0;2008-09-08 18:20:00;0000-00-00 00:00:00;191;0;company;0;;;64;crm\r",
-    "domain": null
-  },
-  {
-    "id": "legacy_company_Republic;;;;http://www.philipem.com/;;1.5;0;2009-06-07 19:42:34;0000-00-00 00:00:00;47;0;company;0;;;75;crm\r",
-    "name": "Company Republic;;;;http://www.philipem.com/;;1.5;0;2009-06-07 19:42:34;0000-00-00 00:00:00;47;0;company;0;;;75;crm\r",
-    "domain": null
-  },
-  {
-    "id": "legacy_company_Chuo-ku 541-0052 Osaka Japan\r\r",
-    "name": "Company Chuo-ku 541-0052 Osaka Japan\r\r",
-    "domain": null
-  },
-  {
-    "id": "legacy_company_;;;;http://www.penncm.com/;;1.5;0;2009-08-18 16:57:00;0000-00-00 00:00:00;47;0;company;0;;;76;crm\r",
-    "name": "Company ;;;;http://www.penncm.com/;;1.5;0;2009-08-18 16:57:00;0000-00-00 00:00:00;47;0;company;0;;;76;crm\r",
-    "domain": null
-  },
-  {
-    "id": "legacy_company_6-10-1 Nishi-Shinjuku, Shinjuku-ku\r\r",
-    "name": "Company 6-10-1 Nishi-Shinjuku, Shinjuku-ku\r\r",
-    "domain": null
-  },
-  {
-    "id": "legacy_company_Tokyo 160-0023 Japan;;;;http://www.cooperdaniels.com/;;1.5;0;2010-07-06 00:00:00;0000-00-00 00:00:00;85;0;company;0;;;96;crm\r",
-    "name": "Company Tokyo 160-0023 Japan;;;;http://www.cooperdaniels.com/;;1.5;0;2010-07-06 00:00:00;0000-00-00 00:00:00;85;0;company;0;;;96;crm\r",
-    "domain": null
-  },
-  {
-    "id": "legacy_company_Osaka 542-0081 Japan\r\r",
-    "name": "Company Osaka 542-0081 Japan\r\r",
-    "domain": null
-  },
-  {
-    "id": "legacy_company_;;;;http://www.axiscf.com/;;1.5;0;2010-09-10 00:00:00;0000-00-00 00:00:00;93;0;company;0;;;102;crm\r",
-    "name": "Company ;;;;http://www.axiscf.com/;;1.5;0;2010-09-10 00:00:00;0000-00-00 00:00:00;93;0;company;0;;;102;crm\r",
-    "domain": null
-  },
-  {
-    "id": "legacy_company_Azuchi-machi 3 Chome, \r\r",
-    "name": "Company Azuchi-machi 3 Chome, \r\r",
-    "domain": null
-  },
-  {
-    "id": "legacy_company_Chuo-ku, Osaka City, \r\r",
-    "name": "Company Chuo-ku, Osaka City, \r\r",
-    "domain": null
-  },
-  {
-    "id": "legacy_company_Osaka 541-0052, Japan;;;;http://www.idealmergergroup.com/;;1.5;0;2010-09-10 00:00:00;0000-00-00 00:00:00;93;0;company;0;;;104;crm\r",
-    "name": "Company Osaka 541-0052, Japan;;;;http://www.idealmergergroup.com/;;1.5;0;2010-09-10 00:00:00;0000-00-00 00:00:00;93;0;company;0;;;104;crm\r",
-    "domain": null
-  },
-  {
-    "id": "legacy_company_Osaka, 541-0055, Japan;;;;http://www.newoutlookmg.com/;;1.5;0;2011-02-18 00:00:00;0000-00-00 00:00:00;85;0;company;0;;;106;crm\r",
-    "name": "Company Osaka, 541-0055, Japan;;;;http://www.newoutlookmg.com/;;1.5;0;2011-02-18 00:00:00;0000-00-00 00:00:00;85;0;company;0;;;106;crm\r",
-    "domain": null
-  },
-  {
-    "id": "legacy_company_2-9-19 Shibata, Kita-ku, Osaka 530-0012, Japan;;;;http://www.heritagefinance-am.com/;;1.5;0;2011-02-18 00:00:00;0000-00-00 00:00:00;85;0;company;0;;;107;crm\r",
-    "name": "Company 2-9-19 Shibata, Kita-ku, Osaka 530-0012, Japan;;;;http://www.heritagefinance-am.com/;;1.5;0;2011-02-18 00:00:00;0000-00-00 00:00:00;85;0;company;0;;;107;crm\r",
-    "domain": null
-  },
-  {
-    "id": "legacy_company_1-1-6, Uchihonmachi, Chuo-Ku, Osaka, Japan, 540-0026;;;;http://www.fortunecf.com/;;1.5;0;2011-02-18 00:00:00;0000-00-00 00:00:00;85;0;company;0;;;108;crm\r",
-    "name": "Company 1-1-6, Uchihonmachi, Chuo-Ku, Osaka, Japan, 540-0026;;;;http://www.fortunecf.com/;;1.5;0;2011-02-18 00:00:00;0000-00-00 00:00:00;85;0;company;0;;;108;crm\r",
-    "domain": null
-  },
-  {
-    "id": "legacy_company_Tokyo, 104-0031, Japan;;;;http://www.drakemerger.com/;;1.5;0;2012-08-03 23:11:00;0000-00-00 00:00:00;85;0;company;0;;;145;crm\r",
-    "name": "Company Tokyo, 104-0031, Japan;;;;http://www.drakemerger.com/;;1.5;0;2012-08-03 23:11:00;0000-00-00 00:00:00;85;0;company;0;;;145;crm\r",
-    "domain": null
-  },
-  {
-    "id": "legacy_company_Tokyo 100-0011, Japan;;;;http://www.assuredacq.com/;;1.5;0;2012-09-04 23:57:00;0000-00-00 00:00:00;85;0;company;0;;;146;crm\r",
-    "name": "Company Tokyo 100-0011, Japan;;;;http://www.assuredacq.com/;;1.5;0;2012-09-04 23:57:00;0000-00-00 00:00:00;85;0;company;0;;;146;crm\r",
-    "domain": null
-  },
-  {
-    "id": "legacy_company_Tokyo, Japan 102-0083;;;;http://reynoldsmsolutions.com/;;1.5;0;2012-10-01 21:00:00;0000-00-00 00:00:00;85;0;company;0;;;148;crm\r",
-    "name": "Company Tokyo, Japan 102-0083;;;;http://reynoldsmsolutions.com/;;1.5;0;2012-10-01 21:00:00;0000-00-00 00:00:00;85;0;company;0;;;148;crm\r",
-    "domain": null
-  },
-  {
-    "id": "legacy_company_4-28, Mita 1-chome, Chiyoda-ku, Tokyo, 108-0073 Japan;;;;http://www.oracleacq.com/;;1.5;0;2012-11-01 17:06:00;0000-00-00 00:00:00;85;0;company;0;;;150;crm\r",
-    "name": "Company 4-28, Mita 1-chome, Chiyoda-ku, Tokyo, 108-0073 Japan;;;;http://www.oracleacq.com/;;1.5;0;2012-11-01 17:06:00;0000-00-00 00:00:00;85;0;company;0;;;150;crm\r",
-    "domain": null
-  },
-  {
-    "id": "legacy_company_ ZIP 101-0047;+81 345 774 660 ; +81 344 965 102 ;;http://www.jpbtc-gov.org;2016-01-29;;1;2015-02-24 18:15:11;2015-05-05 20:04:50;0;0;registry;0;;;242;crm\r",
-    "name": "Company  ZIP 101-0047;+81 345 774 660 ; +81 344 965 102 ;;http://www.jpbtc-gov.org;2016-01-29;;1;2015-02-24 18:15:11;2015-05-05 20:04:50;0;0;registry;0;;;242;crm\r",
-    "domain": null
-  }
+	{
+		"id": "legacy_company_Boston, MA 02109-1650;;;;http://www.premiereassetmanagement.com/;;2.6;0;2006-04-27 23:30:42;0000-00-00 00:00:00;191;0;company;0;;;11;crm\r",
+		"name": "Company Boston, MA 02109-1650;;;;http://www.premiereassetmanagement.com/;;2.6;0;2006-04-27 23:30:42;0000-00-00 00:00:00;191;0;company;0;;;11;crm\r",
+		"domain": null
+	},
+	{
+		"id": "legacy_company_Durham, NC 27713-5272;;;;http://www.cathayam.com/;;2.6;0;2006-06-01 23:30:42;0000-00-00 00:00:00;191;0;company;0;;;22;crm\r",
+		"name": "Company Durham, NC 27713-5272;;;;http://www.cathayam.com/;;2.6;0;2006-06-01 23:30:42;0000-00-00 00:00:00;191;0;company;0;;;22;crm\r",
+		"domain": null
+	},
+	{
+		"id": "legacy_company_;;;;http://www.fwmna.com/;;2.6;0;2006-08-17 04:54:00;0000-00-00 00:00:00;191;0;company;0;;;25;crm\r",
+		"name": "Company ;;;;http://www.fwmna.com/;;2.6;0;2006-08-17 04:54:00;0000-00-00 00:00:00;191;0;company;0;;;25;crm\r",
+		"domain": null
+	},
+	{
+		"id": "legacy_company_Houston, TX 77027;;;;http://www.nfinancialgroup.com/;;2.6;0;0000-00-00 00:00:00;0000-00-00 00:00:00;191;0;company;0;;;29;crm\r",
+		"name": "Company Houston, TX 77027;;;;http://www.nfinancialgroup.com/;;2.6;0;0000-00-00 00:00:00;0000-00-00 00:00:00;191;0;company;0;;;29;crm\r",
+		"domain": null
+	},
+	{
+		"id": "legacy_company_Salt Lake City, UT 84101, United States;;;;http://www.olsenacquisitions.com/;;2.6;0;2007-09-28 02:30:00;0000-00-00 00:00:00;191;0;company;0;;;49;crm\r",
+		"name": "Company Salt Lake City, UT 84101, United States;;;;http://www.olsenacquisitions.com/;;2.6;0;2007-09-28 02:30:00;0000-00-00 00:00:00;191;0;company;0;;;49;crm\r",
+		"domain": null
+	},
+	{
+		"id": "legacy_company_�???�??�?½eletavsk�???�??�?¡ 9, 140 00 Praha 4, \r\r",
+		"name": "Company �???�??�?½eletavsk�???�??�?¡ 9, 140 00 Praha 4, \r\r",
+		"domain": null
+	},
+	{
+		"id": "legacy_company_Praha, Czech Republic;;;;http://www.equitytmgmt.com/;;1.5;0;2009-11-23 17:53:00;0000-00-00 00:00:00;47;0;company;0;;;81;crm\r",
+		"name": "Company Praha, Czech Republic;;;;http://www.equitytmgmt.com/;;1.5;0;2009-11-23 17:53:00;0000-00-00 00:00:00;47;0;company;0;;;81;crm\r",
+		"domain": null
+	},
+	{
+		"id": "legacy_company_4-4-7 Imabashi Chuo-ku, Osaka, Japan, 541-0042;;;;http://www.lexiconma.com/;;1.5;0;2011-04-15 00:00:00;0000-00-00 00:00:00;85;0;company;0;;;109;crm\r",
+		"name": "Company 4-4-7 Imabashi Chuo-ku, Osaka, Japan, 541-0042;;;;http://www.lexiconma.com/;;1.5;0;2011-04-15 00:00:00;0000-00-00 00:00:00;85;0;company;0;;;109;crm\r",
+		"domain": null
+	},
+	{
+		"id": "legacy_company_Minato-ku, Tokyo, 105-0022, Japan;;;;http://www.primemarket-am.com/;;1.5;0;2012-07-27 23:14:00;0000-00-00 00:00:00;85;0;company;0;;;144;crm\r",
+		"name": "Company Minato-ku, Tokyo, 105-0022, Japan;;;;http://www.primemarket-am.com/;;1.5;0;2012-07-27 23:14:00;0000-00-00 00:00:00;85;0;company;0;;;144;crm\r",
+		"domain": null
+	},
+	{
+		"id": "legacy_company_Tokyo 100-0004, Japan;;;;http://www.directmergersacq.com/;;1.5;0;2012-09-12 21:14:00;0000-00-00 00:00:00;85;0;company;0;;;147;crm\r",
+		"name": "Company Tokyo 100-0004, Japan;;;;http://www.directmergersacq.com/;;1.5;0;2012-09-12 21:14:00;0000-00-00 00:00:00;85;0;company;0;;;147;crm\r",
+		"domain": null
+	},
+	{
+		"id": "legacy_company_Shinjuku-ku, Tokyo, 160-0023;+81 3 4578 0402;+81 3 4333 0394 ;;http://www.aaoc.jp;2014-09-30;1;0;0000-00-00 00:00:00;2015-02-19 17:02:38;0;0;company;0;;;235;crm\r",
+		"name": "Company Shinjuku-ku, Tokyo, 160-0023;+81 3 4578 0402;+81 3 4333 0394 ;;http://www.aaoc.jp;2014-09-30;1;0;0000-00-00 00:00:00;2015-02-19 17:02:38;0;0;company;0;;;235;crm\r",
+		"domain": null
+	},
+	{
+		"id": "legacy_company_ZIP 102-0094;81345781758;81345895377;;http://jma-gov.org/;;;0;2014-05-18 13:33:15;2014-09-23 16:19:37;85;0;registry;25;Mr. Ronald Lewis;;49;crm_2\r",
+		"name": "Company ZIP 102-0094;81345781758;81345895377;;http://jma-gov.org/;;;0;2014-05-18 13:33:15;2014-09-23 16:19:37;85;0;registry;25;Mr. Ronald Lewis;;49;crm_2\r",
+		"domain": null
+	},
+	{
+		"id": "legacy_company_Georgia 30326;;;;http://www.americanmaservices.com/;;2.6;0;2006-04-27 23:30:42;0000-00-00 00:00:00;191;0;company;0;;;4;crm\r",
+		"name": "Company Georgia 30326;;;;http://www.americanmaservices.com/;;2.6;0;2006-04-27 23:30:42;0000-00-00 00:00:00;191;0;company;0;;;4;crm\r",
+		"domain": null
+	},
+	{
+		"id": "legacy_company_Suite 1300 Cleveland\r\r",
+		"name": "Company Suite 1300 Cleveland\r\r",
+		"domain": null
+	},
+	{
+		"id": "legacy_company_Ohio 44114\r\r",
+		"name": "Company Ohio 44114\r\r",
+		"domain": null
+	},
+	{
+		"id": "legacy_company_;;;;http://www.chabertam.com/;;2.6;0;2006-04-27 23:30:42;0000-00-00 00:00:00;191;0;company;0;;;5;crm\r",
+		"name": "Company ;;;;http://www.chabertam.com/;;2.6;0;2006-04-27 23:30:42;0000-00-00 00:00:00;191;0;company;0;;;5;crm\r",
+		"domain": null
+	},
+	{
+		"id": "legacy_company_Minneapolis, MN 55408;;;;http://www.mullerschmidt.com/;;2.6;0;2006-04-27 23:30:42;0000-00-00 00:00:00;191;0;company;0;;;7;crm\r",
+		"name": "Company Minneapolis, MN 55408;;;;http://www.mullerschmidt.com/;;2.6;0;2006-04-27 23:30:42;0000-00-00 00:00:00;191;0;company;0;;;7;crm\r",
+		"domain": null
+	},
+	{
+		"id": "legacy_company_4th Floor\r\r",
+		"name": "Company 4th Floor\r\r",
+		"domain": null
+	},
+	{
+		"id": "legacy_company_Boston, MA 02210\r\r",
+		"name": "Company Boston, MA 02210\r\r",
+		"domain": null
+	},
+	{
+		"id": "legacy_company_;;;;http://www.youngleeassociates.com/;;2.6;0;2006-04-27 23:30:42;0000-00-00 00:00:00;191;0;company;0;;;8;crm\r",
+		"name": "Company ;;;;http://www.youngleeassociates.com/;;2.6;0;2006-04-27 23:30:42;0000-00-00 00:00:00;191;0;company;0;;;8;crm\r",
+		"domain": null
+	},
+	{
+		"id": "legacy_company_Houston, TX 77002-2761 \r\r",
+		"name": "Company Houston, TX 77002-2761 \r\r",
+		"domain": null
+	},
+	{
+		"id": "legacy_company_United States of America;;;;http://www.oxleyma.com/;;2.6;0;2006-04-27 23:30:42;0000-00-00 00:00:00;191;0;company;0;;;12;crm\r",
+		"name": "Company United States of America;;;;http://www.oxleyma.com/;;2.6;0;2006-04-27 23:30:42;0000-00-00 00:00:00;191;0;company;0;;;12;crm\r",
+		"domain": null
+	},
+	{
+		"id": "legacy_company_Memphis, TN 38120-1431\r\r",
+		"name": "Company Memphis, TN 38120-1431\r\r",
+		"domain": null
+	},
+	{
+		"id": "legacy_company_United States Of America;;;;http://www.suninternationalma.com/;;2.6;0;2006-04-27 23:30:42;0000-00-00 00:00:00;191;0;company;0;;;13;crm\r",
+		"name": "Company United States Of America;;;;http://www.suninternationalma.com/;;2.6;0;2006-04-27 23:30:42;0000-00-00 00:00:00;191;0;company;0;;;13;crm\r",
+		"domain": null
+	},
+	{
+		"id": "legacy_company_Chicago, IL 60602-4270\r\r",
+		"name": "Company Chicago, IL 60602-4270\r\r",
+		"domain": null
+	},
+	{
+		"id": "legacy_company_;;;;http://www.whitmanlloyds.com/;;2.6;0;2006-04-27 23:30:42;0000-00-00 00:00:00;191;0;company;0;;;14;crm\r",
+		"name": "Company ;;;;http://www.whitmanlloyds.com/;;2.6;0;2006-04-27 23:30:42;0000-00-00 00:00:00;191;0;company;0;;;14;crm\r",
+		"domain": null
+	},
+	{
+		"id": "legacy_company_1170 Peachtree Street N.E.\r\r",
+		"name": "Company 1170 Peachtree Street N.E.\r\r",
+		"domain": null
+	},
+	{
+		"id": "legacy_company_Atlanta, GA 30309;;;;http://www.deltatradefinancial.com/;;2.6;0;2006-04-27 23:30:42;0000-00-00 00:00:00;191;0;company;0;;;16;crm\r",
+		"name": "Company Atlanta, GA 30309;;;;http://www.deltatradefinancial.com/;;2.6;0;2006-04-27 23:30:42;0000-00-00 00:00:00;191;0;company;0;;;16;crm\r",
+		"domain": null
+	},
+	{
+		"id": "legacy_company_Cleveland, OH 44114-1724\r\r",
+		"name": "Company Cleveland, OH 44114-1724\r\r",
+		"domain": null
+	},
+	{
+		"id": "legacy_company_United States;;;;http://www.linkmna.com/;;2.6;0;2006-04-27 23:30:42;0000-00-00 00:00:00;191;0;company;0;;;18;crm\r",
+		"name": "Company United States;;;;http://www.linkmna.com/;;2.6;0;2006-04-27 23:30:42;0000-00-00 00:00:00;191;0;company;0;;;18;crm\r",
+		"domain": null
+	},
+	{
+		"id": "legacy_company_San Francisco, CA 94108-2728\r\r",
+		"name": "Company San Francisco, CA 94108-2728\r\r",
+		"domain": null
+	},
+	{
+		"id": "legacy_company_United States;;;;http://www.harborcapitalmgm.com/;;2.6;0;2006-04-27 23:30:42;0000-00-00 00:00:00;191;0;company;0;;;19;crm\r",
+		"name": "Company United States;;;;http://www.harborcapitalmgm.com/;;2.6;0;2006-04-27 23:30:42;0000-00-00 00:00:00;191;0;company;0;;;19;crm\r",
+		"domain": null
+	},
+	{
+		"id": "legacy_company_Amsterdam 1014 BM\r\r",
+		"name": "Company Amsterdam 1014 BM\r\r",
+		"domain": null
+	},
+	{
+		"id": "legacy_company_Netherlands;;;;http://www.vandenbergam.com/;;2.6;0;2006-04-27 23:30:42;0000-00-00 00:00:00;191;0;company;0;;;20;crm\r",
+		"name": "Company Netherlands;;;;http://www.vandenbergam.com/;;2.6;0;2006-04-27 23:30:42;0000-00-00 00:00:00;191;0;company;0;;;20;crm\r",
+		"domain": null
+	},
+	{
+		"id": "legacy_company_Chicago, IL 60659\r\r",
+		"name": "Company Chicago, IL 60659\r\r",
+		"domain": null
+	},
+	{
+		"id": "legacy_company_United States;;;;http://www.firstamericanam.com/;;2.6;0;0000-00-00 00:00:00;0000-00-00 00:00:00;191;0;company;0;;;21;crm\r",
+		"name": "Company United States;;;;http://www.firstamericanam.com/;;2.6;0;0000-00-00 00:00:00;0000-00-00 00:00:00;191;0;company;0;;;21;crm\r",
+		"domain": null
+	},
+	{
+		"id": "legacy_company_Salt Lake City, UT 84121-7060\r\r",
+		"name": "Company Salt Lake City, UT 84121-7060\r\r",
+		"domain": null
+	},
+	{
+		"id": "legacy_company_United States;;;;http://www.crownfinancialmgmt.com/;;2.6;0;2006-07-24 22:20:00;0000-00-00 00:00:00;191;0;company;0;;;23;crm\r",
+		"name": "Company United States;;;;http://www.crownfinancialmgmt.com/;;2.6;0;2006-07-24 22:20:00;0000-00-00 00:00:00;191;0;company;0;;;23;crm\r",
+		"domain": null
+	},
+	{
+		"id": "legacy_company_North East Columbus\r\r",
+		"name": "Company North East Columbus\r\r",
+		"domain": null
+	},
+	{
+		"id": "legacy_company_Columbia, SC 29223-7222\r\r",
+		"name": "Company Columbia, SC 29223-7222\r\r",
+		"domain": null
+	},
+	{
+		"id": "legacy_company_United States;;;;http://www.southerncrossma.com/;;2.6;0;2006-07-24 22:20:00;0000-00-00 00:00:00;191;0;company;0;;;24;crm\r",
+		"name": "Company United States;;;;http://www.southerncrossma.com/;;2.6;0;2006-07-24 22:20:00;0000-00-00 00:00:00;191;0;company;0;;;24;crm\r",
+		"domain": null
+	},
+	{
+		"id": "legacy_company_Houston, TX 77042 - 3000\r\r",
+		"name": "Company Houston, TX 77042 - 3000\r\r",
+		"domain": null
+	},
+	{
+		"id": "legacy_company_Madison, WI 53703\r\r",
+		"name": "Company Madison, WI 53703\r\r",
+		"domain": null
+	},
+	{
+		"id": "legacy_company_;;;;http://www.lowelane.com/;;2.6;0;2006-08-17 05:03:03;0000-00-00 00:00:00;191;0;company;0;;;26;crm\r",
+		"name": "Company ;;;;http://www.lowelane.com/;;2.6;0;2006-08-17 05:03:03;0000-00-00 00:00:00;191;0;company;0;;;26;crm\r",
+		"domain": null
+	},
+	{
+		"id": "legacy_company_San Francisco, CA 94107-1243\r\r",
+		"name": "Company San Francisco, CA 94107-1243\r\r",
+		"domain": null
+	},
+	{
+		"id": "legacy_company_;;;;http://www.wakefieldpartners.com/;;2.6;0;0000-00-00 00:00:00;0000-00-00 00:00:00;191;0;company;0;;;27;crm\r",
+		"name": "Company ;;;;http://www.wakefieldpartners.com/;;2.6;0;0000-00-00 00:00:00;0000-00-00 00:00:00;191;0;company;0;;;27;crm\r",
+		"domain": null
+	},
+	{
+		"id": "legacy_company_Salt Lake City - UT 84107;;;;http://www.cloverma.com/;;2.6;0;0000-00-00 00:00:00;2006-09-29 02:09:51;191;0;company;0;;;28;crm\r",
+		"name": "Company Salt Lake City - UT 84107;;;;http://www.cloverma.com/;;2.6;0;0000-00-00 00:00:00;2006-09-29 02:09:51;191;0;company;0;;;28;crm\r",
+		"domain": null
+	},
+	{
+		"id": "legacy_company_Med Center\r\r",
+		"name": "Company Med Center\r\r",
+		"domain": null
+	},
+	{
+		"id": "legacy_company_Phoenix, AZ 85016\r\r",
+		"name": "Company Phoenix, AZ 85016\r\r",
+		"domain": null
+	},
+	{
+		"id": "legacy_company_United States of America;;;;http://www.lincolnellisam.com/;;2.6;0;2006-10-17 01:06:38;2006-10-19 22:57:35;191;0;company;0;;;30;crm\r",
+		"name": "Company United States of America;;;;http://www.lincolnellisam.com/;;2.6;0;2006-10-17 01:06:38;2006-10-19 22:57:35;191;0;company;0;;;30;crm\r",
+		"domain": null
+	},
+	{
+		"id": "legacy_company_Indianapolis, IN\r\r",
+		"name": "Company Indianapolis, IN\r\r",
+		"domain": null
+	},
+	{
+		"id": "legacy_company_46222 - 5917;;;;http://www.heronassetmgmt.com/;;2.6;0;2006-10-17 01:10:00;2006-10-31 07:31:52;191;0;company;0;;;31;crm\r",
+		"name": "Company 46222 - 5917;;;;http://www.heronassetmgmt.com/;;2.6;0;2006-10-17 01:10:00;2006-10-31 07:31:52;191;0;company;0;;;31;crm\r",
+		"domain": null
+	},
+	{
+		"id": "legacy_company_Houston, TX, 77079-1175;;;;http://www.phoenixacquisitions.com/;;2.6;0;2006-10-17 01:13:58;2006-11-16 06:37:35;191;0;company;0;;;32;crm\r",
+		"name": "Company Houston, TX, 77079-1175;;;;http://www.phoenixacquisitions.com/;;2.6;0;2006-10-17 01:13:58;2006-11-16 06:37:35;191;0;company;0;;;32;crm\r",
+		"domain": null
+	},
+	{
+		"id": "legacy_company_Cleveland,\r\r",
+		"name": "Company Cleveland,\r\r",
+		"domain": null
+	},
+	{
+		"id": "legacy_company_OH 44114;;;;http://www.winstonpartnersco.com/;;2.6;0;2006-10-17 01:15:37;2006-11-17 06:57:53;191;0;company;0;;;33;crm\r",
+		"name": "Company OH 44114;;;;http://www.winstonpartnersco.com/;;2.6;0;2006-10-17 01:15:37;2006-11-17 06:57:53;191;0;company;0;;;33;crm\r",
+		"domain": null
+	},
+	{
+		"id": "legacy_company_Minneapolis, MN\r\r",
+		"name": "Company Minneapolis, MN\r\r",
+		"domain": null
+	},
+	{
+		"id": "legacy_company_55402-8773;;;;http://www.griffinma.com/;;2.6;0;2006-10-17 01:17:30;2007-02-06 13:01:13;191;0;company;0;;;34;crm\r",
+		"name": "Company 55402-8773;;;;http://www.griffinma.com/;;2.6;0;2006-10-17 01:17:30;2007-02-06 13:01:13;191;0;company;0;;;34;crm\r",
+		"domain": null
+	},
+	{
+		"id": "legacy_company_Hartford, CT 06103, United States;;;;http://www.ashleypartners.com/;;2.6;0;2007-09-28 02:30:00;0000-00-00 00:00:00;191;0;company;0;;;50;crm\r",
+		"name": "Company Hartford, CT 06103, United States;;;;http://www.ashleypartners.com/;;2.6;0;2007-09-28 02:30:00;0000-00-00 00:00:00;191;0;company;0;;;50;crm\r",
+		"domain": null
+	},
+	{
+		"id": "legacy_company_Minato-ku, Tokyo, Japan;;;;http://www.orionacquisitions.com/;;2.6;0;2008-05-07 03:13:00;0000-00-00 00:00:00;191;0;company;0;;;56;crm\r",
+		"name": "Company Minato-ku, Tokyo, Japan;;;;http://www.orionacquisitions.com/;;2.6;0;2008-05-07 03:13:00;0000-00-00 00:00:00;191;0;company;0;;;56;crm\r",
+		"domain": null
+	},
+	{
+		"id": "legacy_company_Kuala Lumpur\r\r",
+		"name": "Company Kuala Lumpur\r\r",
+		"domain": null
+	},
+	{
+		"id": "legacy_company_Malaysia;;;;http://omegacm.com/;;2.6;0;2008-06-27 03:11:00;0000-00-00 00:00:00;191;0;company;0;;;59;crm\r",
+		"name": "Company Malaysia;;;;http://omegacm.com/;;2.6;0;2008-06-27 03:11:00;0000-00-00 00:00:00;191;0;company;0;;;59;crm\r",
+		"domain": null
+	},
+	{
+		"id": "legacy_company_Kuala Lumpur ZIP 50250;;;;http://www.morgancp.com/;;2.6;0;2008-09-08 18:20:00;0000-00-00 00:00:00;191;0;company;0;;;64;crm\r",
+		"name": "Company Kuala Lumpur ZIP 50250;;;;http://www.morgancp.com/;;2.6;0;2008-09-08 18:20:00;0000-00-00 00:00:00;191;0;company;0;;;64;crm\r",
+		"domain": null
+	},
+	{
+		"id": "legacy_company_Republic;;;;http://www.philipem.com/;;1.5;0;2009-06-07 19:42:34;0000-00-00 00:00:00;47;0;company;0;;;75;crm\r",
+		"name": "Company Republic;;;;http://www.philipem.com/;;1.5;0;2009-06-07 19:42:34;0000-00-00 00:00:00;47;0;company;0;;;75;crm\r",
+		"domain": null
+	},
+	{
+		"id": "legacy_company_Chuo-ku 541-0052 Osaka Japan\r\r",
+		"name": "Company Chuo-ku 541-0052 Osaka Japan\r\r",
+		"domain": null
+	},
+	{
+		"id": "legacy_company_;;;;http://www.penncm.com/;;1.5;0;2009-08-18 16:57:00;0000-00-00 00:00:00;47;0;company;0;;;76;crm\r",
+		"name": "Company ;;;;http://www.penncm.com/;;1.5;0;2009-08-18 16:57:00;0000-00-00 00:00:00;47;0;company;0;;;76;crm\r",
+		"domain": null
+	},
+	{
+		"id": "legacy_company_6-10-1 Nishi-Shinjuku, Shinjuku-ku\r\r",
+		"name": "Company 6-10-1 Nishi-Shinjuku, Shinjuku-ku\r\r",
+		"domain": null
+	},
+	{
+		"id": "legacy_company_Tokyo 160-0023 Japan;;;;http://www.cooperdaniels.com/;;1.5;0;2010-07-06 00:00:00;0000-00-00 00:00:00;85;0;company;0;;;96;crm\r",
+		"name": "Company Tokyo 160-0023 Japan;;;;http://www.cooperdaniels.com/;;1.5;0;2010-07-06 00:00:00;0000-00-00 00:00:00;85;0;company;0;;;96;crm\r",
+		"domain": null
+	},
+	{
+		"id": "legacy_company_Osaka 542-0081 Japan\r\r",
+		"name": "Company Osaka 542-0081 Japan\r\r",
+		"domain": null
+	},
+	{
+		"id": "legacy_company_;;;;http://www.axiscf.com/;;1.5;0;2010-09-10 00:00:00;0000-00-00 00:00:00;93;0;company;0;;;102;crm\r",
+		"name": "Company ;;;;http://www.axiscf.com/;;1.5;0;2010-09-10 00:00:00;0000-00-00 00:00:00;93;0;company;0;;;102;crm\r",
+		"domain": null
+	},
+	{
+		"id": "legacy_company_Azuchi-machi 3 Chome, \r\r",
+		"name": "Company Azuchi-machi 3 Chome, \r\r",
+		"domain": null
+	},
+	{
+		"id": "legacy_company_Chuo-ku, Osaka City, \r\r",
+		"name": "Company Chuo-ku, Osaka City, \r\r",
+		"domain": null
+	},
+	{
+		"id": "legacy_company_Osaka 541-0052, Japan;;;;http://www.idealmergergroup.com/;;1.5;0;2010-09-10 00:00:00;0000-00-00 00:00:00;93;0;company;0;;;104;crm\r",
+		"name": "Company Osaka 541-0052, Japan;;;;http://www.idealmergergroup.com/;;1.5;0;2010-09-10 00:00:00;0000-00-00 00:00:00;93;0;company;0;;;104;crm\r",
+		"domain": null
+	},
+	{
+		"id": "legacy_company_Osaka, 541-0055, Japan;;;;http://www.newoutlookmg.com/;;1.5;0;2011-02-18 00:00:00;0000-00-00 00:00:00;85;0;company;0;;;106;crm\r",
+		"name": "Company Osaka, 541-0055, Japan;;;;http://www.newoutlookmg.com/;;1.5;0;2011-02-18 00:00:00;0000-00-00 00:00:00;85;0;company;0;;;106;crm\r",
+		"domain": null
+	},
+	{
+		"id": "legacy_company_2-9-19 Shibata, Kita-ku, Osaka 530-0012, Japan;;;;http://www.heritagefinance-am.com/;;1.5;0;2011-02-18 00:00:00;0000-00-00 00:00:00;85;0;company;0;;;107;crm\r",
+		"name": "Company 2-9-19 Shibata, Kita-ku, Osaka 530-0012, Japan;;;;http://www.heritagefinance-am.com/;;1.5;0;2011-02-18 00:00:00;0000-00-00 00:00:00;85;0;company;0;;;107;crm\r",
+		"domain": null
+	},
+	{
+		"id": "legacy_company_1-1-6, Uchihonmachi, Chuo-Ku, Osaka, Japan, 540-0026;;;;http://www.fortunecf.com/;;1.5;0;2011-02-18 00:00:00;0000-00-00 00:00:00;85;0;company;0;;;108;crm\r",
+		"name": "Company 1-1-6, Uchihonmachi, Chuo-Ku, Osaka, Japan, 540-0026;;;;http://www.fortunecf.com/;;1.5;0;2011-02-18 00:00:00;0000-00-00 00:00:00;85;0;company;0;;;108;crm\r",
+		"domain": null
+	},
+	{
+		"id": "legacy_company_Tokyo, 104-0031, Japan;;;;http://www.drakemerger.com/;;1.5;0;2012-08-03 23:11:00;0000-00-00 00:00:00;85;0;company;0;;;145;crm\r",
+		"name": "Company Tokyo, 104-0031, Japan;;;;http://www.drakemerger.com/;;1.5;0;2012-08-03 23:11:00;0000-00-00 00:00:00;85;0;company;0;;;145;crm\r",
+		"domain": null
+	},
+	{
+		"id": "legacy_company_Tokyo 100-0011, Japan;;;;http://www.assuredacq.com/;;1.5;0;2012-09-04 23:57:00;0000-00-00 00:00:00;85;0;company;0;;;146;crm\r",
+		"name": "Company Tokyo 100-0011, Japan;;;;http://www.assuredacq.com/;;1.5;0;2012-09-04 23:57:00;0000-00-00 00:00:00;85;0;company;0;;;146;crm\r",
+		"domain": null
+	},
+	{
+		"id": "legacy_company_Tokyo, Japan 102-0083;;;;http://reynoldsmsolutions.com/;;1.5;0;2012-10-01 21:00:00;0000-00-00 00:00:00;85;0;company;0;;;148;crm\r",
+		"name": "Company Tokyo, Japan 102-0083;;;;http://reynoldsmsolutions.com/;;1.5;0;2012-10-01 21:00:00;0000-00-00 00:00:00;85;0;company;0;;;148;crm\r",
+		"domain": null
+	},
+	{
+		"id": "legacy_company_4-28, Mita 1-chome, Chiyoda-ku, Tokyo, 108-0073 Japan;;;;http://www.oracleacq.com/;;1.5;0;2012-11-01 17:06:00;0000-00-00 00:00:00;85;0;company;0;;;150;crm\r",
+		"name": "Company 4-28, Mita 1-chome, Chiyoda-ku, Tokyo, 108-0073 Japan;;;;http://www.oracleacq.com/;;1.5;0;2012-11-01 17:06:00;0000-00-00 00:00:00;85;0;company;0;;;150;crm\r",
+		"domain": null
+	},
+	{
+		"id": "legacy_company_ ZIP 101-0047;+81 345 774 660 ; +81 344 965 102 ;;http://www.jpbtc-gov.org;2016-01-29;;1;2015-02-24 18:15:11;2015-05-05 20:04:50;0;0;registry;0;;;242;crm\r",
+		"name": "Company  ZIP 101-0047;+81 345 774 660 ; +81 344 965 102 ;;http://www.jpbtc-gov.org;2016-01-29;;1;2015-02-24 18:15:11;2015-05-05 20:04:50;0;0;registry;0;;;242;crm\r",
+		"domain": null
+	}
 ]

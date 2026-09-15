@@ -5,9 +5,21 @@ import { ActivityStampService } from "../src/crm/activity-stamp.service";
 function service() {
 	const seen: { company?: unknown; contact?: unknown; deal?: unknown } = {};
 	const db = {
-		company: { updateMany: async (args: unknown) => { seen.company = args; } },
-		contact: { updateMany: async (args: unknown) => { seen.contact = args; } },
-		deal: { updateMany: async (args: unknown) => { seen.deal = args; } },
+		company: {
+			updateMany: async (args: unknown) => {
+				seen.company = args;
+			},
+		},
+		contact: {
+			updateMany: async (args: unknown) => {
+				seen.contact = args;
+			},
+		},
+		deal: {
+			updateMany: async (args: unknown) => {
+				seen.deal = args;
+			},
+		},
 	} as unknown as Db;
 
 	return { svc: new ActivityStampService(db), seen };
@@ -21,7 +33,10 @@ describe("ActivityStampService.touch", () => {
 		await svc.touch({ companyId: "co_1" }, at);
 
 		expect(seen.company).toEqual({
-			where: { id: "co_1", OR: [{ lastActivityAt: null }, { lastActivityAt: { lt: at } }] },
+			where: {
+				id: "co_1",
+				OR: [{ lastActivityAt: null }, { lastActivityAt: { lt: at } }],
+			},
 			data: { lastActivityAt: at },
 		});
 		expect(seen.contact).toBeUndefined();

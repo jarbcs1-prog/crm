@@ -1,8 +1,8 @@
 import { EnrichmentStatus } from "@crm/db";
 import { APP_AUTH, type AppAuth } from "./app-auth";
 import { brandOutcome, runBrand } from "./brand";
-import { LEGAL_APPROACH_SCRIPT } from "./legal-approach";
 import { markRunning, settle } from "./enrichment";
+import { LEGAL_APPROACH_SCRIPT } from "./legal-approach";
 import { collapsing, runLimited } from "./pool";
 import { runPortrait } from "./portrait";
 import {

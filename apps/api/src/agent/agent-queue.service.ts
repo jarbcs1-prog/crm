@@ -14,13 +14,11 @@ export class AgentQueueService {
 		return this.queued("contactId", ids);
 	}
 
-	async isQueued(
-		subject: {
-			companyId?: string;
-			contactId?: string;
-			kind?: string;
-		},
-	): Promise<boolean> {
+	async isQueued(subject: {
+		companyId?: string;
+		contactId?: string;
+		kind?: string;
+	}): Promise<boolean> {
 		const row = await this.db.agentTask.findFirst({
 			where: {
 				finishedAt: null,

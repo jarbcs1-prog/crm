@@ -1,7 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it } from "bun:test";
 import {
-	PROVIDER_NAMES,
 	isProviderConfigured,
+	PROVIDER_NAMES,
 	providerEndpoint,
 	providerKey,
 	providerModel,
@@ -112,7 +112,12 @@ describe("remote gateways", () => {
 
 describe("voice and dialing vendors", () => {
 	it("gates each vendor on its key", () => {
-		for (const name of ["deepgram", "elevenlabs", "cartesia", "telnyx"] as const) {
+		for (const name of [
+			"deepgram",
+			"elevenlabs",
+			"cartesia",
+			"telnyx",
+		] as const) {
 			expect(isProviderConfigured(name)).toBe(false);
 		}
 		process.env.DEEPGRAM_API_KEY = "key";

@@ -356,7 +356,9 @@ export class CalendarSyncService {
 
 		const pending = attendees.filter((attendee) => attendee.contactId);
 		await Promise.allSettled(
-			pending.map((attendee) => this.agent.meetingSoon(attendee.contactId as string, startsAt)),
+			pending.map((attendee) =>
+				this.agent.meetingSoon(attendee.contactId as string, startsAt),
+			),
 		);
 	}
 

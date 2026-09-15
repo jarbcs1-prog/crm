@@ -12,8 +12,8 @@ import {
 	NotFoundException,
 } from "@nestjs/common";
 import { ActivityStampService } from "../crm/activity-stamp.service";
-import { fromCents, toCents } from "../crm/values";
 import { TtlCache } from "../crm/ttl-cache";
+import { fromCents, toCents } from "../crm/values";
 import { InjectDatabase } from "../database/database.constants";
 import {
 	countsByKey,
@@ -355,7 +355,13 @@ export class DealsService {
 	}
 
 	private async facetCounts(input: DealListInput) {
-		const key = JSON.stringify({ q: input.q.trim(), owner: input.owner, status: input.status, stage: input.stage, closing: input.closing });
+		const key = JSON.stringify({
+			q: input.q.trim(),
+			owner: input.owner,
+			status: input.status,
+			stage: input.stage,
+			closing: input.closing,
+		});
 		const cached = this.facetCache.get(key);
 		if (cached) return cached;
 

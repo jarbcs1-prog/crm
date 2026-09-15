@@ -14,8 +14,8 @@ import {
 } from "@nestjs/common";
 import { AgentQueueService } from "../agent/agent-queue.service";
 import { AgentTriggerService } from "../agent/agent-trigger.service";
-import { blankToNull, toCents } from "../crm/values";
 import { TtlCache } from "../crm/ttl-cache";
+import { blankToNull, toCents } from "../crm/values";
 import { InjectDatabase } from "../database/database.constants";
 import { OPEN_DEAL_STAGES } from "../deals/deal-stage";
 import {
@@ -145,7 +145,10 @@ export class CompaniesService {
 			ids.length
 				? this.db.deal.groupBy({
 						by: ["companyId"],
-						where: { companyId: { in: ids }, stage: { in: [...OPEN_DEAL_STAGES] } },
+						where: {
+							companyId: { in: ids },
+							stage: { in: [...OPEN_DEAL_STAGES] },
+						},
 						_count: { _all: true },
 					})
 				: [],
@@ -153,13 +156,15 @@ export class CompaniesService {
 		]);
 
 		const contactsByCompany = new Map(
-			contactCounts.map((row: { companyId: string | null; _count: { _all: number } }) =>
-				[row.companyId, row._count._all] as const,
+			contactCounts.map(
+				(row: { companyId: string | null; _count: { _all: number } }) =>
+					[row.companyId, row._count._all] as const,
 			),
 		);
 		const dealsByCompany = new Map(
-			dealCounts.map((row: { companyId: string | null; _count: { _all: number } }) =>
-				[row.companyId, row._count._all] as const,
+			dealCounts.map(
+				(row: { companyId: string | null; _count: { _all: number } }) =>
+					[row.companyId, row._count._all] as const,
 			),
 		);
 
@@ -500,7 +505,13 @@ export class CompaniesService {
 	}
 
 	private async facetCounts(input: CompanyListInput) {
-		const key = JSON.stringify({ q: input.q.trim(), industry: input.industry, owner: input.owner, enrichment: input.enrichment, source: input.source });
+		const key = JSON.stringify({
+			q: input.q.trim(),
+			industry: input.industry,
+			owner: input.owner,
+			enrichment: input.enrichment,
+			source: input.source,
+		});
 		const cached = this.facetCache.get(key);
 		if (cached) return cached;
 

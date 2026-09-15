@@ -2,7 +2,7 @@ import { spawn } from "node:child_process";
 import { mkdirSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { CallStatus } from "@crm/db";
-import { nonohConfigured, nonohMakeCall, nonohHangup } from "./nonoh-sip";
+import { nonohConfigured, nonohHangup, nonohMakeCall } from "./nonoh-sip";
 
 const DEFAULT_BASE_URL = "https://l7api.com/v1.2/voipstudio";
 

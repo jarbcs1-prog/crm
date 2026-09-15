@@ -110,5 +110,7 @@ export function isProviderConfigured(name: ProviderName): boolean {
 	if (config.keyEnvs.length > 0) {
 		return config.keyEnvs.every((env) => read(env) !== undefined);
 	}
-	return (config.endpointEnv ? read(config.endpointEnv) : undefined) !== undefined;
+	return (
+		(config.endpointEnv ? read(config.endpointEnv) : undefined) !== undefined
+	);
 }

@@ -2,8 +2,16 @@ import { describe, expect, it } from "bun:test";
 import type { Db } from "@crm/db";
 import { SearchService } from "../src/search/search.service";
 
-function service(companies: unknown[] = [], contacts: unknown[] = [], deals: unknown[] = []) {
-	const seen: { companyWhere?: unknown; contactWhere?: unknown; dealWhere?: unknown } = {};
+function service(
+	companies: unknown[] = [],
+	contacts: unknown[] = [],
+	deals: unknown[] = [],
+) {
+	const seen: {
+		companyWhere?: unknown;
+		contactWhere?: unknown;
+		dealWhere?: unknown;
+	} = {};
 	const db = {
 		company: {
 			findMany: async (args: { where: unknown }) => {
@@ -49,7 +57,16 @@ describe("SearchService.quick", () => {
 
 	it("maps hits with label and detail", async () => {
 		const { svc } = service(
-			[{ id: "co_1", name: "Acme", domain: "acme.com", iconUrl: null, iconDarkUrl: null, iconTone: null }],
+			[
+				{
+					id: "co_1",
+					name: "Acme",
+					domain: "acme.com",
+					iconUrl: null,
+					iconDarkUrl: null,
+					iconTone: null,
+				},
+			],
 			[
 				{
 					id: "c_1",
@@ -60,7 +77,18 @@ describe("SearchService.quick", () => {
 					company: { name: "Acme" },
 				},
 			],
-			[{ id: "d_1", name: "Acme deal", company: { name: "Acme", iconUrl: null, iconDarkUrl: null, iconTone: null } }],
+			[
+				{
+					id: "d_1",
+					name: "Acme deal",
+					company: {
+						name: "Acme",
+						iconUrl: null,
+						iconDarkUrl: null,
+						iconTone: null,
+					},
+				},
+			],
 		);
 
 		const { hits } = await svc.quick("acme");

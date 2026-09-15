@@ -118,7 +118,7 @@ export async function noteSession(
 }
 
 export function jitteredBackoffMs(attempt: number): number {
-	const base = 1000 * Math.pow(2, attempt);
+	const base = 1000 * 2 ** attempt;
 	const jitter = 0.85 + Math.random() * 0.3;
 	return Math.round(base * jitter);
 }

@@ -14,7 +14,10 @@ export async function sendTelegramMessage(input: {
 	const homeChannel = process.env.TELEGRAM_HOME_CHANNEL ?? "";
 	const chatId = input.chatId ?? homeChannel;
 	if (!chatId) {
-		return { ok: false, error: "No chatId provided and TELEGRAM_HOME_CHANNEL is not set." };
+		return {
+			ok: false,
+			error: "No chatId provided and TELEGRAM_HOME_CHANNEL is not set.",
+		};
 	}
 
 	const url = `https://api.telegram.org/bot${token}/sendMessage`;
@@ -57,9 +60,17 @@ export default defineTool({
 	description:
 		"Sends a message to a Telegram chat via the Telegram Bot API. Requires TELEGRAM_BOT_TOKEN.",
 	inputSchema: z.object({
-		chatId: z.string().optional().describe("The Telegram chat ID to send the message to. Defaults to TELEGRAM_HOME_CHANNEL."),
+		chatId: z
+			.string()
+			.optional()
+			.describe(
+				"The Telegram chat ID to send the message to. Defaults to TELEGRAM_HOME_CHANNEL.",
+			),
 		text: z.string().min(1).describe("The message text to send."),
-		disableNotification: z.boolean().optional().describe("Whether to send silently."),
+		disableNotification: z
+			.boolean()
+			.optional()
+			.describe("Whether to send silently."),
 	}),
 	async execute({ chatId, text, disableNotification }) {
 		return sendTelegramMessage({ chatId, text, disableNotification });

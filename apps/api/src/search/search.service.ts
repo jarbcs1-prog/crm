@@ -16,7 +16,10 @@ export type SearchHit = {
 const PER_KIND = 5;
 
 const SEARCH_CACHE_TTL_MS = 10_000;
-const searchCache = new Map<string, { expiresAt: number; value: { hits: SearchHit[] } }>();
+const searchCache = new Map<
+	string,
+	{ expiresAt: number; value: { hits: SearchHit[] } }
+>();
 
 @Injectable()
 export class SearchService {
@@ -128,7 +131,10 @@ export class SearchService {
 				),
 			],
 		};
-		searchCache.set(cacheKey, { expiresAt: Date.now() + SEARCH_CACHE_TTL_MS, value });
+		searchCache.set(cacheKey, {
+			expiresAt: Date.now() + SEARCH_CACHE_TTL_MS,
+			value,
+		});
 		if (searchCache.size > 200) {
 			const firstKey = searchCache.keys().next().value as string | undefined;
 			if (firstKey) searchCache.delete(firstKey);

@@ -267,7 +267,10 @@ export class GmailSyncService {
 				if (result.status === "rejected") {
 					this.logger.warn({
 						message: "Gmail store failed",
-						error: result.reason instanceof Error ? result.reason.message : String(result.reason),
+						error:
+							result.reason instanceof Error
+								? result.reason.message
+								: String(result.reason),
 					});
 				}
 			}

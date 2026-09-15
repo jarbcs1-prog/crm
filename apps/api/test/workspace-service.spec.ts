@@ -1,6 +1,5 @@
 import { describe, expect, it } from "bun:test";
 import type { Db } from "@crm/db";
-import { WORKSPACE_ID } from "@crm/db/workspace";
 import { WorkspaceService } from "../src/workspace/workspace.service";
 
 function svcWith(role: string | null, overrides: Record<string, unknown> = {}) {
@@ -49,7 +48,9 @@ function svcWith(role: string | null, overrides: Record<string, unknown> = {}) {
 		organization: { findUnique: async () => null },
 	} as unknown as Db;
 
-	const agent = { workspaceChanged: async () => {} } as unknown as import("../src/agent/agent-trigger.service").AgentTriggerService;
+	const agent = {
+		workspaceChanged: async () => {},
+	} as unknown as import("../src/agent/agent-trigger.service").AgentTriggerService;
 
 	return { svc: new WorkspaceService(db, agent), seen };
 }
@@ -87,7 +88,9 @@ describe("WorkspaceService.removeMember", () => {
 			queryRaw: () => [{ id: "m1" }, { id: "m2" }],
 		});
 
-		expect(svc.removeMember("user_1", "m1")).rejects.toThrow("Only an owner can remove");
+		expect(svc.removeMember("user_1", "m1")).rejects.toThrow(
+			"Only an owner can remove",
+		);
 	});
 
 	it("refuses to demote the last owner", async () => {
@@ -109,11 +112,13 @@ describe("WorkspaceService.removeMember", () => {
 		} as unknown as Db;
 
 		const agent = { workspaceChanged: async () => {} } as unknown as never;
-		const { WorkspaceService: WS } = await import("../src/workspace/workspace.service");
+		const { WorkspaceService: WS } = await import(
+			"../src/workspace/workspace.service"
+		);
 		const svc = new WS(db, agent);
 
-		expect(svc.setMemberRole("user_1", { memberId: "m1", role: "member" })).rejects.toThrow(
-			"needs an owner",
-		);
+		expect(
+			svc.setMemberRole("user_1", { memberId: "m1", role: "member" }),
+		).rejects.toThrow("needs an owner");
 	});
 });

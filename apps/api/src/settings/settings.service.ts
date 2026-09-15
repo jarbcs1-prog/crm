@@ -1,17 +1,17 @@
+import { isWorkspaceAdmin } from "@crm/auth";
 import type { Db } from "@crm/db";
 import {
 	DEFAULT_AGENT_MODEL,
 	readAgentModel,
 	writeAgentModel,
 } from "@crm/db/settings";
+import { WORKSPACE_ID } from "@crm/db/workspace";
 import {
 	BadRequestException,
 	ForbiddenException,
 	Injectable,
 	Logger,
 } from "@nestjs/common";
-import { isWorkspaceAdmin } from "@crm/auth";
-import { WORKSPACE_ID } from "@crm/db/workspace";
 import { InjectDatabase } from "../database/database.constants";
 import {
 	type CatalogModel,
@@ -61,11 +61,18 @@ export class SettingsService {
 	): Promise<AgentModelSettings> {
 		if (actingUserId) {
 			const member = await this.db.member.findUnique({
-				where: { organizationId_userId: { organizationId: WORKSPACE_ID, userId: actingUserId } },
+				where: {
+					organizationId_userId: {
+						organizationId: WORKSPACE_ID,
+						userId: actingUserId,
+					},
+				},
 				select: { role: true },
 			});
 			if (!member || !isWorkspaceAdmin(member.role as never)) {
-				throw new ForbiddenException("Only an owner or an admin can change the agent model.");
+				throw new ForbiddenException(
+					"Only an owner or an admin can change the agent model.",
+				);
 			}
 		}
 

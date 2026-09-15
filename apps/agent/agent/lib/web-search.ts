@@ -111,7 +111,9 @@ async function askExa(
 			query: question,
 			...(options.deep ? { depth: "deep" } : { depth: "basic" }),
 			...(options.domains ? { include_domains: options.domains } : {}),
-			...(options.system ? { summary: { type: "detailed", instructions: options.system } } : {}),
+			...(options.system
+				? { summary: { type: "detailed", instructions: options.system } }
+				: {}),
 			num_results: options.deep ? 10 : 5,
 			visualize_results: false,
 			...(options.system ? { character: "comprehensive" } : {}),
