@@ -2,20 +2,11 @@ export function collapsing<A extends unknown[]>(
 	run: (...args: A) => Promise<void>,
 ): (...args: A) => Promise<void> {
 	let active: Promise<void> | null = null;
-	let trailing: Map<string, A> | null = null;
-
-	const keyFor = (args: A): string => {
-		try {
-			return JSON.stringify(args);
-		} catch {
-			return String(args);
-		}
-	};
+	let trailing: A | null = null;
 
 	const invoke = async (...args: A): Promise<void> => {
 		if (active) {
-			if (!trailing) trailing = new Map<string, A>();
-			trailing.set(keyFor(args), args);
+			trailing = args;
 			return active;
 		}
 
@@ -31,19 +22,14 @@ export function collapsing<A extends unknown[]>(
 			active = null;
 		}
 
-		const pending = trailing;
-		trailing = null;
-
-		if (pending) {
-			for (const nextArgs of pending.values()) {
-				const catchUp = invoke(...nextArgs);
-				try {
-					await catchUp;
-				} catch (error) {
-					console.warn({ message: "collapsing catchUp failed", error });
-					if (!failure) throw error;
-				}
-				if (failure) break;
+		if (trailing !== null) {
+			const t = trailing;
+			trailing = null;
+			try {
+				await invoke(...t);
+			} catch (error) {
+				console.warn({ message: "collapsing catchUp failed", error });
+				if (!failure) throw error;
 			}
 		}
 

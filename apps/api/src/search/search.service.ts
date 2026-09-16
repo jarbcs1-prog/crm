@@ -30,7 +30,13 @@ export class SearchService {
 		if (term.length < 3) return { hits: [] };
 		const cacheKey = term.toLowerCase();
 		const cached = searchCache.get(cacheKey);
-		if (cached && cached.expiresAt > Date.now()) return cached.value;
+		if (cached && cached.expiresAt > Date.now()) {
+			if (cached.value.hits.length === 0) {
+				searchCache.delete(cacheKey);
+			} else {
+				return cached.value;
+			}
+		}
 
 		const [companies, contacts, deals] = await Promise.all([
 			this.db.company.findMany({
@@ -131,13 +137,15 @@ export class SearchService {
 				),
 			],
 		};
-		searchCache.set(cacheKey, {
-			expiresAt: Date.now() + SEARCH_CACHE_TTL_MS,
-			value,
-		});
-		if (searchCache.size > 200) {
-			const firstKey = searchCache.keys().next().value as string | undefined;
-			if (firstKey) searchCache.delete(firstKey);
+		if (value.hits.length > 0) {
+			searchCache.set(cacheKey, {
+				expiresAt: Date.now() + SEARCH_CACHE_TTL_MS,
+				value,
+			});
+			if (searchCache.size > 200) {
+				const firstKey = searchCache.keys().next().value as string | undefined;
+				if (firstKey) searchCache.delete(firstKey);
+			}
 		}
 		return value;
 	}

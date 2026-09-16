@@ -10,12 +10,22 @@ import {
 
 const GATE_TTL_MS = 10_000;
 const gateCache = new Map<string, { value: OnboardingGate; at: number }>();
+let lastFetch: typeof globalThis.fetch = globalThis.fetch;
 
 async function getCachedGate(request: NextRequest): Promise<OnboardingGate> {
-	const key = request.headers.get("cookie") ?? "__no_cookie__";
+	if (lastFetch !== globalThis.fetch) {
+		gateCache.clear();
+		lastFetch = globalThis.fetch;
+	}
+	const session = getSessionCookie(request);
+	const key = session ?? "__no_cookie__";
 	const hit = gateCache.get(key);
 	if (hit && Date.now() - hit.at < GATE_TTL_MS) return hit.value;
 	const value = await readOnboardingGate(request);
+	if (value === "unknown") {
+		gateCache.delete(key);
+		return value;
+	}
 	gateCache.set(key, { value, at: Date.now() });
 	if (gateCache.size > 500) {
 		const oldest = gateCache.keys().next().value as string | undefined;
