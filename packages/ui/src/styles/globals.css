@@ -841,7 +841,9 @@
 	.link-hover *,
 	.link-hover::before,
 	.link-hover::after {
+		/* biome-ignore lint/complexity/noImportantStyles: reduced-motion accessibility override must use !important to override animations */
 		animation: none !important;
+		/* biome-ignore lint/complexity/noImportantStyles: reduced-motion accessibility override must use !important to override animations */
 		transition-duration: 0.01ms !important;
 	}
 }

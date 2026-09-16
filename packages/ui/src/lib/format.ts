@@ -54,7 +54,10 @@ const NF_USD_COMPACT_F1 = new Intl.NumberFormat(undefined, {
 
 const moneyCache = new Map<string, Intl.NumberFormat>();
 
-function getMoneyFormatter(currency: string, fractionDigits: number): Intl.NumberFormat {
+function getMoneyFormatter(
+	currency: string,
+	fractionDigits: number,
+): Intl.NumberFormat {
 	const key = `${currency}:${fractionDigits}`;
 	let f = moneyCache.get(key);
 	if (!f) {
@@ -68,7 +71,10 @@ function getMoneyFormatter(currency: string, fractionDigits: number): Intl.Numbe
 	return f;
 }
 
-function getMoneyCompactFormatter(currency: string, fractionDigits: number): Intl.NumberFormat {
+function getMoneyCompactFormatter(
+	currency: string,
+	fractionDigits: number,
+): Intl.NumberFormat {
 	const key = `${currency}:compact:${fractionDigits}`;
 	let f = moneyCache.get(key);
 	if (!f) {
@@ -86,14 +92,18 @@ function getMoneyCompactFormatter(currency: string, fractionDigits: number): Int
 export function formatMoney(cents: number, currency = "usd"): string {
 	const code = displayCurrencyCode(currency);
 	const fractionDigits = cents % 100 === 0 ? 0 : 2;
-	if (code === "USD") return (fractionDigits === 0 ? NF_USD : NF_USD_F2).format(cents / 100);
+	if (code === "USD")
+		return (fractionDigits === 0 ? NF_USD : NF_USD_F2).format(cents / 100);
 	return getMoneyFormatter(code, fractionDigits).format(cents / 100);
 }
 
 export function formatMoneyCompact(cents: number, currency = "usd"): string {
 	const code = displayCurrencyCode(currency);
 	const fractionDigits = cents % 100_000 === 0 ? 0 : 1;
-	if (code === "USD") return (fractionDigits === 0 ? NF_USD_COMPACT : NF_USD_COMPACT_F1).format(cents / 100);
+	if (code === "USD")
+		return (fractionDigits === 0 ? NF_USD_COMPACT : NF_USD_COMPACT_F1).format(
+			cents / 100,
+		);
 	return getMoneyCompactFormatter(code, fractionDigits).format(cents / 100);
 }
 
