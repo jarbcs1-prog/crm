@@ -1,13 +1,24 @@
+import "reflect-metadata";
 import { afterAll, beforeAll, describe, expect, it } from "bun:test";
 import type { INestApplication } from "@nestjs/common";
 import { Test, type TestingModule } from "@nestjs/testing";
 import request from "supertest";
+import { DATABASE } from "../src/database/database.constants";
 
 const fallback = (key: string, value: string) => {
 	if (!process.env[key]) {
 		process.env[key] = value;
 	}
 };
+
+if (
+	process.env.NONOH_PASSWORD &&
+	process.env.NONOH_PASSWORD.length > 0 &&
+	process.env.NONOH_PASSWORD.length < 16
+) {
+	process.env.NONOH_PASSWORD =
+		"test-password-at-least-16-chars-long";
+}
 
 fallback(
 	"DATABASE_URL",
@@ -25,16 +36,34 @@ describe("Auth (e2e)", () => {
 	beforeAll(async () => {
 		const { AppModule } = await import("../src/app.module");
 
+		const mockDb: Record<string, unknown> = {
+			$connect: async () => {},
+			$disconnect: async () => {},
+			user: { findUnique: async () => null },
+			session: { findUnique: async () => null },
+			account: { findMany: async () => [] },
+			member: { findUnique: async () => null },
+			ssoProvider: {
+				findMany: async () => [],
+				findUnique: async () => null,
+				count: async () => 0,
+			},
+			verification: { findFirst: async () => null },
+		};
+
 		const moduleFixture: TestingModule = await Test.createTestingModule({
 			imports: [AppModule],
-		}).compile();
+		})
+			.overrideProvider(DATABASE)
+			.useValue(mockDb)
+			.compile();
 
 		app = moduleFixture.createNestApplication({ bodyParser: false });
 		await app.init();
-	});
+	}, 30000);
 
 	afterAll(async () => {
-		await app.close();
+		if (app) await app.close();
 	});
 
 	it("rejects an unauthenticated request to a guarded route", async () => {

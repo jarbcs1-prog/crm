@@ -36,12 +36,39 @@ const appUrls = (optional("APP_URL") ?? DEFAULT_APP_URL)
 
 const appUrl = appUrls[0] ?? DEFAULT_APP_URL;
 
+export function getApiUrl(): string {
+	return optional("API_URL") ?? optional("BETTER_AUTH_URL") ?? DEFAULT_API_URL;
+}
+
+export function getAppUrl(): string {
+	const urls = (optional("APP_URL") ?? DEFAULT_APP_URL)
+		.split(",")
+		.map((origin) => origin.trim())
+		.filter(Boolean);
+	return urls[0] ?? DEFAULT_APP_URL;
+}
+
+export function getAppUrls(): string[] {
+	return (optional("APP_URL") ?? DEFAULT_APP_URL)
+		.split(",")
+		.map((origin) => origin.trim())
+		.filter(Boolean);
+}
+
 export const env = {
-	appUrl: apiUrl,
+	get appUrl(): string {
+		return getAppUrl();
+	},
 	google: googleCredentials(),
-	cookieDomain: optional("AUTH_COOKIE_DOMAIN"),
-	trustedOrigins: [...new Set([...appUrls, apiUrl])],
-	isProduction: process.env.NODE_ENV === "production",
+	get cookieDomain(): string | undefined {
+		return optional("AUTH_COOKIE_DOMAIN");
+	},
+	get trustedOrigins(): string[] {
+		return [...new Set([...getAppUrls(), getApiUrl()])];
+	},
+	get isProduction(): boolean {
+		return process.env.NODE_ENV === "production";
+	},
 } as const;
 
 export function isGoogleConfigured(): boolean {
