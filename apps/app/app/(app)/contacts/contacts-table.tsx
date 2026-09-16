@@ -1,5 +1,6 @@
 "use client";
 
+import type { ContactVerificationStatus } from "@crm/db/enums";
 import {
 	DataTable,
 	type DataTableColumn,
@@ -108,7 +109,14 @@ const COLUMNS: DataTableColumn<ContactRow>[] = [
 		label: "Verification status",
 		defaultHidden: true,
 		width: "w-[14%]",
-		cell: (row) => <VerificationIndicator status={(row as any).verificationStatus} />,
+		cell: (row) => (
+			<VerificationIndicator
+				status={
+					(row as unknown as { verificationStatus: ContactVerificationStatus })
+						.verificationStatus
+				}
+			/>
+		),
 	},
 	{
 		id: "lastActivity",

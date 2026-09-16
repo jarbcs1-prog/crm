@@ -4,7 +4,7 @@ import { type BetterAuthOptions, betterAuth } from "better-auth";
 import { prismaAdapter } from "better-auth/adapters/prisma";
 import { APIError } from "better-auth/api";
 import { organization } from "better-auth/plugins/organization";
-import { env, apiUrl } from "./env";
+import { apiUrl, env } from "./env";
 import { ensureWorkspaceMembership } from "./organization";
 import { SYNC_SCOPES } from "./scopes";
 import { notifySignedIn } from "./signed-in";

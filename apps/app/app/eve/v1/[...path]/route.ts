@@ -9,7 +9,9 @@ export const dynamic = "force-dynamic";
 
 const BODY_LIMIT = 1_048_576;
 
-function limitedBody(body: ReadableStream<Uint8Array> | null): ReadableStream<Uint8Array> | null {
+function limitedBody(
+	body: ReadableStream<Uint8Array> | null,
+): ReadableStream<Uint8Array> | null {
 	if (!body) return null;
 	let seen = 0;
 	return body.pipeThrough(

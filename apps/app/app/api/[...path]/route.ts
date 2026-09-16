@@ -14,7 +14,9 @@ function decode(buf: Buffer, encoding: string | null): Buffer {
 	return buf;
 }
 
-function limitedBody(body: ReadableStream<Uint8Array> | null): ReadableStream<Uint8Array> | null {
+function limitedBody(
+	body: ReadableStream<Uint8Array> | null,
+): ReadableStream<Uint8Array> | null {
 	if (!body) return null;
 	let seen = 0;
 	return body.pipeThrough(
@@ -75,7 +77,10 @@ async function handler(request: Request): Promise<Response> {
 	try {
 		upstream = await fetch(target, init);
 	} catch (error) {
-		console.warn(`API proxy is not reachable for ${request.method} ${url.pathname}.`, error);
+		console.warn(
+			`API proxy is not reachable for ${request.method} ${url.pathname}.`,
+			error,
+		);
 
 		return Response.json(
 			{ error: "The API is not reachable." },

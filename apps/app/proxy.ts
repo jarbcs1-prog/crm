@@ -3,9 +3,9 @@ import { type NextRequest, NextResponse } from "next/server";
 import {
 	ONBOARDING_COOKIE,
 	ONBOARDING_PATH,
+	type OnboardingGate,
 	readOnboardingGate,
 	settleOnboarding,
-	type OnboardingGate,
 } from "@/lib/onboarding";
 
 const GATE_TTL_MS = 10_000;

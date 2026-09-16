@@ -16,8 +16,7 @@ if (
 	process.env.NONOH_PASSWORD.length > 0 &&
 	process.env.NONOH_PASSWORD.length < 16
 ) {
-	process.env.NONOH_PASSWORD =
-		"test-password-at-least-16-chars-long";
+	process.env.NONOH_PASSWORD = "test-password-at-least-16-chars-long";
 }
 
 fallback(

@@ -1,5 +1,6 @@
 "use client";
 
+import type { ActivityType, DealStage } from "@crm/db";
 import { Button } from "@crm/ui/components/button";
 import {
 	Card,
@@ -44,9 +45,9 @@ import { useOpenRecord } from "@/components/crm/record-sheet/record-stack";
 import { activityLabel } from "@/components/crm/timeline/activity-icon";
 import { useCrmCache } from "@/lib/trpc/cache";
 import { useTRPC } from "@/lib/trpc/client";
+import type { RouterOutputs } from "@/lib/trpc/types";
 import { overviewParsers } from "./overview-search-params";
 import { SalesDashboard } from "./sales-dashboard";
-import type { RouterOutputs } from "@/lib/trpc/types";
 
 const CELL = "px-3 py-2.5 align-middle";
 
@@ -69,7 +70,9 @@ export function DashboardSummary() {
 		}),
 	);
 
-	const summary = summaryQuery.data as any;
+	const summary = summaryQuery.data as unknown as
+		| RouterOutputs["dashboard"]["summary"]
+		| undefined;
 
 	if (!summary) {
 		return (
@@ -79,10 +82,12 @@ export function DashboardSummary() {
 		);
 	}
 
-	const { biggestOpen, overdueTasks, recentActivity } = summary as any;
+	const { biggestOpen, overdueTasks, recentActivity } = summary;
 
 	const mine = scope === "me";
-	const largestOpenCents = biggestOpen[0]?.amountCents ?? 0;
+	const largestOpenCents =
+		(biggestOpen[0] as unknown as { amountCents: number | null } | undefined)
+			?.amountCents ?? 0;
 
 	const openColumns: SimpleTableColumn[] = [
 		{ header: "Deal" },
@@ -133,7 +138,24 @@ export function DashboardSummary() {
 							</CardPanelEmpty>
 						) : (
 							<SimpleTable variant="panel" surface="page" columns={openColumns}>
-								{biggestOpen.map((deal: any) => (
+								{(
+									biggestOpen as unknown as Array<
+										RouterOutputs["dashboard"]["summary"]["biggestOpen"][number] & {
+											id: string;
+											name: string;
+											stage: DealStage;
+											amountCents: number | null;
+											currency: string;
+											stageChangedAt: string;
+											company: {
+												name: string;
+												iconUrl: string | null;
+												iconDarkUrl: string | null;
+												iconTone: string | null;
+											};
+										}
+									>
+								).map((deal) => (
 									<SimpleTableRow
 										key={deal.id}
 										clickable
@@ -187,7 +209,17 @@ export function DashboardSummary() {
 							<CardPanelEmpty>Nothing overdue. Good.</CardPanelEmpty>
 						) : (
 							<SimpleTable variant="panel" surface="page" columns={taskColumns}>
-								{overdueTasks.map((task: any) => (
+								{(
+									overdueTasks as unknown as Array<
+										RouterOutputs["dashboard"]["summary"]["overdueTasks"][number] & {
+											id: string;
+											subject: string;
+											dueAt: string | null;
+											deal: { id: string; name: string } | null;
+											company: { id: string; name: string } | null;
+										}
+									>
+								).map((task) => (
 									<SimpleTableRow key={task.id}>
 										<TableCell className={CELL}>
 											<Checkbox
@@ -249,7 +281,19 @@ export function DashboardSummary() {
 					<CardTableEmpty>Nothing has happened yet.</CardTableEmpty>
 				) : (
 					<SimpleTable columns={activityColumns}>
-						{recentActivity.map((entry: any) => (
+						{(
+							recentActivity as unknown as Array<
+								RouterOutputs["dashboard"]["summary"]["recentActivity"][number] & {
+									id: string;
+									type: ActivityType;
+									subject: string | null;
+									createdAt: string;
+									company: { id: string; name: string } | null;
+									deal: { id: string; name: string } | null;
+									createdBy: { name: string };
+								}
+							>
+						).map((entry) => (
 							<SimpleTableRow key={entry.id}>
 								<TableCell className={CELL}>
 									<span className="truncate">
