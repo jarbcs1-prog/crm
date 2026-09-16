@@ -44,7 +44,7 @@ const DUMP_DIR = (() => {
 		resolve("F:/crm/sql_dump"),
 	];
 	for (const c of candidates) if (existsSync(c)) return c;
-	return candidates[0]!;
+	return candidates[0] ?? "F:/crm/sql_dump";
 })();
 
 function parseArgs() {
@@ -70,8 +70,9 @@ function splitName(raw: string) {
 	const t = raw.trim().replace(/\s+/g, " ");
 	if (!t) return { firstName: "Unknown", lastName: null as string | null };
 	const parts = t.split(" ");
-	if (parts.length === 1) return { firstName: parts[0]!, lastName: null };
-	return { firstName: parts[0]!, lastName: parts.slice(1).join(" ") };
+	const first = parts[0] ?? "Unknown";
+	if (parts.length === 1) return { firstName: first, lastName: null };
+	return { firstName: first, lastName: parts.slice(1).join(" ") };
 }
 
 function domainFromUrl(raw: string): string | null {
@@ -102,14 +103,19 @@ async function readCompanies(): Promise<LegacyCompany[]> {
 	const raw = readFileSync(p, "utf-8");
 	const lines = raw.split("\n").filter(Boolean);
 	if (lines.length < 2) return [];
-	const header = lines[0]!.split(";").map((s) => s.replaceAll('"', "").trim());
+	const headerLine = lines[0];
+	if (!headerLine) return [];
+	const header = headerLine.split(";").map((s) => s.replaceAll('"', "").trim());
 	const rows: LegacyCompany[] = [];
 	for (let i = 1; i < lines.length; i++) {
-		const line = lines[i]!;
+		const line = lines[i];
+		if (!line) continue;
 		if (!line.trim()) continue;
 		const cols = splitSemicolonCsv(line);
 		const obj: Record<string, string> = {};
-		header.forEach((h, idx) => (obj[h] = (cols[idx] ?? "").replaceAll('"', "")));
+		header.forEach((h, idx) => {
+			obj[h] = (cols[idx] ?? "").replaceAll('"', "");
+		});
 		rows.push(obj as unknown as LegacyCompany);
 	}
 	return rows;
@@ -120,7 +126,7 @@ function splitSemicolonCsv(line: string): string[] {
 	let cur = "";
 	let inQ = false;
 	for (let i = 0; i < line.length; i++) {
-		const ch = line[i]!;
+		const ch = line[i] ?? "";
 		if (ch === '"') {
 			if (inQ && line[i + 1] === '"') {
 				cur += '"';
@@ -144,13 +150,19 @@ async function readClients(limit?: number): Promise<LegacyClient[]> {
 		return typeof limit === "number" ? arr.slice(0, limit) : arr;
 	}
 	const lines = raw.split("\n").filter(Boolean);
-	const header = lines[0]!.split(";").map((s) => s.replaceAll('"', "").trim());
+	const headerLine = lines[0];
+	if (!headerLine) return [];
+	const header = headerLine.split(";").map((s) => s.replaceAll('"', "").trim());
 	const rows: LegacyClient[] = [];
 	for (let i = 1; i < lines.length; i++) {
 		if (typeof limit === "number" && rows.length >= limit) break;
-		const cols = splitSemicolonCsv(lines[i]!);
+		const lineVal = lines[i];
+		if (!lineVal) continue;
+		const cols = splitSemicolonCsv(lineVal);
 		const obj: Record<string, string> = {};
-		header.forEach((h, idx) => (obj[h] = (cols[idx] ?? "").replaceAll('"', "")));
+		header.forEach((h, idx) => {
+			obj[h] = (cols[idx] ?? "").replaceAll('"', "");
+		});
 		rows.push(obj as unknown as LegacyClient);
 	}
 	return rows;
@@ -162,12 +174,18 @@ async function readNotes(): Promise<LegacyNote[]> {
 	const raw = readFileSync(p, "utf-8");
 	const lines = raw.split("\n").filter(Boolean);
 	if (lines.length < 2) return [];
-	const header = lines[0]!.split(";").map((s) => s.replaceAll('"', "").trim());
+	const headerLine = lines[0];
+	if (!headerLine) return [];
+	const header = headerLine.split(";").map((s) => s.replaceAll('"', "").trim());
 	const rows: LegacyNote[] = [];
 	for (let i = 1; i < lines.length; i++) {
-		const cols = splitSemicolonCsv(lines[i]!);
+		const lineVal = lines[i];
+		if (!lineVal) continue;
+		const cols = splitSemicolonCsv(lineVal);
 		const obj: Record<string, string> = {};
-		header.forEach((h, idx) => (obj[h] = (cols[idx] ?? "").replaceAll('"', "")));
+		header.forEach((h, idx) => {
+			obj[h] = (cols[idx] ?? "").replaceAll('"', "");
+		});
 		rows.push(obj as unknown as LegacyNote);
 	}
 	return rows;
@@ -176,10 +194,15 @@ async function readNotes(): Promise<LegacyNote[]> {
 async function main() {
 	const { dryRun, limit, batch, only } = parseArgs();
 	console.log(`[import] dump dir: ${DUMP_DIR}`);
-	console.log(`[import] dryRun=${dryRun} limit=${limit ?? "all"} batch=${batch} only=${only || "all"}`);
+	console.log(
+		`[import] dryRun=${dryRun} limit=${limit ?? "all"} batch=${batch} only=${only || "all"}`,
+	);
 
 	const owner = await db.user.findFirst({ select: { id: true } });
-	if (!owner) throw new Error("No user found — seed or create a user first (bun run db:seed).");
+	if (!owner)
+		throw new Error(
+			"No user found — seed or create a user first (bun run db:seed).",
+		);
 	console.log(`[import] ownerId=${owner.id}`);
 
 	const before = {
@@ -218,7 +241,11 @@ async function main() {
 				await db.company.upsert({
 					where: { id },
 					create: data,
-					update: { name: data.name, domain: data.domain, website: data.website },
+					update: {
+						name: data.name,
+						domain: data.domain,
+						website: data.website,
+					},
 				});
 			} catch (e: unknown) {
 				if (
@@ -234,7 +261,9 @@ async function main() {
 			}
 			created++;
 		}
-		console.log(`[import] companies: created/upserted=${created} skipped=${skipped}`);
+		console.log(
+			`[import] companies: created/upserted=${created} skipped=${skipped}`,
+		);
 	}
 
 	if (!only || only === "contacts") {
@@ -263,9 +292,14 @@ async function main() {
 						continue;
 					}
 					const { firstName, lastName } = splitName(cl.name);
-					const companyId = cl.id_company ? `legacy_company_${cl.id_company}` : null;
+					const companyId = cl.id_company
+						? `legacy_company_${cl.id_company}`
+						: null;
 					const companyExists = companyId
-						? await tx.company.findUnique({ where: { id: companyId }, select: { id: true } })
+						? await tx.company.findUnique({
+								where: { id: companyId },
+								select: { id: true },
+							})
 						: null;
 					const contactId = `legacy_client_${cl.id}`;
 					const createdAt = parseDate(cl.created_at) ?? new Date();
@@ -287,12 +321,26 @@ async function main() {
 					contactsCreated++;
 
 					const bodies: { body: string; at: Date | null }[] = [];
-					if (cl.notes?.trim()) bodies.push({ body: `Legacy notes (client ${cl.id}):\n${cl.notes.trim()}`, at: createdAt });
-					if (cl.notes_registry?.trim()) bodies.push({ body: `Legacy registry notes (client ${cl.id}):\n${cl.notes_registry.trim()}`, at: parseDate(cl.updated_at) });
-					if (cl.address?.trim()) bodies.push({ body: `Legacy address (client ${cl.id}): ${cl.address.trim()}`, at: createdAt });
+					if (cl.notes?.trim())
+						bodies.push({
+							body: `Legacy notes (client ${cl.id}):\n${cl.notes.trim()}`,
+							at: createdAt,
+						});
+					if (cl.notes_registry?.trim())
+						bodies.push({
+							body: `Legacy registry notes (client ${cl.id}):\n${cl.notes_registry.trim()}`,
+							at: parseDate(cl.updated_at),
+						});
+					if (cl.address?.trim())
+						bodies.push({
+							body: `Legacy address (client ${cl.id}): ${cl.address.trim()}`,
+							at: createdAt,
+						});
 
 					for (const b of bodies) {
-						const hash = Buffer.from(b.body.slice(0, 64)).toString("hex").slice(0, 12);
+						const hash = Buffer.from(b.body.slice(0, 64))
+							.toString("hex")
+							.slice(0, 12);
 						const actId = `legacy_act_${cl.id}_${hash}`;
 						await tx.activity.upsert({
 							where: { id: actId },
@@ -304,7 +352,10 @@ async function main() {
 								contactId,
 								createdById: owner.id,
 								createdAt: b.at ?? createdAt,
-								meta: { legacyClientId: String(cl.id), legacyCompanyId: String(cl.id_company) },
+								meta: {
+									legacyClientId: String(cl.id),
+									legacyCompanyId: String(cl.id_company),
+								},
 							},
 							update: {},
 						});
@@ -312,22 +363,30 @@ async function main() {
 					}
 				}
 			});
-			console.log(`[import] batch ${i / batch + 1}: contacts=${contactsCreated} activities~${activitiesFromNotes}`);
+			console.log(
+				`[import] batch ${i / batch + 1}: contacts=${contactsCreated} activities~${activitiesFromNotes}`,
+			);
 		}
-		console.log(`[import] contacts: upserted=${contactsCreated} skipped=${contactsSkipped} activities from notes~${activitiesFromNotes}`);
+		console.log(
+			`[import] contacts: upserted=${contactsCreated} skipped=${contactsSkipped} activities from notes~${activitiesFromNotes}`,
+		);
 	}
 
 	if (!only || only === "notes") {
 		const notes = await readNotes();
 		console.log(`[import] legacy standalone notes: ${notes.length}`);
 		if (dryRun) {
-			console.log(`[import] (dry-run) would create ${notes.length} activities from clients_notes_dump.csv`);
+			console.log(
+				`[import] (dry-run) would create ${notes.length} activities from clients_notes_dump.csv`,
+			);
 		} else if (notes.length > 0) {
-				const toCreate = notes.slice(0, limit ?? notes.length);
+			const toCreate = notes.slice(0, limit ?? notes.length);
 			if (toCreate.length === 0) {
 				console.log(`[import] standalone notes: none to create`);
 			} else {
-				const contactIds = [...new Set(toCreate.map((n) => `legacy_client_${n.id_client}`))];
+				const contactIds = [
+					...new Set(toCreate.map((n) => `legacy_client_${n.id_client}`)),
+				];
 				const existing = await db.contact.findMany({
 					where: { id: { in: contactIds } },
 					select: { id: true },
@@ -337,29 +396,30 @@ async function main() {
 				let skippedFk = 0;
 				for (let i = 0; i < toCreate.length; i += batch) {
 					const slice = toCreate.slice(i, i + batch);
-					const data = slice
-						.map((n) => {
-							const cid = `legacy_client_${n.id_client}`;
-							const ok = existingSet.has(cid);
-							if (!ok) skippedFk++;
-							return {
-								id: `legacy_note_${n.id}`,
-								type: ActivityType.NOTE,
-								body: n.note.slice(0, 8000),
-								contactId: ok ? cid : null,
-								companyId: null,
-								createdById: owner.id,
-								createdAt: parseDate(n.created_at) ?? new Date(),
-								meta: { legacyNoteId: n.id, legacyClientId: n.id_client },
-							};
-						});
+					const data = slice.map((n) => {
+						const cid = `legacy_client_${n.id_client}`;
+						const ok = existingSet.has(cid);
+						if (!ok) skippedFk++;
+						return {
+							id: `legacy_note_${n.id}`,
+							type: ActivityType.NOTE,
+							body: n.note.slice(0, 8000),
+							contactId: ok ? cid : null,
+							companyId: null,
+							createdById: owner.id,
+							createdAt: parseDate(n.created_at) ?? new Date(),
+							meta: { legacyNoteId: n.id, legacyClientId: n.id_client },
+						};
+					});
 					await db.activity.createMany({
 						data,
 						skipDuplicates: true,
 					});
 					made += data.length;
 				}
-				console.log(`[import] standalone notes activities created: ${made} (skipped FK ${skippedFk} set to null contact)`);
+				console.log(
+					`[import] standalone notes activities created: ${made} (skipped FK ${skippedFk} set to null contact)`,
+				);
 			}
 		}
 	}
@@ -370,7 +430,9 @@ async function main() {
 		activity: await db.activity.count(),
 	};
 	console.log(`[import] after: ${JSON.stringify(after)}`);
-	console.log(`[import] delta: companies +${after.company - before.company}, contacts +${after.contact - before.contact}, activities +${after.activity - before.activity}`);
+	console.log(
+		`[import] delta: companies +${after.company - before.company}, contacts +${after.contact - before.contact}, activities +${after.activity - before.activity}`,
+	);
 }
 
 main()

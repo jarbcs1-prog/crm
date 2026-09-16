@@ -102,17 +102,25 @@ const DIRECT_LINE_PREFIXES: Record<string, boolean> = {
 	"478": true,
 };
 
-const COUNTRY_IDS: Record<string, { id: number; name: string; callingCode: string; iso3166: string }> = {
+const COUNTRY_IDS: Record<
+	string,
+	{ id: number; name: string; callingCode: string; iso3166: string }
+> = {
 	DE: { id: 276, name: "Germany", callingCode: "49", iso3166: "DE" },
 	CH: { id: 756, name: "Switzerland", callingCode: "41", iso3166: "CH" },
 };
 
-export type CountryInfo = { id: number; name: string; callingCode: string; iso3166: string };
+export type CountryInfo = {
+	id: number;
+	name: string;
+	callingCode: string;
+	iso3166: string;
+};
 
 export function detectPhoneType(phone: string | null | undefined): PhoneType {
 	if (!phone) return "unknown";
 
-	const cleaned = phone.replace(/[\s\-\(\)]/g, "");
+	const cleaned = phone.replace(/[\s\-()]/g, "");
 
 	if (!cleaned.startsWith("+")) return "unknown";
 
@@ -136,7 +144,10 @@ export function isValidEmail(email: string | null | undefined): boolean {
 	return emailRegex.test(email.trim());
 }
 
-export function hasName(firstName: string | null | undefined, lastName: string | null | undefined): boolean {
+export function hasName(
+	firstName: string | null | undefined,
+	lastName: string | null | undefined,
+): boolean {
 	return Boolean(firstName?.trim() || lastName?.trim());
 }
 
@@ -162,7 +173,10 @@ export function viabilityScore(contact: {
 		emailScore = 25;
 	}
 
-	const hasContactName = hasName(contact.firstName ?? null, contact.lastName ?? null);
+	const hasContactName = hasName(
+		contact.firstName ?? null,
+		contact.lastName ?? null,
+	);
 	if (hasContactName) {
 		nameScore = 10;
 	}
@@ -240,8 +254,11 @@ export async function segmentFeasibility(
 
 	const totalScore = scores.reduce((sum, s) => sum + s.score, 0);
 	const averageScore = contacts.length > 0 ? totalScore / contacts.length : 0;
-	const missingPhoneCount = scores.filter((s) => s.breakdown.phone === 0).length;
-	const missingPhonePercent = contacts.length > 0 ? (missingPhoneCount / contacts.length) * 100 : 100;
+	const missingPhoneCount = scores.filter(
+		(s) => s.breakdown.phone === 0,
+	).length;
+	const missingPhonePercent =
+		contacts.length > 0 ? (missingPhoneCount / contacts.length) * 100 : 100;
 
 	const requiresOSINT = averageScore < 50 || missingPhonePercent > 50;
 
@@ -273,7 +290,8 @@ export function evaluateOsintRequirement(contact: {
 	const missingPhone = contact.phone === null || contact.phone === undefined;
 	const missingEmail = contact.email === null || contact.email === undefined;
 
-	const touchpoints: { type: "score" | "threshold"; value: number | string }[] = [];
+	const touchpoints: { type: "score" | "threshold"; value: number | string }[] =
+		[];
 
 	if (missingPhone) {
 		touchpoints.push({ type: "threshold", value: "missing_phone" });
@@ -294,7 +312,9 @@ export function evaluateOsintRequirement(contact: {
 				`Viability score ${score.score} below threshold (50)`,
 				missingPhone ? "No phone number available" : null,
 				!score.emailValid ? "Invalid email format" : null,
-		  ].filter(Boolean).join(". ")
+			]
+				.filter(Boolean)
+				.join(". ")
 		: `Viability score ${score.score} meets threshold`;
 
 	return {
@@ -320,9 +340,10 @@ export async function getOsintRecommendation(
 		const existingScore = Number(scoreData[0].score);
 		return {
 			requiresOsint: existingScore < 50,
-			reason: existingScore < 50
-				? `OSINT score ${existingScore} indicates needs verification`
-				: `OSINT score ${existingScore} is sufficient`,
+			reason:
+				existingScore < 50
+					? `OSINT score ${existingScore} indicates needs verification`
+					: `OSINT score ${existingScore} is sufficient`,
 		};
 	}
 

@@ -13,21 +13,21 @@ export type {
 	FactEvidence,
 	WorkspaceProfileSections,
 } from "./json";
+export type {
+	CountryInfo,
+	OsintFlag,
+	PhoneType,
+	SegmentFeasibilityResult,
+	ViabilityScore,
+} from "./viability";
 export {
-	viabilityScore,
 	detectPhoneType,
-	isValidEmail,
-	hasName,
-	segmentFeasibility,
 	evaluateOsintRequirement,
-	getOsintRecommendation,
 	getCountryById,
 	getCountryInfo,
-} from "./viability";
-export type {
-	ViabilityScore,
-	SegmentFeasibilityResult,
-	OsintFlag,
-	CountryInfo,
-	PhoneType,
+	getOsintRecommendation,
+	hasName,
+	isValidEmail,
+	segmentFeasibility,
+	viabilityScore,
 } from "./viability";

@@ -6,10 +6,10 @@ export const TASK_KINDS = [
 	"profile",
 	"call",
 	"osint-enrich",
-  "recheck",
-  "company-profile",
-  "workspace-profile",
-  "verify",
+	"recheck",
+	"company-profile",
+	"workspace-profile",
+	"verify",
 ] as const;
 
 export type TaskKind = (typeof TASK_KINDS)[number];
@@ -29,10 +29,10 @@ export const PRIORITY = {
 	requested: 300,
 	meeting: 200,
 	call: 150,
-  identify: 100,
-  osintEnrich: 60,
-  verify: 60,
-  sweep: 50,
+	identify: 100,
+	osintEnrich: 60,
+	verify: 60,
+	sweep: 50,
 	companyProfile: 40,
 	recheck: 0,
 } as const;
