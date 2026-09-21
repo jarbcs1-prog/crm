@@ -2,7 +2,7 @@
 
 A collapsible task list component for displaying AI workflow progress, with status indicators and optional descriptions.
 
-The `Task` component provides a structured way to display task lists or workflow progress with collapsible details, status indicators, and progress tracking. It consists of a main `Task` container with `TaskTrigger` for the clickable header and `TaskContent` for the collapsible content area.
+The `Task` component provides a structured way to display task lists or workflow progress with collapsible details, status indicators and progress tracking. It consists of a main `Task` container with `TaskTrigger` for the clickable header and `TaskContent` for the collapsible content area.
 
 See `scripts/task.tsx` for this example.
 
@@ -179,7 +179,7 @@ export async function POST(req: Request) {
 
 ## Features
 
-- Visual icons for pending, in-progress, completed, and error states
+- Visual icons for pending, in-progress, completed and error states
 - Expandable content for task descriptions and additional information
 - Built-in progress counter showing completed vs total tasks
 - Optional progressive reveal of tasks with customizable timing

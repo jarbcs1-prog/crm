@@ -1,8 +1,8 @@
 # Context
 
-A compound component system for displaying AI model context window usage, token consumption, and cost estimation.
+A compound component system for displaying AI model context window usage, token consumption and cost estimation.
 
-The `Context` component provides a comprehensive view of AI model usage through a compound component system. It displays context window utilization, token consumption breakdown (input, output, reasoning, cache), and cost estimation in an interactive hover card interface.
+The `Context` component provides a comprehensive view of AI model usage through a compound component system. It displays context window utilization, token consumption breakdown (input, output, reasoning, cache) and cost estimation in an interactive hover card interface.
 
 See `scripts/context.tsx` for this example.
 
@@ -16,7 +16,7 @@ npx ai-elements@latest add context
 
 - **Compound Component Architecture**: Flexible composition of context display elements
 - **Visual Progress Indicator**: Circular SVG progress ring showing context usage percentage
-- **Token Breakdown**: Detailed view of input, output, reasoning, and cached tokens
+- **Token Breakdown**: Detailed view of input, output, reasoning and cached tokens
 - **Cost Estimation**: Real-time cost calculation using the `tokenlens` library
 - **Intelligent Formatting**: Automatic token count formatting (K, M, B suffixes)
 - **Interactive Hover Card**: Detailed information revealed on hover

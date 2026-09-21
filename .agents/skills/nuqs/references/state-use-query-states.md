@@ -7,7 +7,7 @@ tags: state, useQueryStates, batching, atomic, related-params
 
 ## Use useQueryStates for Related Parameters
 
-When multiple URL parameters are logically related (coordinates, date ranges, filter sets), prefer `useQueryStates` over a tower of `useQueryState` calls. nuqs already batches sibling setter calls within the same event-loop tick into a single URL flush, so the win isn't "fewer history entries" — it's a single typed state object, a single combined update payload, and a single returned `URLSearchParams` you can inspect for the merged result.
+When multiple URL parameters are logically related (coordinates, date ranges, filter sets), prefer `useQueryStates` over a tower of `useQueryState` calls. nuqs already batches sibling setter calls within the same event-loop tick into a single URL flush, so the win isn't "fewer history entries" — it's a single typed state object, a single combined update payload and a single returned `URLSearchParams` you can inspect for the merged result.
 
 **Incorrect (one hook per parameter):**
 

@@ -1,13 +1,13 @@
 ---
 title: Use Standard Schema for Cross-Library Validation
 impact: MEDIUM
-impactDescription: one parser map validates nuqs, tRPC, route validators, and forms — no duplicated schema
+impactDescription: one parser map validates nuqs, tRPC, route validators and forms — no duplicated schema
 tags: state, standard-schema, zod, valibot, trpc, validation
 ---
 
 ## Use Standard Schema for Cross-Library Validation
 
-Since nuqs v2.5, every `parseAsX` builder implements the [Standard Schema](https://standardschema.dev) interface, and `parseAsJson` accepts any Standard Schema validator (Zod, Valibot, ArkType, Effect Schema, …) directly in the validator slot. That means one parser map can drive **all of**: client-side `useQueryState`, server-side `createSearchParamsCache`/`createLoader`, tRPC procedure inputs, TanStack Router search-param validation, and form-level validation — without redefining the schema in three places.
+Since nuqs v2.5, every `parseAsX` builder implements the [Standard Schema](https://standardschema.dev) interface and `parseAsJson` accepts any Standard Schema validator (Zod, Valibot, ArkType, Effect Schema, …) directly in the validator slot. That means one parser map can drive **all of**: client-side `useQueryState`, server-side `createSearchParamsCache`/`createLoader`, tRPC procedure inputs, TanStack Router search-param validation and form-level validation — without redefining the schema in three places.
 
 **Incorrect (shape defined in three places, drift inevitable):**
 
@@ -74,7 +74,7 @@ export default function Filters() {
 
 **Using a Standard Schema library inside `parseAsJson`:**
 
-`parseAsJson` accepts any Standard Schema validator directly — Zod 4+, Valibot 0.30+, ArkType, and Effect Schema all qualify.
+`parseAsJson` accepts any Standard Schema validator directly — Zod 4+, Valibot 0.30+, ArkType and Effect Schema all qualify.
 
 ```tsx
 import { z } from 'zod'

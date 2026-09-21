@@ -180,7 +180,7 @@ useMountEffect(() => {
 });
 ```
 
-**Smell test:** You are synchronizing with an external system, and the behavior is naturally "setup on mount, cleanup on unmount."
+**Smell test:** You are synchronizing with an external system and the behavior is naturally "setup on mount, cleanup on unmount."
 
 ### Rule 5: Reset with key, not dependency choreography
 

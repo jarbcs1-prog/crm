@@ -4,7 +4,7 @@ A comprehensive best practices skill for using [nuqs](https://nuqs.dev) - type-s
 
 ## Overview
 
-This skill provides 42 rules across 8 categories to help AI agents and developers write correct, performant, and maintainable code when using nuqs for URL state management.
+This skill provides 42 rules across 8 categories to help AI agents and developers write correct, performant and maintainable code when using nuqs for URL state management.
 
 ## Getting Started
 

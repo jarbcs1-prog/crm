@@ -7,7 +7,7 @@ tags: testing, unit-tests, mocking, jest
 
 ## Use Testing Module for Unit Tests
 
-Use `@nestjs/testing` module to create isolated test environments with mocked dependencies. This ensures your tests run fast, don't depend on external services, and properly test your business logic in isolation.
+Use `@nestjs/testing` module to create isolated test environments with mocked dependencies. This ensures your tests run fast, don't depend on external services and properly test your business logic in isolation.
 
 **Incorrect (manual instantiation bypassing DI):**
 

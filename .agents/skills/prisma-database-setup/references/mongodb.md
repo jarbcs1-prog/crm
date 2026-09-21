@@ -74,7 +74,7 @@ DATABASE_URL="mongodb+srv://user:password@cluster.mongodb.net/mydb?retryWrites=t
 - `prisma init --datasource-provider mongodb` is still implemented in Prisma's CLI source.
 - Prisma's upstream repo still contains MongoDB fixtures and tests.
 - Local verification shows Prisma 7 can still recognize MongoDB inputs, but the generated client path does not provide a supported MongoDB upgrade path.
-- Local verification shows Prisma 6.x works end to end with `prisma-client-js`, `prisma db push`, and `new PrismaClient()` against a MongoDB replica set.
+- Local verification shows Prisma 6.x works end to end with `prisma-client-js`, `prisma db push` and `new PrismaClient()` against a MongoDB replica set.
 
 ## Version Guidance
 

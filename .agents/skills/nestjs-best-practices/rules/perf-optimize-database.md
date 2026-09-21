@@ -7,7 +7,7 @@ tags: performance, database, queries, optimization
 
 ## Optimize Database Queries
 
-Select only needed columns, use proper indexes, avoid over-fetching relations, and consider query performance when designing your data access. Most API slowness traces back to inefficient database queries.
+Select only needed columns, use proper indexes, avoid over-fetching relations and consider query performance when designing your data access. Most API slowness traces back to inefficient database queries.
 
 **Incorrect (over-fetching data and missing indexes):**
 

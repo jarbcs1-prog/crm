@@ -1,8 +1,8 @@
 # Chain of Thought
 
-A collapsible component that visualizes AI reasoning steps with support for search results, images, and step-by-step progress indicators.
+A collapsible component that visualizes AI reasoning steps with support for search results, images and step-by-step progress indicators.
 
-The `ChainOfThought` component provides a visual representation of an AI's reasoning process, showing step-by-step thinking with support for search results, images, and progress indicators. It helps users understand how AI arrives at conclusions.
+The `ChainOfThought` component provides a visual representation of an AI's reasoning process, showing step-by-step thinking with support for search results, images and progress indicators. It helps users understand how AI arrives at conclusions.
 
 See `scripts/chain-of-thought.tsx` for this example.
 

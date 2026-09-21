@@ -5,7 +5,7 @@ description: nuqs (type-safe URL query state) best practices for Next.js and oth
 
 # Community nuqs Best Practices for Next.js & React
 
-Comprehensive guide for type-safe URL query state management with nuqs across Next.js, React Router, TanStack Router, Remix, and plain React. Covers nuqs v2.5–v2.9 features. Contains 39 rules across 8 categories, prioritized by impact to guide code generation, refactoring, and code review.
+Comprehensive guide for type-safe URL query state management with nuqs across Next.js, React Router, TanStack Router, Remix and plain React. Covers nuqs v2.5–v2.9 features. Contains 39 rules across 8 categories, prioritized by impact to guide code generation, refactoring and code review.
 
 ## When to Apply
 

@@ -2,7 +2,7 @@
 
 A composable dialog component for selecting AI voices with metadata display and search functionality.
 
-The `VoiceSelector` component provides a flexible and composable interface for selecting AI voices. Built on shadcn/ui's Dialog and Command components, it features a searchable voice list with support for metadata display (gender, accent, age), grouping, and customizable layouts. The component includes a context provider for accessing voice selection state from any nested component.
+The `VoiceSelector` component provides a flexible and composable interface for selecting AI voices. Built on shadcn/ui's Dialog and Command components, it features a searchable voice list with support for metadata display (gender, accent, age), grouping and customizable layouts. The component includes a context provider for accessing voice selection state from any nested component.
 
 See `scripts/voice-selector.tsx` for this example.
 

@@ -2,7 +2,7 @@
 
 A button component that captures voice input and converts it to text, with cross-browser support.
 
-The `SpeechInput` component provides an easy-to-use interface for capturing voice input in your application. It uses the Web Speech API for real-time transcription in supported browsers (Chrome, Edge), and falls back to MediaRecorder with an external transcription service for browsers that don't support Web Speech API (Firefox, Safari).
+The `SpeechInput` component provides an easy-to-use interface for capturing voice input in your application. It uses the Web Speech API for real-time transcription in supported browsers (Chrome, Edge) and falls back to MediaRecorder with an external transcription service for browsers that don't support Web Speech API (Firefox, Safari).
 
 See `scripts/speech-input.tsx` for this example.
 

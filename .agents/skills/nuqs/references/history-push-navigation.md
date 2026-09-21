@@ -63,6 +63,6 @@ setPage(5)                          // navigation → pushes
 setPage(1, { history: 'replace' })  // "reset to first page" shouldn't spam Back
 ```
 
-The mirror pattern also works: keep the parser on `replace`, mirror the input in local `useState` while typing, and `setQuery(input, { history: 'push' })` only on explicit submit.
+The mirror pattern also works: keep the parser on `replace`, mirror the input in local `useState` while typing and `setQuery(input, { history: 'push' })` only on explicit submit.
 
 Reference: [nuqs History Option](https://nuqs.dev/docs/options)

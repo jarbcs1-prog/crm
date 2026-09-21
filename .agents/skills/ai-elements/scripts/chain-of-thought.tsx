@@ -56,7 +56,7 @@ const ChainOfThoughtExample = () => (
       </ChainOfThoughtStep>
 
       <ChainOfThoughtStep
-        label="Hayden Bleasel is an Australian product designer, software engineer, and founder. He is currently based in the United States working for Vercel, an American cloud application company."
+        label="Hayden Bleasel is an Australian product designer, software engineer and founder. He is currently based in the United States working for Vercel, an American cloud application company."
         status="complete"
       />
 

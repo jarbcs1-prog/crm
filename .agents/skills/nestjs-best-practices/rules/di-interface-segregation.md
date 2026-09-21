@@ -7,7 +7,7 @@ tags: dependency-injection, interfaces, solid, isp
 
 ## Apply Interface Segregation Principle
 
-Clients should not be forced to depend on interfaces they don't use. In NestJS, this means keeping interfaces small and focused on specific capabilities rather than creating "fat" interfaces that bundle unrelated methods. When a service only needs to send emails, it shouldn't depend on an interface that also includes SMS, push notifications, and logging. Split large interfaces into role-based ones.
+Clients should not be forced to depend on interfaces they don't use. In NestJS, this means keeping interfaces small and focused on specific capabilities rather than creating "fat" interfaces that bundle unrelated methods. When a service only needs to send emails, it shouldn't depend on an interface that also includes SMS, push notifications and logging. Split large interfaces into role-based ones.
 
 **Incorrect (fat interface forcing unused dependencies):**
 

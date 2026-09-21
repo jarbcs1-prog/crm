@@ -7,7 +7,7 @@ tags: testing, e2e, supertest, integration
 
 ## Use Supertest for E2E Testing
 
-End-to-end tests use Supertest to make real HTTP requests against your NestJS application. They test the full stack including middleware, guards, pipes, and interceptors. E2E tests catch integration issues that unit tests miss.
+End-to-end tests use Supertest to make real HTTP requests against your NestJS application. They test the full stack including middleware, guards, pipes and interceptors. E2E tests catch integration issues that unit tests miss.
 
 **Incorrect (no proper E2E setup or teardown):**
 

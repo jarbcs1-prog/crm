@@ -7,7 +7,7 @@ tags: advanced, createParser, custom, serialize, parse
 
 ## Create Custom Parsers for Complex Types
 
-When built-in parsers don't fit your needs, create custom parsers with `createParser`. Define `parse`, `serialize`, and optionally `eq` for equality checking.
+When built-in parsers don't fit your needs, create custom parsers with `createParser`. Define `parse`, `serialize` and optionally `eq` for equality checking.
 
 **Incorrect (manual parsing in component):**
 

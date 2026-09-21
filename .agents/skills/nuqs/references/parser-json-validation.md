@@ -7,7 +7,7 @@ tags: parser, parseAsJson, validation, standard-schema, zod
 
 ## Validate JSON Parser Input
 
-`parseAsJson` requires a validator function (this is a hard requirement in nuqs v2 — calling `parseAsJson<T>()` with no argument is a TypeScript error). The validator must return the typed value when valid and either throw or return `null` when invalid. Avoid the "make the type errors go away" shortcut of an unchecked cast — URL params are attacker-controlled input, and an unchecked cast lets any shape into your app.
+`parseAsJson` requires a validator function (this is a hard requirement in nuqs v2 — calling `parseAsJson<T>()` with no argument is a TypeScript error). The validator must return the typed value when valid and either throw or return `null` when invalid. Avoid the "make the type errors go away" shortcut of an unchecked cast — URL params are attacker-controlled input and an unchecked cast lets any shape into your app.
 
 **Incorrect (unchecked cast as the validator):**
 

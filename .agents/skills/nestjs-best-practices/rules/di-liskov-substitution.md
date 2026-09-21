@@ -73,7 +73,7 @@ interface PaymentGateway {
    * Charges the specified amount.
    * @param amount - Amount in smallest currency unit (cents)
    * @param currency - ISO 4217 currency code
-   * @returns PaymentResult with transactionId, success status, and amount
+   * @returns PaymentResult with transactionId, success status and amount
    * @throws PaymentFailedException if charge is declined
    * @throws InvalidCurrencyException if currency is not supported
    */

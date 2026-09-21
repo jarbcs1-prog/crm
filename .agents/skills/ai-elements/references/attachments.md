@@ -1,6 +1,6 @@
 # Attachments
 
-A flexible, composable attachment component for displaying files, images, videos, audio, and source documents.
+A flexible, composable attachment component for displaying files, images, videos, audio and source documents.
 
 The `Attachment` component provides a unified way to display file attachments and source documents with multiple layout variants.
 
@@ -53,7 +53,7 @@ export default MessageAttachments;
 
 ## Features
 
-- Three display variants: grid (thumbnails), inline (badges), and list (rows)
+- Three display variants: grid (thumbnails), inline (badges) and list (rows)
 - Supports both FileUIPart and SourceDocumentUIPart from the AI SDK
 - Automatic media type detection (image, video, audio, document, source)
 - Hover card support for inline previews

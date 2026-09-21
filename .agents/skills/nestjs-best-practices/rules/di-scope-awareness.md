@@ -7,7 +7,7 @@ tags: dependency-injection, scopes, request-context
 
 ## Understand Provider Scopes
 
-NestJS has three provider scopes: DEFAULT (singleton), REQUEST (per-request instance), and TRANSIENT (new instance for each injection). Most providers should be singletons. Request-scoped providers have performance implications as they bubble up through the dependency tree. Understanding scopes prevents memory leaks and incorrect data sharing.
+NestJS has three provider scopes: DEFAULT (singleton), REQUEST (per-request instance) and TRANSIENT (new instance for each injection). Most providers should be singletons. Request-scoped providers have performance implications as they bubble up through the dependency tree. Understanding scopes prevents memory leaks and incorrect data sharing.
 
 **Incorrect (wrong scope usage):**
 

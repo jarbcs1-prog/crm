@@ -44,3 +44,7 @@ yarn-error.log*
 
 # OpenCode session state
 .opencode/goals/
+
+# Legacy dump extracts (340MB+, may contain credentials - never commit)
+crm_extracted/
+sql_dump/

@@ -1,0 +1,26 @@
+{
+  "id": "ai-agent-compliant-outreach-v1",
+  "name": "Compliant AI outreach template (example)",
+  "description": "Example pitch designed for AI voice agents. Discloses AI identity up front, states real org + reason, asks consent before any PII, offers opt-out and human handoff. Replace bracketed placeholders before any use. Never use for legal threats, debt collection, or unverifiable claims.",
+  "variables": ["firstName"],
+  "segments": [
+    {
+      "id": "s1",
+      "listenAfter": true,
+      "listenMs": 8000,
+      "text": "Hello {firstName}, this is an automated AI assistant calling on behalf of [ORG_NAME]. This call is being recorded for quality. Is now a bad time, or may I have thirty seconds to explain why I am calling?"
+    },
+    {
+      "id": "s2",
+      "listenAfter": true,
+      "listenMs": 8000,
+      "text": "Thank you. I am following up because [VERIFIABLE_REASON, e.g. you downloaded our pricing guide on DATE]. I do not have any legal authority and I am not offering legal advice. If you want to verify me, you can reach [ORG_NAME] at [PUBLIC_PHONE] or [PUBLIC_URL], reference case [REF_IF_ANY]. Would you like me to continue, or should I remove your number?"
+    },
+    {
+      "id": "s3",
+      "listenAfter": true,
+      "listenMs": 12000,
+      "text": "Understood. I will not ask for bank details, wire records, or passwords on this call. If you are interested, the next step is a short human follow-up at a time you choose, and I can email the details to an address you provide. Otherwise say stop and I will end the call and mark you as do-not-call. What would you prefer?"
+    }
+  ]
+}

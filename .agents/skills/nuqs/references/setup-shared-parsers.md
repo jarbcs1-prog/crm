@@ -66,7 +66,7 @@ export function PageInfo() {
 
 **Share the same map between client and server:**
 
-The same parser map drives a Server Component's `createSearchParamsCache` (or `createLoader`) and a client `useQueryState`. Keep the server cache in its own module so `nuqs/server` never leaks into a client bundle, and import the parsers from a client-safe file:
+The same parser map drives a Server Component's `createSearchParamsCache` (or `createLoader`) and a client `useQueryState`. Keep the server cache in its own module so `nuqs/server` never leaks into a client bundle and import the parsers from a client-safe file:
 
 ```tsx
 // lib/searchParams.server.ts — server-only

@@ -2,7 +2,7 @@
 
 A composable audio player component built on media-chrome, with shadcn styling and flexible controls.
 
-The `AudioPlayer` component provides a flexible and customizable audio playback interface built on top of media-chrome. It features a composable architecture that allows you to build audio experiences with custom controls, metadata display, and seamless integration with AI-generated audio content.
+The `AudioPlayer` component provides a flexible and customizable audio playback interface built on top of media-chrome. It features a composable architecture that allows you to build audio experiences with custom controls, metadata display and seamless integration with AI-generated audio content.
 
 See `scripts/audio-player.tsx` for this example.
 
