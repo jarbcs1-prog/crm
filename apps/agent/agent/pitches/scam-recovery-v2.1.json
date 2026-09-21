@@ -30,7 +30,9 @@
     "principal_role": "{principal_role}",
     "approved_case_description": "{approved_case_description}",
     "approved_case_development": "{approved_case_development}",
-    "approved_source_description": "{approved_source_description}"
+    "approved_source_description": "{approved_source_description}",
+    "slot_a": "{slot_a}",
+    "slot_b": "{slot_b}"
   },
 
   "states": {
@@ -214,7 +216,7 @@
         "Now isn't a good time"
       ],
       "action": "CLARIFY_ONCE",
-      "text": "Of course. When should we call back, is there a day and time that works, or should we leave it there?"
+      "text": "Sure thing, {firstName}, I didn't mean to keep you longer than five minutes anyway, so would {slot_a} or {slot_b} work for a callback?"
     }
   ],
 
@@ -226,7 +228,8 @@
     "wrong_person": "Terminate unless the person voluntarily provides a correction. Do not interrogate them for identifying information.",
     "wrong_number": "Terminate. Do not request the correct number.",
     "verification_concern": "Provide only approved verification information. Do not attempt to persuade the recipient to trust the caller.",
-    "not_now": "Do not take an unspecific 'later' at face value: ask once for a concrete day and time (CLARIFY_ONCE). A named time may be scheduled through the verified channel; vagueness, deflection or a second brush-off terminates the call. If declined, terminate.",
+    "not_now": "Do not take an unspecific 'later' at face value. Pin-down runs at most once and counts as the call's single clarify allowance: (1) offer the two computed slots {slot_a} / {slot_b} (next-day afternoon and day-after morning by default, e.g. tomorrow 14:35 / day after 10:30, computed at call time and passed as values); (2) if both are refused, one deference question only — the agent is flexible, asks the callee to name any day and time, weekends included — then any further vagueness, deflection or refusal terminates the call.",
+    "slot_values": "{slot_a} and {slot_b} are computed by the agent at call time from the current date, not deployment config. If they cannot be computed, do not invent times: fall back to asking for any day and time once, then terminate on evasion.",
     "ambiguous_response": "Ask one neutral clarification question rather than treating ambiguity as consent.",
     "silence_or_disconnect": "Terminate. Do not treat silence or a disconnected call as consent."
   },
