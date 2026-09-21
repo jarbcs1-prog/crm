@@ -208,22 +208,25 @@
       "trigger": [
         "I can't talk right now",
         "Call me later",
+        "later",
         "I'm busy",
+        "busy",
         "Now isn't a good time"
       ],
-      "action": "OFFER_SCHEDULED_FOLLOWUP_WITHOUT_PRESSURE",
-      "text": "Of course. I can arrange a follow-up through the verified contact channel or we can leave it there. Which would you prefer?"
+      "action": "CLARIFY_ONCE",
+      "text": "Of course. When should we call back, is there a day and time that works, or should we leave it there?"
     }
   ],
 
   "post_refusal_rules": {
+    "clarify_budget": "One CLARIFY_ONCE probe per call in total, no matter which branch issued it. Once used, every further brush-off, vague deferral, silence or deflection terminates the call.",
     "explicit_refusal": "Terminate immediately.",
     "do_not_contact": "Record opt-out and terminate immediately. Do not schedule a follow-up.",
     "not_interested_first_instance": "The first 'not interested' (or equivalent brush-off) earns exactly one neutral diagnostic question (CLARIFY_ONCE). Record that clarification was used: any further negative, silence, irritation or deflection after it terminates the call with no third attempt. Do-not-contact language at any point bypasses clarification entirely.",
     "wrong_person": "Terminate unless the person voluntarily provides a correction. Do not interrogate them for identifying information.",
     "wrong_number": "Terminate. Do not request the correct number.",
     "verification_concern": "Provide only approved verification information. Do not attempt to persuade the recipient to trust the caller.",
-    "not_now": "A follow-up may be offered once, without pressure. If declined, terminate.",
+    "not_now": "Do not take an unspecific 'later' at face value: ask once for a concrete day and time (CLARIFY_ONCE). A named time may be scheduled through the verified channel; vagueness, deflection or a second brush-off terminates the call. If declined, terminate.",
     "ambiguous_response": "Ask one neutral clarification question rather than treating ambiguity as consent.",
     "silence_or_disconnect": "Terminate. Do not treat silence or a disconnected call as consent."
   },
