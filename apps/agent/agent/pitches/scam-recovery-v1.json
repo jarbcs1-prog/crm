@@ -1,0 +1,44 @@
+{
+  "id": "scam-recovery-v1",
+  "name": "Scam recovery outreach (trial)",
+  "description": "Trial pitch. Not the final version. Speak segments in order, listening after each one.",
+  "variables": ["firstName"],
+  "segments": [
+    {
+      "id": "s1",
+      "listenAfter": true,
+      "listenMs": 8000,
+      "text": "Hello {firstName}, my name is James. I'm an AI agent acting as a legal assistant, calling in reference to a number of fraudulent schemes run by a man by the name of Ronald Shane Flynn. My records here show that you too lost money to those scams — especially those big, glossy promises of guaranteed returns — and I wanted to touch base with you today because you're not alone in this. How are you today? Don't worry, I am not going to take too long of your time right now. In fact, all I wanted today was to touch base and let you know that I'm calling on behalf of a client whose investigators were involved in the January events in Manila — where authorities shut down a massive, decade-long scam network which opened up a real chance for my client who is trying to recover his losses."
+    },
+    {
+      "id": "s2",
+      "listenAfter": true,
+      "listenMs": 5000,
+      "text": "What I'm about to disclose to you right now isn't a theory or wishful thinking. It's based on a major enforcement operation that seized over 1.7 million files, detained hundreds of scammers and uncovered a complex web of fraud and money laundering on January 8 this year. And buried somewhere in that digital chaos is the evidence that could help my client and get his money back — and/or hold these crooks accountable. That's the value I wanted to focus on today: transforming this chaos into a strategic advantage for recovery."
+    },
+    {
+      "id": "s3",
+      "listenAfter": true,
+      "listenMs": 8000,
+      "text": "Here's the key point: The recent Manila raid, the biggest of its kind in a decade, exposed a network that was moving stolen funds through various offshore accounts, disguising their tracks behind licensed online businesses — like the offshore operators you've dealt with. And to answer that question you're about to ask me? 'Where did you get my number from?' The investigators found your name in the database of several companies — ProfitiX, Trade12, Fundiza — just to name a few that you might recognize. That means that if you would consider assisting us with your story and supporting documentation, you're in the unique position to help us leverage this recent law enforcement breakthrough to reclaim my client's funds."
+    },
+    {
+      "id": "s4",
+      "listenAfter": true,
+      "listenMs": 6000,
+      "text": "Now, I know what you're probably thinking — 'How can that raid in Manila help me? It's probably going to be one more of those cases that drags on forever...' Great question, {firstName}. First, yes, prosecutions and investigations can take time — and that's why acting now is crucial. My client's lawyer says speed is everything here because these criminals are experts at disappearing at the first sign of pressure. But because we have direct access to the seized data — those files that contain your encrypted transaction records, correspondence, bank details etc. — we're not starting from scratch. That data is a goldmine and with your help we can leverage it to my client's advantage by getting that encrypted information from you instead of having to wait until that gets decrypted and pressure those crooks into a corner to get them to agree to a quick settlement on our terms just to make us go away without even more trouble. And second — about guarantees. Look, I can't promise you that if you decide to assist us with your story and the supporting documentation, you too will see your money back or that your case is guaranteed as well if you decided to pursue it. Nobody can. What I can tell you is this: The very evidence recovered from the raid gives us a strategic edge for a limited period of time. If you agree to lend us a helping hand by sharing your story and the documentation that supports it — your wire transfers, email exchanges, any promotional material you got from the crooks over the years that you may still have — you significantly increase our legal leverage by providing the very data needed to build the leverage that an iron-clad case would bring to the table and that will put the squeeze on these scammers, creating the pressure the lawyer would require to coerce them into accepting a quick settlement on our own terms rather than dragging everyone through courts for years."
+    },
+    {
+      "id": "s5",
+      "listenAfter": true,
+      "listenMs": 5000,
+      "text": "Think about it — what's the alternative? Waiting years, hoping for the best, possibly ending up empty-handed? Or taking what we know we could build up right now — the body of evidence, from you and others like you — and working swiftly to negotiate from a position of strength? That's the advantage. Right now, I am only in position to help you sort out exactly what documents are most important, but once we would have them and the investigators had gone over them, I will also be able to help with their presentation and the best way to use this recent enforcement breakthrough to your benefit, should you decide to get involved, that is. My current goal is to help my client get a fair settlement as quickly as possible, not get him stuck in litigation forever."
+    },
+    {
+      "id": "s6",
+      "listenAfter": true,
+      "listenMs": 12000,
+      "text": "One thing I want to be clear about, {firstName}: I can't promise or guarantee you anything else other than this: if upon assessing your file the investigators establish that your involvement is backed by direct evidence in connection with my client's case, that gives him a real shot. The law enforcement agencies in Manila — whose work is still ongoing — have opened the doorway that we can now walk through, if we move fast enough. So, here's what I'm asking: Let's have another 15 to 20 minutes conversation tomorrow or any other time this week, so that I can walk you through exactly what's happening right now while the investigators have the time to look at your documents, so that you can actually understand how we will use this critical momentum to our advantage. No obligations, no pressure — just a clear plan of action. If you're willing to lend us a hand, {firstName}, my client will be forever grateful for providing us the means to take advantage of this window of opportunity. Listen, I said I won't keep too long — let me give you the email address where the documents must be sent to. Better yet, give me your email address and I'll send you the details afterward and we can get started immediately. How does that sound? Now {firstName}, if right now you're going to tell me to bugger off, I will completely understand and respect your decision. But I truly hope that you will not push me away, as acting now is our best chance and all I'm asking for is the paperwork that proves you lost your money too. The authorities in Manila had been making arrests, seizing files, but the longer we linger the lower our chances will get, since the crooks won't just sit back idly watching everything around them crumbling to dust and this window of opportunity won't stay open much longer. Shall we lock in a quick follow-up and start turning this law enforcement success into to the advantage of the victim, for once?"
+    }
+  ]
+}
