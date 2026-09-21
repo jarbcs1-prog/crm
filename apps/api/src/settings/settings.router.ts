@@ -30,6 +30,11 @@ export class SettingsRouter {
 		return this.settings.modelCatalog();
 	}
 
+	@Query()
+	async localProviders() {
+		return this.settings.localProviders();
+	}
+
 	@Mutation({ input: setAgentModelInput })
 	async setAgentModel(
 		@Ctx() ctx: AuthedTrpcContext,

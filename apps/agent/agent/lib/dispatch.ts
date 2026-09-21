@@ -169,7 +169,7 @@ function work(kind: string, reason: string): string {
 		case "meeting-prep":
 			return "There is a meeting with this person soon. Make sure whoever is taking it opens the record knowing who they are dealing with.";
 		case "call":
-			return `Ring this contact on the number on file and qualify them using the legal approach script. Lead with who you are and which company you represent, ask about their situation, qualify their budget, timeline, and fit, listen, and come back with what happened. Script: ${LEGAL_APPROACH_SCRIPT}. Use record_call_outcome to capture the outcome with INTERESTED, FOLLOW_UP, DO_NOT_CALL, or NOT_INTERESTED. If there is no number, say so plainly rather than inventing one; flag them for OSINT with flag_for_osint instead.`;
+			return `Ring this contact on the number on file and qualify them using the legal approach script. Lead with who you are and which company you represent, ask about their situation, qualify their budget, timeline and fit, listen and come back with what happened. Script: ${LEGAL_APPROACH_SCRIPT}. Use record_call_outcome to capture the outcome with INTERESTED, FOLLOW_UP, DO_NOT_CALL, or NOT_INTERESTED. If there is no number, say so plainly rather than inventing one; flag them for OSINT with flag_for_osint instead.`;
 		case "osint-enrich":
 			return "Verify and enrich this contact from public sources: phone number, email address, current title. Correct the record where you find something better and note what you could not settle.";
 		case "company-profile":

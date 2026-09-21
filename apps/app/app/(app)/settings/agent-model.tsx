@@ -37,6 +37,12 @@ type CatalogModel = {
 	pricing: { input: number; output: number } | null;
 };
 
+type LocalProvider = {
+	name: string;
+	endpoint: string;
+	modelId: string | null;
+};
+
 const FOLLOW_DEFAULT = "__default__";
 
 function perMillion(rate: number): string {
@@ -74,6 +80,7 @@ export function AgentModel() {
 
 	const settings = useQuery(trpc.settings.agentModel.queryOptions());
 	const catalog = useQuery(trpc.settings.modelCatalog.queryOptions());
+	const localProviders = useQuery(trpc.settings.localProviders.queryOptions());
 
 	const save = useMutation(
 		trpc.settings.setAgentModel.mutationOptions({
@@ -90,6 +97,7 @@ export function AgentModel() {
 	const { selectedId, effectiveId, defaultId, effective } = settings.data;
 	const models = catalog.data?.models ?? [];
 	const unavailable = catalog.data !== undefined && !catalog.data.available;
+	const providers = (localProviders.data ?? []) as LocalProvider[];
 
 	const defaultModel = models.find((model) => model.id === defaultId);
 	const current = selectedId ?? FOLLOW_DEFAULT;
@@ -111,7 +119,7 @@ export function AgentModel() {
 			<CardHeader>
 				<CardTitle>Research agent</CardTitle>
 				<CardDescription>
-					The model the agent thinks with, routed through the Vercel AI Gateway.
+					The model the agent thinks with. Local providers are used first when configured; the Vercel AI Gateway is the fallback.
 				</CardDescription>
 			</CardHeader>
 
@@ -145,6 +153,27 @@ export function AgentModel() {
 										Default — {defaultModel?.name ?? defaultId}
 									</CommandItem>
 								</CommandGroup>
+
+								{(providers as LocalProvider[]).length > 0 && (
+									<CommandGroup heading="Local providers">
+										{(providers as LocalProvider[]).map((provider) => (
+											<CommandItem
+												key={(provider as LocalProvider).endpoint}
+												value={(provider as LocalProvider).modelId ?? (provider as LocalProvider).endpoint}
+												data-checked={current === (provider as LocalProvider).modelId}
+											onSelect={() => {
+												const modelId = (provider as LocalProvider).modelId;
+												if (modelId) choose(modelId);
+											}}
+											>
+												<span>{(provider as LocalProvider).name}</span>
+												<span className="ml-auto text-muted-foreground text-xs">
+													{(provider as LocalProvider).modelId ?? "no model set"}
+												</span>
+											</CommandItem>
+										))}
+									</CommandGroup>
+								)}
 
 								{byProvider(models).map(([provider, group]) => (
 									<CommandGroup key={provider} heading={provider}>
@@ -185,3 +214,5 @@ export function AgentModel() {
 		</Card>
 	);
 }
+
+

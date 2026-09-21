@@ -84,6 +84,13 @@ export function capabilities(): readonly Capability[] {
 			enabled: set("DEEPGRAM_API_KEY"),
 		},
 		{
+			env: "FASTER_WHISPER_URL",
+			label: "Local transcription",
+			gives:
+				"speech-to-text for call recordings and uploaded audio, run on this machine by a faster-whisper server you start yourself (`bun run stt`, or scripts\\start-stt-server.ps1). The URL being set only means one was intended — if the server is not actually running, transcription returns nothing rather than an error, so treat a silent transcript as a dead server rather than as silence on the call",
+			enabled: set("FASTER_WHISPER_URL"),
+		},
+		{
 			env: "ELEVENLABS_API_KEY",
 			label: "ElevenLabs voices",
 			gives: "natural text-to-speech voices for live outbound calls",

@@ -1,7 +1,7 @@
 import { isWorkspaceAdmin } from "@crm/auth";
 import type { Db } from "@crm/db";
 import {
-	DEFAULT_AGENT_MODEL,
+	selectDefaultModel,
 	readAgentModel,
 	writeAgentModel,
 } from "@crm/db/settings";
@@ -17,6 +17,12 @@ import {
 	type CatalogModel,
 	ModelCatalogService,
 } from "./model-catalog.service";
+
+export interface LocalProvider {
+	name: string;
+	endpoint: string;
+	modelId: string | null;
+}
 
 export interface AgentModelSettings {
 	selectedId: string | null;
@@ -49,7 +55,7 @@ export class SettingsService {
 		return {
 			selectedId: model.isDefault ? null : model.id,
 			effectiveId: model.id,
-			defaultId: DEFAULT_AGENT_MODEL.id,
+			defaultId: selectDefaultModel().id,
 			effective: await this.catalog.find(model.id),
 			updatedAt: row?.updatedAt.toISOString() ?? null,
 		};
@@ -111,5 +117,29 @@ export class SettingsService {
 	async modelCatalog(): Promise<ModelCatalogResult> {
 		const models = await this.catalog.models();
 		return { models: models ?? [], available: models !== null };
+	}
+
+	async localProviders(): Promise<LocalProvider[]> {
+		const providers: LocalProvider[] = [];
+		const checks: Array<{ env: string; modelEnv: string | null; name: string; prefix: string }> = [
+			{ env: "OLLAMA_BASE_URL", modelEnv: "OLLAMA_MODEL", name: "Ollama", prefix: "ollama" },
+			{ env: "LMSTUDIO_BASE_URL", modelEnv: "LMSTUDIO_MODEL", name: "LM Studio", prefix: "lmstudio" },
+			{ env: "KOBOLD_BASE_URL", modelEnv: "KOBOLD_MODEL", name: "KoboldCpp", prefix: "kobold" },
+			{ env: "LLAMA_CPP_BASE_URL", modelEnv: null, name: "llama.cpp", prefix: "llamacpp" },
+			{ env: "OPENCODE_API_URL", modelEnv: null, name: "Opencode", prefix: "opencode" },
+		];
+
+		for (const p of checks) {
+			const url = process.env[p.env];
+			if (!url?.trim()) continue;
+			const model = p.modelEnv ? process.env[p.modelEnv] ?? null : null;
+			providers.push({
+				name: p.name,
+				endpoint: url.trim(),
+				modelId: model ? `${p.prefix}/${model}` : null,
+			});
+		}
+
+		return providers;
 	}
 }

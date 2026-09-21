@@ -48,3 +48,6 @@ yarn-error.log*
 # Legacy dump extracts (340MB+, may contain credentials - never commit)
 crm_extracted/
 sql_dump/
+
+# Serena MCP local state
+.serena/

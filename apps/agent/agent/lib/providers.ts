@@ -105,6 +105,45 @@ export function telnyxCallerId(): string | undefined {
 	return read("TELNYX_CALLER_ID");
 }
 
+export interface ConfiguredProvider {
+	name: ProviderName;
+	endpoint: string;
+	modelId: string;
+}
+
+export function getConfiguredProviders(): ConfiguredProvider[] {
+	const configured: ConfiguredProvider[] = [];
+
+	const providerOrder: ProviderName[] = [
+		"ollama",
+		"lmstudio",
+		"kobold",
+		"llamacpp",
+		"opencode",
+		"openrouter",
+		"replicate",
+	];
+
+	for (const name of providerOrder) {
+		if (!isProviderConfigured(name)) continue;
+		const endpoint = providerEndpoint(name) ?? "";
+		const model = providerModel(name);
+		const modelId = model ? `${name}/${model}` : `${name}/model`;
+		configured.push({ name, endpoint, modelId });
+	}
+
+	return configured;
+}
+
+export function selectDefaultModel(): { id: string; contextWindowTokens: number } {
+	const configured = getConfiguredProviders();
+	if (configured.length > 0) {
+		const first = configured[0]!;
+		return { id: first.modelId, contextWindowTokens: 1_000_000 };
+	}
+	return { id: "ollama/qwen2.5-coder:14b", contextWindowTokens: 1_000_000 };
+}
+
 export function isProviderConfigured(name: ProviderName): boolean {
 	const config = PROVIDERS[name];
 	if (config.keyEnvs.length > 0) {

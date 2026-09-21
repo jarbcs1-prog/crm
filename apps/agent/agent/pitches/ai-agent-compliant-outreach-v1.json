@@ -1,26 +1,36 @@
 {
   "id": "ai-agent-compliant-outreach-v1",
   "name": "Compliant AI outreach template (example)",
-  "description": "Example pitch designed for AI voice agents. Discloses AI identity up front, states real org + reason, asks consent before any PII, offers opt-out and human handoff. Replace bracketed placeholders before any use. Never use for legal threats, debt collection, or unverifiable claims.",
+  "description": "Buyer-configurable template for AI voice agents. The template carries no real org name, number, URL, or case ID — those come from the buyer's deployment config at render time. The agent may only state a contact reason whose evidence is already in the CRM ledger. Never use for legal threats, debt collection, or unverifiable claims.",
   "variables": ["firstName"],
+  "policy": {
+    "reason_taxonomy": {
+      "PRIOR_CONTACT": "Requires a dated CRM activity (call/email/meeting) the callee can recognize. State the date and channel.",
+      "INBOUND_REQUEST": "Requires a logged inbound artifact (form, event scan, ticket, order). State what it was and when.",
+      "PUBLIC_LISTING": "Requires a public source already stored as evidence (directory, listing). Name the source, never invent one.",
+      "REFERRAL": "Requires a named referrer with a stored consent record. Name them only if the record exists."
+    },
+    "identity_block": "Rendered from deployment config, never hardcoded: ORG_DISPLAY_NAME + one callback channel (CALLBACK_PHONE and/or CALLBACK_URL) + optional REFERENCE (ticket/order/case only if that workflow exists). If the buyer has no callback channel configured, the agent must offer do-not-call instead of inventing one.",
+    "forbidden": ["legal authority claims", "debt or payment demands", "named private individuals as wrongdoers", "unverifiable enforcement operations", "bank/wire/password collection on-call"]
+  },
   "segments": [
     {
       "id": "s1",
       "listenAfter": true,
       "listenMs": 8000,
-      "text": "Hello {firstName}, this is an automated AI assistant calling on behalf of [ORG_NAME]. This call is being recorded for quality. Is now a bad time, or may I have thirty seconds to explain why I am calling?"
+      "text": "Hello {firstName}, this is an automated AI assistant calling on behalf of [ORG_DISPLAY_NAME]. This call may be recorded. Do you have thirty seconds to hear why I am calling?"
     },
     {
       "id": "s2",
       "listenAfter": true,
       "listenMs": 8000,
-      "text": "Thank you. I am following up because [VERIFIABLE_REASON, e.g. you downloaded our pricing guide on DATE]. I do not have any legal authority and I am not offering legal advice. If you want to verify me, you can reach [ORG_NAME] at [PUBLIC_PHONE] or [PUBLIC_URL], reference case [REF_IF_ANY]. Would you like me to continue, or should I remove your number?"
+      "text": "Thank you. I am calling because [REASON per taxonomy, e.g. we spoke on DATE about TOPIC / you requested DETAILS on DATE / your public listing at SOURCE]. I am not calling with any legal authority and this is not legal advice. You can verify us at [CALLBACK_CHANNEL from deployment config][ and reference REFERENCE if configured]. Would you like me to continue, or should I remove your number?"
     },
     {
       "id": "s3",
       "listenAfter": true,
       "listenMs": 12000,
-      "text": "Understood. I will not ask for bank details, wire records, or passwords on this call. If you are interested, the next step is a short human follow-up at a time you choose, and I can email the details to an address you provide. Otherwise say stop and I will end the call and mark you as do-not-call. What would you prefer?"
+      "text": "Understood. I will not ask for sensitive personal or financial information on this call. If you are interested, the next step is a short human follow-up at a time you choose, and I can send details to an address you provide. Otherwise say stop and I will end the call and mark you as do-not-call. What would you prefer?"
     }
   ]
 }
