@@ -24,13 +24,11 @@ bridge](#the-bridge).
 
 ## The model is a setting, not a deploy
 
-The agent runs on **`zai/glm-5.2-fast`** by default and a rep can change that
-on the settings page without touching the code.
+The agent runs on **the first configured provider's model** by default and a rep can change that on the settings page without touching the code.
 
-`DEFAULT_AGENT_MODEL` lives in [`@crm/db/settings`](../packages/db/src/settings.ts)
-because two processes need the same answer — the agent, to compile its
-fallback and the API, to tell the settings page what "Default" resolves to.
-A second copy of that string is a second answer to the question.
+`selectDefaultModel()` lives in [`@crm/db/settings`](../packages/db/src/settings.ts) because two processes need the same answer — the agent, to compile its fallback and the API, to tell the settings page what "Default" resolves to. A second copy of that string is a second answer to the question.
+
+The default is derived by scanning providers in priority order (ollama → lmstudio → kobold → llamacpp → opencode → openrouter → replicate) and picking the first one whose environment variables are set. If no provider is configured, it falls back to `ollama/qwen2.5-coder:14b`. A rep can override this on the settings page to any model available through the AI Gateway or a local provider.
 
 - **The choice is a row, not an env var.** `AppSetting` holds one record, and
   `agent.ts` resolves it through `defineDynamic` on `session.started` — so a
@@ -847,3 +845,23 @@ byte-identical to the one it sent.** Parse for your own marker.
 `bun run --filter=agent test`. The integration specs need `DATABASE_URL` and run
 against a real Postgres, which is the point — "never overwrite a human" is only
 true if the transaction says so.
+
+## Voice calling
+
+Outbound voice runs through Nonoh SIP (`NONOH_SIP_SERVER/USERNAME/PASSWORD`, see
+`agent/lib/nonoh-sip.ts` on the shared telephony `SipClient`), local Kokoro TTS
+(`lib/voice.ts synthesizeSpeech`) and local Faster-Whisper XXL transcription
+(`lib/voice.ts transcribe()`, `tiny` model under `F:/Faster-Whisper-XXL/_models`;
+Deepgram is fallback only). Proven: `test-output.wav` transcribes accurately in
+~4s with no vendor key.
+
+Pitches live in `agent/pitches/` and load via the `load_pitch` tool, which speaks
+two schemas: legacy `segments[]`, and policy pitches (`conversation[]` plus
+`refusal_branches`, `consent_rules`, `states`, `policy`) whose deployment
+placeholders (`principal_name`, callback channel, case reference, callback slots)
+render from caller-supplied `values` and report the rest in `missing` instead of
+inventing them. `listen_on_call` matches transcripts against refusal triggers
+and returns terminal/clarify guidance; `speak_on_call` refuses document-request
+turns without recorded explicit consent. House rules enforced by the v2.1 policy
+pitch: clarify-once on brush-offs, pin-down on deferrals, repeat-later-without-time
+terminates, and every terminal branch speaks its closing line before `end_call`.

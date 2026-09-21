@@ -233,7 +233,10 @@ Beyond the four values above, everything is optional and the app runs without an
 | `CRON_SECRET` | Guards the Gmail/Calendar sync route. Required to use it. |
 | `OLLAMA_BASE_URL` / `OLLAMA_MODEL` | Local Ollama server for model inference. |
 | `LMSTUDIO_BASE_URL` / `LMSTUDIO_MODEL` | Local LM Studio server for model inference. |
+| `KOBOLD_BASE_URL` / `KOBOLD_MODEL` | Local KoboldCpp server (models + Kokoro/Qwen TTS audio). |
 | `LLAMA_CPP_BASE_URL` | Local llama.cpp server for model inference. |
+| `DEEPGRAM_API_KEY` | Cloud speech-to-text fallback (local Faster-Whisper XXL is primary). |
+| `NONOH_SIP_SERVER` / `NONOH_USERNAME` / `NONOH_PASSWORD` | Nonoh SIP trunk for agent outbound voice calls. |
 | `OPENCODE_API_KEY` | Opencode/Zen gateway for hosted model routing. |
 | `OPENROUTER_API_KEY` / `OPENROUTER_MODEL` | OpenRouter gateway (100+ models). |
 | `REPLICATE_API_TOKEN` | Replicate hosted inference. |

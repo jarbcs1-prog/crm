@@ -327,7 +327,7 @@ Added Telegram bot channel infrastructure to the research agent, enabling the ag
 - `bun test`: 204 pass, 9 fail (pre-existing database-related failures in `claimDue`, `dispatch lanes`, `retireExhausted`)
 - `bun run build` (agent): ✓ Compiled successfully
 - `bun run build` (app): ✓ Compiled successfully
-- `bun run check-types`: ✓ Passes for agent, app, and api packages
+- `bun run check-types`: ✓ Passes for agent, app and api packages
 - `bun test test/telegram-message.spec.ts`: 4/4 pass
 
 ---
@@ -411,3 +411,22 @@ Initial `bun test` after optimization showed 20 failures / 449 pass (plus `viewT
 - `apps/app/next.config.ts:28` — Removed `viewTransition` (not in `Next 16.3.5` `ExperimentalConfig`); verified `bun --cwd apps/app tsc --noEmit EXIT:0` then `5a2e195→be1375b`.
 
 Re-ran targeted suites (see `fix-7…12` verification) — all previously failing now pass except pre-existing `auth.e2e` timeout remains out-of-scope.
+---
+
+## 15. Voice calling stack + local STT repair (2026-09-21/22)
+
+**New:** `apps/agent/agent/lib/telephony/` (SIP client/transport/protocol, RTP session, ulaw audio, STUN), call tools (`make_call`, `end_call`, `call_status`, `speak_on_call`, `listen_on_call`, `record_call_outcome`, `find_leads`, `load_pitch`, `create/update_contact`, `create/list_tickets`, `record_conversation`, `mark_osint`), SIP probes (`sip-echo-probe`, `sip-register-probe`, `test-nonoh-call`, `test-crm-voice-call`), STT launcher (`start-stt-server.ps1`), specs (`sip-protocol`, `audio`, `rtp-loopback`, `stun` - 31 pass, 1 live-skip).
+
+**Repaired:** `lib/voice.ts transcribe()` (output filename derived from the converted file, was always miss then null; `path` import; `Blob | Buffer` signature), `telephony/session.ts` (null-unsafe MP3 convert, `Buffer`-to-`Blob` call mismatch). Deleted orphaned `lib/transcribe-fw.ts` (unreferenced older copy). Verified: `test-output.wav` to accurate transcript in 3.9s via local Faster-Whisper XXL (`tiny` model, `F:/Faster-Whisper-XXL/_models`). `nonoh-sip.ts` refactored onto shared `SipClient` (env-only credentials).
+
+## 16. Parallel legacy store (2026-09-21)
+
+`crm_legacy` schema holds the full 19-table dump (`scripts/crm_legacy_schema.sql`); Prisma stays the client-facing front with the schema-matching subset. Loaded via `scripts/import_final_fixed.sql` (paths corrected to `F:/crm/crm_extracted/`, missing `clients` COPY added): `clients 47836, notes 54680, audit 81099, shares 100382, legacy_map 204589`. Stale hardcoded expected counts in the verification query predate the current extract - CSV content is authoritative. `crm_extracted/` + `sql_dump/` gitignored (340MB+, plaintext passwords in `trunks`).
+
+## 17. Pitch system + consent/refusal loop (2026-09-21/22)
+
+`load_pitch.ts` supports two schemas: legacy `segments[]` (byte-identical behavior) and `conversation[]` (v2.1: runtime `values` substitution with `missing` reporting instead of silent clearing, `refusalBranches`, `consentRules`, `states`, `policy` passthrough). `listen_on_call` matches transcripts token-wise against refusal triggers (contraction-aware) and returns terminal/clarify guidance; `speak_on_call` gates document-request turns on explicit recorded consent. Pitches: `ai-agent-compliant-outreach-v1` (buyer-configurable template), `scam-recovery-v2` (loads, 10 segments), `scam-recovery-v2.1` (policy pitch: clarify-once brush-off handling, two-slot callback pin-down, repeat-later-without-time terminal, spoken closing required before `end_call`). `scam-recovery-v1` retained as do-not-dial fixture only.
+
+## 18. Brand v2, skills, housekeeping (2026-09-21)
+
+`apps/app/public` + route favicon replaced with `brandkit/Shelf-Thought_v2.0` official visuals (verified `bun run build --filter=app` 3/3 green). Integrated ~60 `.agents/skills/*`, sanitized `.env.example` (README provider table extended: KoboldCpp, Nonoh SIP, Deepgram), `.serena/` excluded from git, provider/voice/model-picker lanes committed (`apps/agent/agent/lib/{voice,capabilities,providers,dispatch}.ts`, `agent-model.tsx`, `apps/api/src/settings/*`).

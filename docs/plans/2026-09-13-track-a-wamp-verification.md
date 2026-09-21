@@ -1,7 +1,7 @@
 # Plan — Track A: WAMP import + agent verification
 
 **Date:** 2026-09-13
-**Status:** A1–A5 complete and verified; A6 (real write) awaiting explicit approval
+**Status:** A1–A6 complete and verified end to end (2026-09-21); legacy parallel store loaded alongside (see §Full import + duplication incident for the re-run)
 **Authority:**
 - Design spec (frozen): `docs/specs/2026-08-05-wamp-crm-import-design.md`
 - Execution checklist: `docs/plans/2026-08-05-wamp-crm-import.md`
@@ -193,8 +193,20 @@ bun apps/api/src/import/import-wamp.ts --userId dev-646576406c6f63616c68
 | This import | 47,838 | `cuid` | 19,939 |
 | Manual | 46 | `cuid` | — |
 
-**Root cause:** the spec's collision policy dedupes on `email`/`domain` only, and 43,478 of these contacts have neither, so nothing matched. The plan also lists "dedupe against existing CRM contacts" as out of scope — but the CSV path had already imported the *same* legacy clients, so that assumption was wrong for this database.
+**Root cause:** the spec's collision policy dedupes on `email`/`domain` only and 43,478 of these contacts have neither, so nothing matched. The plan also lists "dedupe against existing CRM contacts" as out of scope — but the CSV path had already imported the *same* legacy clients, so that assumption was wrong for this database.
 
-**Fix implemented** (code only, not yet exercised): `importContacts`/`importCompanies` now check `legacy_client_<id>` / `legacy_company_<id>` before creating, and attach to the carried record instead. The legacy id is already embedded in the existing ids, so it is an exact join — no fuzzy matching.
+**Fix implemented** (code only, not yet exercised): `importContacts`/`importCompanies` now check `legacy_client_<id>` / `legacy_company_<id>` before creating and attach to the carried record instead. The legacy id is already embedded in the existing ids, so it is an exact join — no fuzzy matching.
 
 **Proposed recovery:** roll back this import precisely (everything reachable from `legacyImportMapping`), then re-run with the dedupe so methods and diary notes attach to the existing contacts. Awaiting approval.
+
+### De-duped re-run (2026-09-21) — approved and executed
+
+The database had since been reset (3 contacts: John test profile + 2), leaving 97,390 orphaned `legacyImportMapping` rows blocking re-import via idempotency. Completed:
+
+1. Backup: `legacyImportMapping_backup_20260921` (97,390 rows), then `DELETE FROM legacyImportMapping` → 0.
+2. Restored `import-wamp.ts` + spec from `59f2554` (already carries the `legacy_client_`/`legacy_company_` exact-join dedupe).
+3. Dry-run against `crm_extracted/crm_final.sql`: `contacts 47838, methods 20174, activities 29374` — matches incident shape.
+4. Limit-5 live slice (`--userId seed-ada-okafor`): `contacts 5, methods 17, activities 5, verify queued 5`; second identical run → `0 created, 31 skipped`, idempotency proven.
+5. Full run: `companies 0, contacts 47833, methods 20157, activities 29369, skipped 34, E.164 72, honorifics 17806, verify queued 47833 (+5 already queued)`.
+
+**Outstanding:** 47,838 `verify` tasks queued — real research + vendor credit spend when the agent next runs. Parallel `crm_legacy` store (all 19 dump tables, 204,589 `legacy_map` rows) loaded the same day; see `scripts/crm_legacy_schema.sql` + `scripts/import_final_fixed.sql`.
