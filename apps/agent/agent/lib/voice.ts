@@ -1,7 +1,7 @@
 import { type ChildProcessWithoutNullStreams, spawn } from "node:child_process";
 import { mkdirSync } from "node:fs";
 import { fileURLToPath } from "node:url";
-import { dirname } from "node:path";
+import { dirname, basename } from "node:path";
 import { CallStatus } from "@crm/db";
 import { nonohConfigured, nonohHangup, nonohMakeCall } from "./nonoh-sip";
 
@@ -238,7 +238,7 @@ export function callCode(
 	};
 }
 
-export async function transcribe(input: Blob, mimeType?: string): Promise<string | null> {
+export async function transcribe(input: Blob | Buffer, mimeType?: string): Promise<string | null> {
 	// Use Faster-Whisper standalone CLI (reliable local STT)
 	const tempDir = process.env.TEMP || process.env.TMP || "C:/Users/PC Principal/AppData/Local/Temp";
 	const wavPath = `${tempDir}/crm_stt_${crypto.randomUUID()}.wav`;
@@ -249,7 +249,7 @@ export async function transcribe(input: Blob, mimeType?: string): Promise<string
 			? fs.readFileSync(input)
 			: input instanceof Buffer
 				? input
-				: Buffer.from(await input.arrayBuffer());
+				: Buffer.from(await (input as Blob).arrayBuffer());
 		fs.writeFileSync(wavPath, wavBuffer);
 
 		const fwPath = "F:/Faster-Whisper-XXL/faster-whisper-xxl.exe";
@@ -272,7 +272,7 @@ export async function transcribe(input: Blob, mimeType?: string): Promise<string
 		if (convertCode === 0) converted = convertedPath;
 		else console.log("FW: ffmpeg conversion skipped:", convertCode, convertErr.slice(0, 80));
 
-		const inputBase = path.basename(wavPath, ".wav");
+		const inputBase = basename(converted, ".wav");
 		const outputPath = `${tempDir}/${inputBase}.txt`;
 		const proc = spawn(fwPath, [
 			converted, "--model", "tiny", "--model_dir", "F:/Faster-Whisper-XXL/_models",

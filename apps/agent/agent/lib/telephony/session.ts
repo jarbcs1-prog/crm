@@ -174,10 +174,11 @@ export class CallSession {
 		// ElevenLabs may return MP3 despite requesting WAV - convert if needed
 		let wavBuffer = await readFile(speech.path);
 		if (!isWav(wavBuffer)) {
-			wavBuffer = await convertMp3ToWav(speech.path);
-			if (!wavBuffer) {
+			const converted = await convertMp3ToWav(speech.path);
+			if (!converted) {
 				return { ok: false, reason: "Failed to convert TTS audio to WAV" };
 			}
+			wavBuffer = Buffer.from(converted);
 		}
 
 		try {
@@ -233,7 +234,7 @@ export class CallSession {
 
 	async transcribeHeard(wav: Buffer): Promise<string | null> {
 			// Use Faster-Whisper locally (DeepGram has permission issues)
-			return await transcribe(wav, "audio/wav");
+			return await transcribe(wav);
 		}
 
 	recording(): Buffer {
