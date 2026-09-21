@@ -344,7 +344,16 @@ export default defineTool({
 				: undefined;
 
 		if (rawSegments.kind === "conversation") {
-			const refusalBranches = refusalBranchesOf(record);
+			const rawBranches = refusalBranchesOf(record);
+			const resolvedBranches = rawBranches?.map((branch) => {
+				const resolved = substitute(branch.text, variables, given, supplied);
+				for (const key of resolved.missing) {
+					if (key !== "firstName" && !missingRuntime.includes(key)) {
+						missingRuntime.push(key);
+					}
+				}
+				return { ...branch, text: resolved.text };
+			});
 			const missing = missingRuntime.filter((key) => key !== "firstName");
 			return {
 				pitchId: typeof record.id === "string" && record.id.length > 0 ? record.id : match.stem,
@@ -352,7 +361,7 @@ export default defineTool({
 				schema: "conversation",
 				segmentCount: segments.length,
 				segments,
-				...(refusalBranches === undefined ? {} : { refusalBranches }),
+				...(resolvedBranches === undefined ? {} : { refusalBranches: resolvedBranches }),
 				...(record.consent_rules === undefined
 					? {}
 					: { consentRules: passthroughOf(record, "consent_rules") }),
