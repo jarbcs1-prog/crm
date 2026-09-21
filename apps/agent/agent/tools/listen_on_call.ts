@@ -19,6 +19,7 @@ export type RefusalMatch = {
 	replyText: string;
 	terminate: boolean;
 	optOut: boolean;
+	clarifyOnce: boolean;
 };
 
 const CONTRACTIONS: Array<[RegExp, string]> = [
@@ -94,6 +95,7 @@ export function matchBranch(
 					replyText: branch.text,
 					terminate: branch.action.startsWith("TERMINATE"),
 					optOut: branch.action === "TERMINATE_AND_OPTOUT",
+					clarifyOnce: branch.action === "CLARIFY_ONCE",
 				};
 			}
 		}
@@ -238,7 +240,9 @@ export default defineTool({
 						match,
 						guidance: match.terminate
 							? `Speak the matched reply verbatim, then end the call${match.optOut ? " and record a do-not-contact" : ""}. Do not persuade, schedule, or collect anything further.`
-							: "Verification concern or deferral: speak the matched reply verbatim, provide only approved verification information, and do not request documents on this turn.",
+							: match.clarifyOnce
+								? "First brush-off: speak the matched diagnostic question verbatim, exactly once. Record that clarification was used: any further negative, silence, irritation or deflection after it ends the call with no third attempt. Do-not-contact language at any point bypasses clarification and ends the call immediately."
+								: "Verification concern or deferral: speak the matched reply verbatim, provide only approved verification information, and do not request documents on this turn.",
 					};
 				})()),
 			...(consentRules === undefined ? {} : { consentRules }),
