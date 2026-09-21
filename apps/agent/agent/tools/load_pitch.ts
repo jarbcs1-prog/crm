@@ -23,6 +23,13 @@ type PitchSegment = {
 	listenMs: number;
 };
 
+type RefusalBranch = {
+	id: string;
+	trigger: string[];
+	action: string;
+	text: string;
+};
+
 type PitchFile = {
 	stem: string;
 	parsed: unknown;
@@ -81,10 +88,15 @@ function listPitches(files: PitchFile[]): ListedPitch[] {
 			? record.name
 			: file.stem;
 		const segments = record?.segments;
+		const conversation = record?.conversation;
 		return {
 			id,
 			name,
-			segmentCount: Array.isArray(segments) ? segments.length : 0,
+			segmentCount: Array.isArray(segments)
+				? segments.length
+				: Array.isArray(conversation)
+					? conversation.length
+					: 0,
 		};
 	});
 }
@@ -100,17 +112,79 @@ function variablesOf(record: Record<string, unknown>): string[] {
 	return names.includes("firstName") ? names : ["firstName", ...names];
 }
 
-function substitute(text: string, variables: string[], firstName: string): string {
+function substitute(
+	text: string,
+	variables: string[],
+	firstName: string,
+	values?: Record<string, string>,
+): { text: string; missing: string[] } {
 	let out = text;
 	for (const variable of variables) {
 		out = out.split(`{${variable}}`).join(variable === "firstName" ? firstName : "");
 	}
-	return out.replace(PLACEHOLDER, "");
+	if (values) {
+		for (const [key, value] of Object.entries(values)) {
+			out = out.split(`{${key}}`).join(value);
+		}
+	}
+	const missing: string[] = [];
+	for (const match of out.matchAll(PLACEHOLDER)) {
+		const key = match[0].slice(1, -1);
+		if (key !== "firstName" && !missing.includes(key)) {
+			missing.push(key);
+		}
+	}
+	return { text: out, missing };
+}
+
+function entriesOf(value: unknown): Array<[string, string]> {
+	const record = asRecord(value);
+	if (record === undefined) {
+		return [];
+	}
+	return Object.entries(record).filter(
+		(entry): entry is [string, string] =>
+			typeof entry[1] === "string" && entry[1].length > 0,
+	);
+}
+
+function refusalBranchesOf(record: Record<string, unknown>): RefusalBranch[] | undefined {
+	const branches = record.refusal_branches;
+	if (!Array.isArray(branches)) {
+		return undefined;
+	}
+	return branches.flatMap((entry) => {
+		const branch = asRecord(entry);
+		if (
+			branch === undefined ||
+			typeof branch.id !== "string" ||
+			branch.id.length === 0 ||
+			!Array.isArray(branch.trigger) ||
+			typeof branch.action !== "string" ||
+			typeof branch.text !== "string" ||
+			branch.text.trim().length === 0
+		) {
+			return [];
+		}
+		return [{
+			id: branch.id,
+			trigger: branch.trigger.filter(
+				(value): value is string => typeof value === "string" && value.length > 0,
+			),
+			action: branch.action,
+			text: branch.text,
+		}];
+	});
+}
+
+function passthroughOf(record: Record<string, unknown>, key: string): unknown {
+	const value = record[key];
+	return value === undefined ? undefined : value;
 }
 
 export default defineTool({
 	description:
-		"Loads a stored call pitch so it does not have to be pasted into the prompt. Call it with no pitchId to list the available pitches. With a pitchId it returns the segments in order, each with the listenMs to hand to listen_on_call, with {firstName} placeholders already filled in from the contact's real first name. Never throws: an unknown id returns the list of pitches instead and a broken file comes back with a reason.",
+		"Loads a stored call pitch so it does not have to be pasted into the prompt. Call it with no pitchId to list the available pitches. With a pitchId it returns the segments in order, each with the listenMs to hand to listen_on_call, with {firstName} placeholders already filled in from the contact's real first name. Versioned schemas are supported: legacy pitches expose segments[], policy pitches (scam-recovery-v2.1 shape) expose conversation[] plus refusal_branches, consent_rules, states and policy, with deployment placeholders filled from values. Never throws: an unknown id returns the list of pitches instead and a broken file comes back with a reason.",
 	inputSchema: z.object({
 		pitchId: z
 			.string()
@@ -125,8 +199,14 @@ export default defineTool({
 			.describe(
 				"The contact's real first name, used for {firstName} in the pitch text. Omit it only when the name is unknown.",
 			),
+		values: z
+			.record(z.string(), z.string())
+			.optional()
+			.describe(
+				"Deployment values for pitch placeholders such as principal_name, verified_callback_number, verification_url, case_reference, principal_role, approved_case_description, approved_case_development and approved_source_description. Omitted keys are reported in missing instead of being cleared.",
+			),
 	}),
-	async execute({ pitchId, firstName }) {
+	async execute({ pitchId, firstName, values }) {
 		let files: PitchFile[];
 		try {
 			files = await readPitchFiles();
@@ -177,15 +257,20 @@ export default defineTool({
 			? record.name
 			: match.stem;
 
-		if (!Array.isArray(record.segments)) {
+		const rawSegments = Array.isArray(record.segments)
+			? { kind: "segments" as const, entries: record.segments }
+			: Array.isArray(record.conversation)
+				? { kind: "conversation" as const, entries: record.conversation }
+				: undefined;
+		if (rawSegments === undefined) {
 			return {
 				pitchId,
 				name,
-				reason: `The pitch "${name}" has no "segments" array, so there is nothing to speak.`,
+				reason: `The pitch "${name}" has neither a "segments" array nor a "conversation" array, so there is nothing to speak.`,
 				pitches,
 			};
 		}
-		if (record.segments.length === 0) {
+		if (rawSegments.entries.length === 0) {
 			return {
 				pitchId,
 				name,
@@ -196,11 +281,15 @@ export default defineTool({
 
 		const variables = variablesOf(record);
 		const given = firstName?.trim() ?? "";
+		const supplied = values !== undefined
+			? Object.fromEntries(entriesOf(values))
+			: undefined;
 		const segments: PitchSegment[] = [];
 		let missingName = false;
 		let clearedOther = false;
+		const missingRuntime: string[] = [];
 
-		for (const [index, entry] of record.segments.entries()) {
+		for (const [index, entry] of rawSegments.entries.entries()) {
 			const segment = asRecord(entry);
 			const id =
 				segment && typeof segment.id === "string" && segment.id.length > 0
@@ -227,9 +316,20 @@ export default defineTool({
 				}
 			}
 
+			const substituted = rawSegments.kind === "segments"
+				? {
+					text: substitute(segment.text, variables, given).text.replace(PLACEHOLDER, ""),
+					missing: [] as string[],
+				}
+				: substitute(segment.text, variables, given, supplied);
+			for (const key of substituted.missing) {
+				if (!missingRuntime.includes(key)) {
+					missingRuntime.push(key);
+				}
+			}
 			segments.push({
 				id,
-				text: substitute(segment.text, variables, given),
+				text: substituted.text,
 				listenAfter: typeof segment.listenAfter === "boolean" ? segment.listenAfter : true,
 				listenMs: clampListenMs(segment.listenMs),
 			});
@@ -243,9 +343,33 @@ export default defineTool({
 				? "Placeholders other than {firstName} were cleared because no value was supplied for them."
 				: undefined;
 
+		if (rawSegments.kind === "conversation") {
+			const refusalBranches = refusalBranchesOf(record);
+			const missing = missingRuntime.filter((key) => key !== "firstName");
+			return {
+				pitchId: typeof record.id === "string" && record.id.length > 0 ? record.id : match.stem,
+				name,
+				schema: "conversation",
+				segmentCount: segments.length,
+				segments,
+				...(refusalBranches === undefined ? {} : { refusalBranches }),
+				...(record.consent_rules === undefined
+					? {}
+					: { consentRules: passthroughOf(record, "consent_rules") }),
+				...(record.states === undefined ? {} : { states: passthroughOf(record, "states") }),
+				...(record.policy === undefined ? {} : { policy: passthroughOf(record, "policy") }),
+				...(missing.length === 0 ? {} : {
+					missing,
+					missingNote: "These placeholders have no deployment value yet. Do not read them aloud and do not invent values: ask for verification details or leave the sentence out until values are configured.",
+				}),
+				...(note === undefined ? {} : { note }),
+			};
+		}
+
 		return {
 			pitchId: typeof record.id === "string" && record.id.length > 0 ? record.id : match.stem,
 			name,
+			schema: "segments",
 			segmentCount: segments.length,
 			segments,
 			...(note === undefined ? {} : { note }),
