@@ -13,6 +13,15 @@ const nextConfig: NextConfig = {
 		NEXT_PUBLIC_API_URL: apiUrl,
 	},
 
+	async rewrites() {
+		return [
+			{
+				source: "/api/auth/:path*",
+				destination: `${apiUrl}/api/auth/:path*`,
+			},
+		];
+	},
+
 	transpilePackages: ["@crm/auth", "@crm/db", "@crm/ui"],
 
 	serverExternalPackages: ["@prisma/client", "@prisma/adapter-pg", "pg"],

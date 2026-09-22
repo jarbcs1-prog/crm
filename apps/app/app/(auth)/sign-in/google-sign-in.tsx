@@ -15,14 +15,25 @@ export function GoogleSignIn() {
 
 		const origin = window.location.origin;
 
-		const { error } = await signIn.social({
-			provider: "google",
-			callbackURL: `${origin}/`,
-			errorCallbackURL: `${origin}/sign-in`,
-		});
+		try {
+			const { error } = await signIn.social({
+				provider: "google",
+				callbackURL: `${origin}/`,
+				errorCallbackURL: `${origin}/sign-in`,
+			});
 
-		if (error) {
-			toast.error(error.message ?? "Could not reach the sign-in service.");
+			if (error) {
+				toast.error(error.message ?? "Could not reach the sign-in service.");
+				setPending(false);
+			}
+		} catch (err) {
+			const message =
+				err instanceof TypeError && err.message.includes("Failed to fetch")
+					? "Could not reach the sign-in service. If you have a browser extension blocking requests, try disabling it and retry."
+					: err instanceof Error
+						? err.message
+						: "Could not reach the sign-in service.";
+			toast.error(message);
 			setPending(false);
 		}
 	}
