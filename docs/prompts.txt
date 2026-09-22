@@ -1,9 +1,0 @@
-“Given everything you know about this project, what changes—whether to the product, positioning, target audience, business model, execution, or strategy—would most increase its potential to become commercially viable? Identify the highest-leverage changes, explain why they matter and distinguish between changes that are essential versus merely beneficial.”
-
-“What assumptions or constraints am I treating as fixed that I should reconsider?”
-
-“Given what this platform uniquely enables because these otherwise unrelated systems have been integrated, where is the highest-value commercially viable product hiding inside it?”
-
-
-
-
