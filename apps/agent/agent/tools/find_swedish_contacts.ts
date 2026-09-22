@@ -1,6 +1,6 @@
 import { db } from "@crm/db";
 import { z } from "zod";
-import { defineTool } from "./tool-factory";
+import { defineTool } from "../lib/tool-factory";
 
 export async function findSwedishContacts(
 	input: { limit?: number; requirePhone?: boolean } = {},

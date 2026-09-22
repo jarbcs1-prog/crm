@@ -1,7 +1,7 @@
 import { CallEventType, CallStatus, db } from "@crm/db";
 import { z } from "zod";
 import { transfer } from "../lib/voice";
-import { defineTool } from "./tool-factory";
+import { defineTool } from "../lib/tool-factory";
 
 export default defineTool({
 	description:

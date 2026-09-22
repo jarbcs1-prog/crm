@@ -2,7 +2,7 @@ import { ActivityType, db } from "@crm/db";
 import { z } from "zod";
 import { extract } from "../lib/context-dev";
 import { spend } from "../lib/focus";
-import { defineTool } from "./tool-factory";
+import { defineTool } from "../lib/tool-factory";
 
 const RESEARCH_SCHEMA = {
 	type: "object",

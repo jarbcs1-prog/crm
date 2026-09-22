@@ -3,7 +3,7 @@ import { PRIORITY } from "@crm/db/agent-tasks";
 import { z } from "zod";
 import { LEGAL_APPROACH_SCRIPT } from "../lib/legal-approach";
 import { scheduleTask } from "../lib/tasks";
-import { defineTool } from "./tool-factory";
+import { defineTool } from "../lib/tool-factory";
 
 interface CallScheduleResult {
 	contactId: string;

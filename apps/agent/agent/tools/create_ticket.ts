@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { scheduleTask } from "../lib/tasks";
-import { defineTool } from "./tool-factory";
+import { defineTool } from "../lib/tool-factory";
 
 export async function createTicket(input: {
 	contactId?: string;

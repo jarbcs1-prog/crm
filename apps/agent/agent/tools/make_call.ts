@@ -9,7 +9,7 @@ import { z } from "zod";
 import { focusOn } from "../lib/focus";
 import { CallSession } from "../lib/telephony/session";
 import { isNonohConfigured } from "../lib/voice";
-import { createCallTool } from "./tool-factory";
+import { createCallTool } from "../lib/tool-factory";
 
 export default createCallTool({
 	description:

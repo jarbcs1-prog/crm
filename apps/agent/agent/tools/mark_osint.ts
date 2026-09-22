@@ -1,7 +1,7 @@
 import { db, type FactBand, OsintStatus } from "@crm/db";
 import { z } from "zod";
 import { writeTimelineNote } from "../lib/crm";
-import { defineTool } from "./tool-factory";
+import { defineTool } from "../lib/tool-factory";
 
 const CONFIDENCE: Record<FactBand, number> = {
 	VERIFIED: 0.85,

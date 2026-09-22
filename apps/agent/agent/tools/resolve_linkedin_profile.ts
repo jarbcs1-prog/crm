@@ -3,7 +3,7 @@ import { enabled, unavailable } from "../lib/capabilities";
 import { spend } from "../lib/focus";
 import { searchTerms } from "../lib/names";
 import { findProfileUrls } from "../lib/web-search";
-import { defineTool } from "./tool-factory";
+import { defineTool } from "../lib/tool-factory";
 
 function searchEnabled(): boolean {
 	return (

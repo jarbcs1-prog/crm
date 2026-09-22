@@ -4,7 +4,7 @@ import type { Evidence } from "../lib/evidence";
 import { recordFact } from "../lib/facts";
 import { focusOn } from "../lib/focus";
 import { parseSocialUrl, verifyGithub, verifyX } from "../lib/socials";
-import { defineTool } from "./tool-factory";
+import { defineTool } from "../lib/tool-factory";
 
 export default defineTool({
 	description:

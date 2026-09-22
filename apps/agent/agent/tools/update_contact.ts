@@ -1,7 +1,7 @@
 import { db } from "@crm/db";
 import { z } from "zod";
 import { writeTimelineNote } from "../lib/crm";
-import { defineTool } from "./tool-factory";
+import { defineTool } from "../lib/tool-factory";
 
 export async function updateContact(input: {
 	contactId: string;

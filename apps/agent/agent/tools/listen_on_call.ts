@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { encodeWav, readWav } from "../lib/telephony/audio";
 import { getSession } from "../lib/telephony/session";
-import { defineTool } from "./tool-factory";
+import { defineTool } from "../lib/tool-factory";
 
 const LEAD_TRIM_MS = 400;
 const MAX_LISTEN_MS = 30_000;

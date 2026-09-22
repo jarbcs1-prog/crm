@@ -3,7 +3,7 @@ import { PRIORITY } from "@crm/db/agent-tasks";
 import { z } from "zod";
 import { writeTimelineNote } from "../lib/crm";
 import { scheduleTask } from "../lib/tasks";
-import { defineTool } from "./tool-factory";
+import { defineTool } from "../lib/tool-factory";
 
 export async function recordConversation(input: {
 	contactId: string;

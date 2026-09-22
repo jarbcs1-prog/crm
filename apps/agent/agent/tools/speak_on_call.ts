@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { getSession } from "../lib/telephony/session";
-import { createCallTool } from "./tool-factory";
+import { createCallTool } from "../lib/tool-factory";
 
 export default createCallTool({
 	description:

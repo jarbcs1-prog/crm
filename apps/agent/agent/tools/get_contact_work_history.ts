@@ -2,7 +2,7 @@ import { z } from "zod";
 import { enabled, unavailable } from "../lib/capabilities";
 import { contactProfileSlug } from "../lib/crm";
 import { getExperience, getProfile } from "../lib/linkdapi";
-import { defineTool } from "./tool-factory";
+import { defineTool } from "../lib/tool-factory";
 
 export default defineTool({
 	description:

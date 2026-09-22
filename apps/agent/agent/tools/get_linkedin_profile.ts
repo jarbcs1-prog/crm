@@ -4,7 +4,7 @@ import { spend } from "../lib/focus";
 import { getExperience, getProfile } from "../lib/linkdapi";
 import { looksLikeSameCompany, nameMatchesLocalPart } from "../lib/names";
 import { storePortrait } from "../lib/portrait";
-import { defineTool } from "./tool-factory";
+import { defineTool } from "../lib/tool-factory";
 
 export default defineTool({
 	description:

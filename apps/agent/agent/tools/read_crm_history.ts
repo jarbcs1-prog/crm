@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { readCrmHistory } from "../lib/crm";
 import { focusOn } from "../lib/focus";
-import { createCrmReadTool } from "./tool-factory";
+import { createCrmReadTool } from "../lib/tool-factory";
 
 export default createCrmReadTool({
 	description:

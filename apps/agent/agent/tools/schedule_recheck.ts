@@ -1,7 +1,7 @@
 import { PRIORITY } from "@crm/db/agent-tasks";
 import { z } from "zod";
 import { scheduleTask } from "../lib/tasks";
-import { defineTool } from "./tool-factory";
+import { defineTool } from "../lib/tool-factory";
 
 const MIN_DAYS = 1;
 const MAX_DAYS = 730;

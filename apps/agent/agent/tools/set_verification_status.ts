@@ -1,7 +1,7 @@
 import { db } from "@crm/db";
 import { z } from "zod";
 import { focusOn } from "../lib/focus";
-import { defineTool } from "./tool-factory";
+import { defineTool } from "../lib/tool-factory";
 
 export default defineTool({
 	description:

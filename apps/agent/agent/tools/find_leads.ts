@@ -1,6 +1,6 @@
 import { db, Prisma } from "@crm/db";
 import { z } from "zod";
-import { defineTool } from "./tool-factory";
+import { defineTool } from "../lib/tool-factory";
 
 export async function findLeads(input: {
 	limit?: number;

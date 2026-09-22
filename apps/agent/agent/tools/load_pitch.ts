@@ -2,7 +2,7 @@ import { readdir, readFile } from "node:fs/promises";
 import { join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { z } from "zod";
-import { defineTool } from "./tool-factory";
+import { defineTool } from "../lib/tool-factory";
 
 const PITCHES_DIR = fileURLToPath(new URL("../pitches", import.meta.url));
 const DEFAULT_LISTEN_MS = 8000;
