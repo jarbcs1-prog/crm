@@ -1,9 +1,9 @@
-import { defineTool } from "eve/tools";
 import { z } from "zod";
+import { createCrmReadTool } from "./tool-factory";
 import { readCompanyHistory } from "../lib/accounts";
 import { focusOn } from "../lib/focus";
 
-export default defineTool({
+export default createCrmReadTool({
 	description:
 		"Read everything the CRM has on a company: every contact there with their id, title and whether we have heard from them; every deal with stage and value; recent email threads with full bodies; meetings; and notes. Free and fast — call it first in a company session and whenever you need to find a person at a company you already know.",
 	inputSchema: z.object({
@@ -23,7 +23,8 @@ export default defineTool({
 			.default(25)
 			.describe("How many contacts to list."),
 	}),
-	async execute({ companyId, threads, people }) {
+	name: "read_company_history",
+	fetch: async ({ companyId, threads, people }) => {
 		focusOn({ companyId });
 
 		const history = await readCompanyHistory(companyId, { threads, people });

@@ -1,6 +1,6 @@
 import { db, RecordSource } from "@crm/db";
-import { defineTool } from "eve/tools";
 import { z } from "zod";
+import { defineTool } from "./tool-factory";
 import { focusOn } from "../lib/focus";
 
 const CONTACT_FIELDS = {

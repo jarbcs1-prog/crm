@@ -5,20 +5,15 @@ import {
 	db,
 	evaluateOsintRequirement,
 } from "@crm/db";
-import { defineTool } from "eve/tools";
 import { z } from "zod";
+import { createCallTool } from "./tool-factory";
 import { focusOn } from "../lib/focus";
-import {
-	callerId,
-	isAnyVoiceConfigured,
-	isNonohConfigured,
-	isVoiceConfigured,
-	makeCall as placeCall,
-} from "../lib/voice";
+import { CallSession } from "../lib/telephony/session";
+import { isNonohConfigured } from "../lib/voice";
 
-export default defineTool({
+export default createCallTool({
 	description:
-		"Places an outbound live call to a contact through the voice provider, records the call in the CRM, and hands the line to whoever answers.",
+		"Places an outbound live call to a contact over the Nonoh SIP trunk, records the call in the CRM and keeps the line open so speak_on_call and listen_on_call can hold the conversation. Returns only after the far end answers with SIP 200; a ringing line that never answers is a failure, not a connection.",
 	inputSchema: z.object({
 		contactId: z.string().min(1).describe("The contact to call."),
 		phone: z
@@ -31,11 +26,11 @@ export default defineTool({
 			.describe("Whether to check viability before calling."),
 	}),
 	async execute({ contactId, phone, requiresOsintCheck = true }) {
-		if (!isAnyVoiceConfigured()) {
+		if (!isNonohConfigured()) {
 			return {
 				ok: false as const,
 				reason:
-					"Voice calling is not configured: neither VOIPSTUDIO_API_KEY nor NONOH credentials are set.",
+					"Voice calling is not configured: NONOH_SIP_SERVER, NONOH_USERNAME and NONOH_PASSWORD are all required.",
 			};
 		}
 
@@ -99,39 +94,66 @@ export default defineTool({
 			select: { id: true },
 		});
 
-		let sipCallId: string;
-		try {
-			const placed = await placeCall({ to: number, callerId: callerId() });
-			sipCallId = placed.id;
-		} catch (error) {
-			const reason = `Could not start the call: ${String(error)}`;
+		const dialed = await CallSession.dial(number, { key: call.id });
+
+		if (!dialed.ok || !dialed.session) {
+			const reason = dialed.reason ?? "The call could not be placed.";
+			const now = new Date();
+
 			await db.call.update({
 				where: { id: call.id },
 				data: {
 					status: CallStatus.FAILED,
-					endedAt: new Date(),
-					meta: { error: reason },
+					endedAt: now,
+					meta: {
+						error: reason,
+						...(dialed.status === undefined
+							? {}
+							: { sipStatus: dialed.status }),
+					},
 				},
 			});
 			await db.callEvent.create({
 				data: {
 					callId: call.id,
 					type: CallEventType.SIP_ERROR,
-					payload: { error: reason },
+					payload: {
+						error: reason,
+						...(dialed.status === undefined
+							? {}
+							: { sipStatus: dialed.status }),
+					},
 				},
 			});
-			return { ok: false as const, reason };
+
+			return {
+				ok: false as const,
+				callId: call.id,
+				number,
+				status: CallStatus.FAILED,
+				...(dialed.status === undefined ? {} : { sipStatus: dialed.status }),
+				reason,
+			};
 		}
+
+		const session = dialed.session;
+		const sipCallId = session.sipCallId;
+		const now = new Date();
 
 		await db.call.update({
 			where: { id: call.id },
-			data: { status: CallStatus.RINGING, sipCallId, startedAt: new Date() },
+			data: {
+				status: CallStatus.IN_PROGRESS,
+				sipCallId,
+				startedAt: now,
+				answeredAt: now,
+			},
 		});
 		await db.callEvent.create({
 			data: {
 				callId: call.id,
-				type: CallEventType.RING,
-				payload: { sipCallId },
+				type: CallEventType.ANSWER,
+				payload: { sipCallId, sipStatus: 200 },
 			},
 		});
 		await focusOn({ contactId: contact.id });
@@ -141,8 +163,10 @@ export default defineTool({
 			callId: call.id,
 			sipCallId,
 			number,
+			status: CallStatus.IN_PROGRESS,
+			answered: true as const,
 			pitchHint:
-				"Lead with who you are and which company you represent, then qualify them using the legal approach script.",
+				"Lead with who you are and which company you represent, then qualify them using the legal approach script. Speak a short sentence, then listen; the line is half-duplex and cannot be interrupted.",
 		};
 	},
 });

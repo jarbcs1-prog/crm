@@ -1,8 +1,8 @@
-import { defineTool } from "eve/tools";
 import { z } from "zod";
+import { createCallTool } from "./tool-factory";
 import { getSession } from "../lib/telephony/session";
 
-export default defineTool({
+export default createCallTool({
 	description:
 		"Speaks one short sentence into a live call that make_call answered. Wait for it to return before listening: the line is half-duplex, so audio played now cannot be interrupted. Returns spoken false with a reason when the call is gone instead of throwing. Document-request turns are gated: pass requiresDocumentConsent for any segment that asks for documents or financial information, and the turn is refused unless consentGranted is true from an explicit affirmative earlier in the call.",
 	inputSchema: z.object({
