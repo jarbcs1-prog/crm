@@ -2,6 +2,7 @@ import type { Db, Prisma } from "@crm/db";
 import { blobEnabled, mirror } from "@crm/db/blob";
 import { BLOB_HOST_SUFFIX, COMPANY_IMAGE_FIELDS } from "@crm/db/images";
 import { Injectable, Logger } from "@nestjs/common";
+import { runLimited } from "../common/concurrency";
 import { InjectDatabase } from "../database/database.constants";
 
 const MAX_PER_SWEEP = 25;
@@ -57,31 +58,23 @@ export class ImageMirrorService {
 			},
 		});
 
-		let copied = 0;
-
-		for (const row of rows) {
+		const results = await runLimited(rows, 5, async (row) => {
 			const data: Prisma.CompanyUpdateInput = {};
-
+			let c = 0;
 			for (const field of COMPANY_IMAGE_FIELDS) {
 				const current = row[field];
 				if (!current) continue;
-
 				const stored = await mirror(current, `companies/${row.id}/${field}`);
 				if (!stored || stored === current) continue;
-
 				data[field] = stored;
-				copied += 1;
+				c += 1;
 			}
-
-			if (Object.keys(data).length === 0) continue;
-
-			await this.db.company.updateMany({
-				where: { id: row.id, ...unchanged(row) },
-				data,
-			});
-		}
-
-		return { scanned: rows.length, copied };
+			if (Object.keys(data).length !== 0) {
+				await this.db.company.updateMany({ where: { id: row.id, ...unchanged(row) }, data });
+			}
+			return c;
+		});
+		return { scanned: rows.length, copied: results.reduce((a, b) => a + b, 0) };
 	}
 
 	private async sweepContacts(): Promise<ImageMirrorResult> {
@@ -91,24 +84,14 @@ export class ImageMirrorService {
 			take: MAX_PER_SWEEP,
 			select: { id: true, imageUrl: true },
 		});
-
-		let copied = 0;
-
-		for (const row of rows) {
-			if (!row.imageUrl) continue;
-
+		const counts = await runLimited(rows, 5, async (row) => {
+			if (!row.imageUrl) return 0;
 			const stored = await mirror(row.imageUrl, `contacts/${row.id}`);
-			if (!stored || stored === row.imageUrl) continue;
-
-			const { count } = await this.db.contact.updateMany({
-				where: { id: row.id, imageUrl: row.imageUrl },
-				data: { imageUrl: stored },
-			});
-
-			copied += count;
-		}
-
-		return { scanned: rows.length, copied };
+			if (!stored || stored === row.imageUrl) return 0;
+			const { count } = await this.db.contact.updateMany({ where: { id: row.id, imageUrl: row.imageUrl }, data: { imageUrl: stored } });
+			return count;
+		});
+		return { scanned: rows.length, copied: counts.reduce((a, b) => a + b, 0) };
 	}
 
 	private async sweepUsers(): Promise<ImageMirrorResult> {
@@ -117,24 +100,14 @@ export class ImageMirrorService {
 			take: MAX_PER_SWEEP,
 			select: { id: true, image: true },
 		});
-
-		let copied = 0;
-
-		for (const row of rows) {
-			if (!row.image) continue;
-
+		const counts = await runLimited(rows, 5, async (row) => {
+			if (!row.image) return 0;
 			const stored = await mirror(row.image, `users/${row.id}/avatar`);
-			if (!stored || stored === row.image) continue;
-
-			const { count } = await this.db.user.updateMany({
-				where: { id: row.id, image: row.image },
-				data: { image: stored },
-			});
-
-			copied += count;
-		}
-
-		return { scanned: rows.length, copied };
+			if (!stored || stored === row.image) return 0;
+			const { count } = await this.db.user.updateMany({ where: { id: row.id, image: row.image }, data: { image: stored } });
+			return count;
+		});
+		return { scanned: rows.length, copied: counts.reduce((a, b) => a + b, 0) };
 	}
 }
 
