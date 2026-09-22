@@ -74,3 +74,8 @@ sql_dump/
 
 # Serena MCP local state
 .serena/
+
+# Secrets and dumps
+*.sql
+*.dump
+.env.local
