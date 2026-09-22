@@ -1,11 +1,12 @@
 import { CallEventType, CallStatus, db } from "@crm/db";
-import { defineTool } from "eve/tools";
+import { defineTool } from "./tool-factory";
 import { z } from "zod";
+import { getSession } from "../lib/telephony/session";
 import { callCode, getCall, isTerminalStatus } from "../lib/voice";
 
 export default defineTool({
 	description:
-		"Reports the current status of a call in plain English, asking the voice provider when the call is not already terminal and persisting what the provider says.",
+		"Reports the current status of a call in plain English. A live Nonoh session is reported from its own RTP and SIP state; otherwise the voice provider is asked, when one is configured.",
 	inputSchema: z.object({
 		callId: z.string().min(1).describe("The CRM id of the call to check."),
 	}),
@@ -33,6 +34,47 @@ export default defineTool({
 
 		let status: CallStatus = call.status;
 		let codephrase = `The call is ${call.status.toLowerCase()} according to the CRM.`;
+
+		const session =
+			getSession(callId) ??
+			(call.sipCallId ? getSession(call.sipCallId) : undefined);
+
+		if (session) {
+			const stats = session.stats;
+			const live = !session.hasEnded;
+
+			if (live && call.status !== CallStatus.IN_PROGRESS) {
+				const now = new Date();
+				await db.call.update({
+					where: { id: call.id },
+					data: {
+						status: CallStatus.IN_PROGRESS,
+						answeredAt: call.answeredAt ?? now,
+					},
+				});
+				await db.callEvent.create({
+					data: { callId: call.id, type: CallEventType.ANSWER },
+				});
+				status = CallStatus.IN_PROGRESS;
+			}
+
+			codephrase = live
+				? `The call is live on Nonoh (SIP 200, media flowing): ${stats.rxPackets} packets received${
+						stats.rxSource ? ` from ${stats.rxSource}` : ""
+					}, ${stats.txPackets} sent, inbound peak amplitude ${stats.peak}.`
+				: "The SIP session for this call has ended; no media is flowing.";
+
+			return {
+				ok: true as const,
+				final: false as const,
+				status,
+				live,
+				codephrase,
+				stats,
+			};
+		}
+
+		codephrase = `The call is ${call.status.toLowerCase()} according to the CRM and there is no live Nonoh session for it.`;
 
 		if (call.sipCallId) {
 			try {
@@ -84,7 +126,7 @@ export default defineTool({
 					}
 				}
 			} catch (error) {
-				codephrase = `Could not reach the provider (${String(error)}); leaving the CRM status as ${call.status.toLowerCase()}.`;
+				codephrase = `Could not reach the provider (${String(error)}) and there is no live session to report on; leaving the CRM status as ${call.status.toLowerCase()}.`;
 			}
 		}
 

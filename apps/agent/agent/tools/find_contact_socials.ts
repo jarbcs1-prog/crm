@@ -1,4 +1,4 @@
-import { defineTool } from "eve/tools";
+import { defineTool } from "./tool-factory";
 import { z } from "zod";
 import { personForVerification, stampSocialsChecked } from "../lib/crm";
 import { focusOn, spend } from "../lib/focus";

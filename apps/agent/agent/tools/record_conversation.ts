@@ -1,6 +1,6 @@
 import { db } from "@crm/db";
 import { PRIORITY } from "@crm/db/agent-tasks";
-import { defineTool } from "eve/tools";
+import { defineTool } from "./tool-factory";
 import { z } from "zod";
 import { writeTimelineNote } from "../lib/crm";
 import { scheduleTask } from "../lib/tasks";

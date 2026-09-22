@@ -1,7 +1,7 @@
 import { readdir, readFile } from "node:fs/promises";
 import { join } from "node:path";
 import { fileURLToPath } from "node:url";
-import { defineTool } from "eve/tools";
+import { defineTool } from "./tool-factory";
 import { z } from "zod";
 
 const PITCHES_DIR = fileURLToPath(new URL("../pitches", import.meta.url));

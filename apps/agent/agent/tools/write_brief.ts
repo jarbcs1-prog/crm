@@ -1,4 +1,4 @@
-import { defineTool } from "eve/tools";
+import { defineTool } from "./tool-factory";
 import { z } from "zod";
 import type { Evidence, EvidenceKind } from "../lib/evidence";
 import { WEIGHTS } from "../lib/evidence";

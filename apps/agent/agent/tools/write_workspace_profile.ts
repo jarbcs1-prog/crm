@@ -4,7 +4,7 @@ import {
 	MAX_NARRATIVE,
 	writeWorkspaceProfile,
 } from "@crm/db/workspace";
-import { defineTool } from "eve/tools";
+import { defineTool } from "./tool-factory";
 import { z } from "zod";
 import { currentFocus } from "../lib/focus";
 import { identity } from "../lib/workspace";

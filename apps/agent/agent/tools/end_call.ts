@@ -1,11 +1,12 @@
 import { CallEventType, CallStatus, db } from "@crm/db";
-import { defineTool } from "eve/tools";
+import { defineTool } from "./tool-factory";
 import { z } from "zod";
-import { hangup, isTerminalStatus } from "../lib/voice";
+import { getSession } from "../lib/telephony/session";
+import { isTerminalStatus } from "../lib/voice";
 
 export default defineTool({
 	description:
-		"Ends a call that is still ringing or live: hangs up at the provider when a SIP call id exists, marks the call cancelled, and records a hang-up event. Safe to call twice.",
+		"Ends a call that is still live: sends a SIP BYE when the Nonoh session for it still exists, marks the call cancelled and records a hang-up event. Safe to call twice; still closes the CRM record when the session is already gone.",
 	inputSchema: z.object({
 		callId: z.string().min(1).describe("The CRM id of the call to end."),
 	}),
@@ -30,13 +31,20 @@ export default defineTool({
 			};
 		}
 
+		const session =
+			getSession(callId) ??
+			(call.sipCallId ? getSession(call.sipCallId) : undefined);
+
 		let hangupError: string | null = null;
-		if (call.sipCallId) {
+		if (session) {
 			try {
-				await hangup(call.sipCallId);
+				await session.hangup();
 			} catch (error) {
 				hangupError = String(error);
 			}
+		} else {
+			hangupError =
+				"No live session for this call, so no SIP BYE was sent; the CRM record was closed anyway.";
 		}
 
 		const now = new Date();

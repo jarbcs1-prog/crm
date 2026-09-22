@@ -1,5 +1,5 @@
 import { db, type FactBand, OsintStatus } from "@crm/db";
-import { defineTool } from "eve/tools";
+import { defineTool } from "./tool-factory";
 import { z } from "zod";
 import { writeTimelineNote } from "../lib/crm";
 
@@ -11,7 +11,7 @@ const CONFIDENCE: Record<FactBand, number> = {
 
 export default defineTool({
 	description:
-		"Applies OSINT findings to a contact: corrects the phone, email or title on the contact itself, files the finding with a confidence band, and marks the target enriched.",
+		"Applies OSINT findings to a contact: corrects the phone, email or title on the contact itself, files the finding with a confidence band and marks the target enriched.",
 	inputSchema: z.object({
 		contactId: z
 			.string()
@@ -35,7 +35,7 @@ export default defineTool({
 		notes: z
 			.string()
 			.optional()
-			.describe("Where the finding came from, and any caveats."),
+			.describe("Where the finding came from and any caveats."),
 	}),
 	async execute({ contactId, band, phone, email, title, notes }) {
 		const contact = await db.contact.findUnique({

@@ -1,5 +1,5 @@
 import { ActivityType, db } from "@crm/db";
-import { defineTool } from "eve/tools";
+import { defineTool } from "./tool-factory";
 import { z } from "zod";
 import { extract } from "../lib/context-dev";
 import { spend } from "../lib/focus";

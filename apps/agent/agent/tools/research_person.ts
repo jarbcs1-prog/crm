@@ -1,4 +1,4 @@
-import { defineTool } from "eve/tools";
+import { defineTool } from "./tool-factory";
 import { z } from "zod";
 import { enabled, unavailable } from "../lib/capabilities";
 import { guardThirdPartyQuery } from "../lib/egress-guard";

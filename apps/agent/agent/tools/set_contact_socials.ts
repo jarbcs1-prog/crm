@@ -1,4 +1,4 @@
-import { defineTool } from "eve/tools";
+import { defineTool } from "./tool-factory";
 import { z } from "zod";
 import { personForVerification } from "../lib/crm";
 import type { Evidence } from "../lib/evidence";

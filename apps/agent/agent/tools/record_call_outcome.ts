@@ -5,7 +5,7 @@ import {
 	db,
 	OsintStatus,
 } from "@crm/db";
-import { defineTool } from "eve/tools";
+import { defineTool } from "./tool-factory";
 import { z } from "zod";
 import { writeTimelineNote } from "../lib/crm";
 import { isTerminalStatus } from "../lib/voice";
@@ -25,7 +25,7 @@ const OUTCOME_PORT: Record<string, CallOutcome> = {
 
 export default defineTool({
 	description:
-		"Records what happened on a call: the outcome, optional qualification scores between 0 and 1, and a short summary. Wrong numbers and do-not-call results also pause OSINT work for that contact.",
+		"Records what happened on a call: the outcome, optional qualification scores between 0 and 1 and a short summary. Wrong numbers and do-not-call results also pause OSINT work for that contact.",
 	inputSchema: z.object({
 		callId: z.string().min(1).describe("The CRM id of the call."),
 		outcome: z

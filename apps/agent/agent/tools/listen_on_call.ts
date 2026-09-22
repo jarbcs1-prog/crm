@@ -1,4 +1,4 @@
-import { defineTool } from "eve/tools";
+import { defineTool } from "./tool-factory";
 import { z } from "zod";
 import { encodeWav, readWav } from "../lib/telephony/audio";
 import { getSession } from "../lib/telephony/session";

@@ -1,4 +1,4 @@
-import { defineTool } from "eve/tools";
+import { defineTool } from "./tool-factory";
 import { z } from "zod";
 import { readDealHistory } from "../lib/accounts";
 import { focusOn } from "../lib/focus";
