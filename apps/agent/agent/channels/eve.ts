@@ -42,7 +42,12 @@ export function repFromCrm(secret: string): AuthFn<Request> {
 }
 
 const secret = process.env.AGENT_BRIDGE_SECRET?.trim() || undefined;
+const allowLocalDev = process.env.NODE_ENV !== "production";
 
 export default eveChannel({
-	auth: [...(secret ? [repFromCrm(secret)] : []), vercelOidc(), localDev()],
+	auth: [
+		...(secret ? [repFromCrm(secret)] : []),
+		vercelOidc(),
+		...(allowLocalDev ? [localDev()] : []),
+	],
 });
