@@ -67,7 +67,9 @@ async function readPage(url: URL): Promise<{ body: string; url: URL } | null> {
 	} catch {
 		return null;
 	} finally {
-		await reader.cancel().catch(() => {});
+		await reader.cancel().catch((error: unknown) => {
+			console.debug("[favicon] reader.cancel ignored", error);
+		});
 	}
 
 	return { body, url: result.url };

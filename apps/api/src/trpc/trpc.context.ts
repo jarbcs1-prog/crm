@@ -11,7 +11,10 @@ export class TrpcContext implements TRPCContext {
 		const session = req
 			? await auth.api
 					.getSession({ headers: fromNodeHeaders(req.headers) })
-					.catch(() => null)
+					.catch((error: unknown) => {
+						console.warn("[trpc.context] session lookup failed", error);
+						return null;
+					})
 			: null;
 		return { req, session };
 	}

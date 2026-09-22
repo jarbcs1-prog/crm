@@ -84,7 +84,9 @@ async function readCapped(response: Response): Promise<Buffer | null> {
 	} catch {
 		return null;
 	} finally {
-		await reader.cancel().catch(() => {});
+		await reader.cancel().catch((error: unknown) => {
+			console.debug("[blob] reader.cancel ignored", error);
+		});
 	}
 
 	if (size === 0 || size > MAX_BYTES) return null;
