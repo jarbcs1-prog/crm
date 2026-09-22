@@ -8,9 +8,15 @@ import type {
 import { setRequestUserId } from "../../logging/request-context";
 import type { AuthedTrpcContext, BaseTrpcContext } from "../context.types";
 
+const PUBLIC_PROCEDURES = new Set<string>(["sso.signInOptions"]);
+
 @Injectable()
 export class AuthMiddleware implements TRPCMiddleware {
 	async use(opts: MiddlewareOptions): Promise<MiddlewareResponse> {
+		if (PUBLIC_PROCEDURES.has(opts.path)) {
+			return opts.next();
+		}
+
 		const ctx = opts.ctx as BaseTrpcContext;
 		const user = ctx.session?.user;
 
