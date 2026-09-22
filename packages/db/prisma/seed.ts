@@ -707,9 +707,9 @@ async function healLegacyData() {
 		}
 		console.log(`Healed ${legacyUsers.length} legacy owner(s) by email.`);
 	}
-	const ws = await db.workspace.findFirst();
+	const ws = await db.organization.findFirst();
 	if (ws && ws.name.trim().toLowerCase() === "crm") {
-		await db.workspace.update({ where: { id: ws.id }, data: { name: "Shelf-Thought" } });
+		await db.organization.update({ where: { id: ws.id }, data: { name: "Shelf-Thought" } });
 		console.log("Renamed workspace CRM -> Shelf-Thought");
 	}
 	const org = await db.organization.findFirst({ where: { id: "workspace" } });
