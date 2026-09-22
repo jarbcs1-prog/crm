@@ -27,7 +27,93 @@ export class SearchService {
 
 	async quick(q: string): Promise<{ hits: SearchHit[] }> {
 		const term = q.trim();
-		if (term.length < 3) return { hits: [] };
+		if (term.length === 0) {
+			const [companies, contacts, deals] = await Promise.all([
+				this.db.company.findMany({
+					take: PER_KIND,
+					orderBy: { updatedAt: "desc" },
+					select: {
+						id: true,
+						name: true,
+						domain: true,
+						iconUrl: true,
+						iconDarkUrl: true,
+						iconTone: true,
+					},
+				}),
+				this.db.contact.findMany({
+					take: PER_KIND,
+					orderBy: { updatedAt: "desc" },
+					select: {
+						id: true,
+						firstName: true,
+						lastName: true,
+						email: true,
+						imageUrl: true,
+						company: { select: { name: true } },
+					},
+				}),
+				this.db.deal.findMany({
+					take: PER_KIND,
+					orderBy: { updatedAt: "desc" },
+					select: {
+						id: true,
+						name: true,
+						company: {
+							select: {
+								name: true,
+								iconUrl: true,
+								iconDarkUrl: true,
+								iconTone: true,
+							},
+						},
+					},
+				}),
+			]);
+			return {
+				hits: [
+					...companies.map(
+						(company): SearchHit => ({
+							kind: "company",
+							id: company.id,
+							label: company.name,
+							detail: company.domain,
+							iconUrl: company.iconUrl,
+							iconDarkUrl: company.iconDarkUrl,
+							iconTone: company.iconTone,
+							imageUrl: null,
+						}),
+					),
+					...contacts.map(
+						(contact): SearchHit => ({
+							kind: "contact",
+							id: contact.id,
+							label:
+								[contact.firstName, contact.lastName].filter(Boolean).join(" ") ||
+								(contact.email ?? "Unnamed"),
+							detail: contact.company?.name ?? contact.email,
+							iconUrl: null,
+							iconDarkUrl: null,
+							iconTone: null,
+							imageUrl: contact.imageUrl,
+						}),
+					),
+					...deals.map(
+						(deal): SearchHit => ({
+							kind: "deal",
+							id: deal.id,
+							label: deal.name,
+							detail: deal.company.name,
+							iconUrl: deal.company.iconUrl,
+							iconDarkUrl: deal.company.iconDarkUrl,
+							iconTone: deal.company.iconTone,
+							imageUrl: null,
+						}),
+					),
+				],
+			};
+		}
+		if (term.length < 2) return { hits: [] };
 		const cacheKey = term.toLowerCase();
 		const cached = searchCache.get(cacheKey);
 		if (cached && cached.expiresAt > Date.now()) {

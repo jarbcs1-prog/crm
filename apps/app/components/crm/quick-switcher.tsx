@@ -50,7 +50,7 @@ export function QuickSwitcher() {
 
 	const results = useQuery({
 		...trpc.search.quick.queryOptions({ q: query }),
-		enabled: open && query.trim().length >= 2,
+		enabled: open,
 		placeholderData: (previous) => previous,
 	});
 
@@ -77,9 +77,11 @@ export function QuickSwitcher() {
 				/>
 				<CommandList>
 					<CommandEmpty>
-						{query.trim().length < 2
-							? "Type at least two characters."
-							: "Nothing matches."}
+						{query.trim().length === 0
+							? "No recent items."
+							: query.trim().length < 2
+								? "Type at least two characters."
+								: "Nothing matches."}
 					</CommandEmpty>
 
 					{KINDS.map((kind) => {
