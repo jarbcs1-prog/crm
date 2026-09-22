@@ -20,7 +20,6 @@ import {
 import { ContactsService } from "./contacts.service";
 
 @Router({ alias: "contacts" })
-@UseMiddlewares(AuthMiddleware)
 export class ContactsRouter {
 	constructor(
 		@Inject(ContactsService) private readonly contacts: ContactsService,

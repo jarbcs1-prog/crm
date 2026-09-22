@@ -19,7 +19,6 @@ import {
 import { ConversationsService } from "./conversations.service";
 
 @Router({ alias: "conversations" })
-@UseMiddlewares(AuthMiddleware)
 export class ConversationsRouter {
 	constructor(
 		@Inject(ConversationsService)

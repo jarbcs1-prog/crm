@@ -6,7 +6,6 @@ import { AuthMiddleware } from "../trpc/middlewares/auth.middleware";
 import { UsersService } from "./users.service";
 
 @Router({ alias: "users" })
-@UseMiddlewares(AuthMiddleware)
 export class UsersRouter {
 	constructor(
 		@Inject(UsersService) private readonly users: UsersService,

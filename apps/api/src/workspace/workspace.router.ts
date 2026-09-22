@@ -18,7 +18,6 @@ import {
 import { WorkspaceService } from "./workspace.service";
 
 @Router({ alias: "workspace" })
-@UseMiddlewares(AuthMiddleware)
 export class WorkspaceRouter {
 	constructor(
 		@Inject(WorkspaceService) private readonly workspace: WorkspaceService,

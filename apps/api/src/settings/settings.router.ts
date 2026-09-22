@@ -14,7 +14,6 @@ import { setAgentModelInput } from "./settings.contracts";
 import { SettingsService } from "./settings.service";
 
 @Router({ alias: "settings" })
-@UseMiddlewares(AuthMiddleware)
 export class SettingsRouter {
 	constructor(
 		@Inject(SettingsService) private readonly settings: SettingsService,

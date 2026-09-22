@@ -20,7 +20,6 @@ import {
 import { DealsService } from "./deals.service";
 
 @Router({ alias: "deals" })
-@UseMiddlewares(AuthMiddleware)
 export class DealsRouter {
 	constructor(@Inject(DealsService) private readonly deals: DealsService) {}
 

@@ -21,7 +21,6 @@ import { GoogleConnectionService } from "./google-connection.service";
 import { GoogleSyncService } from "./google-sync.service";
 
 @Router({ alias: "google" })
-@UseMiddlewares(AuthMiddleware)
 export class GoogleRouter {
 	constructor(
 		@Inject(GoogleConnectionService)

@@ -20,7 +20,6 @@ import {
 import { ActivitiesService } from "./activities.service";
 
 @Router({ alias: "activities" })
-@UseMiddlewares(AuthMiddleware)
 export class ActivitiesRouter {
 	constructor(
 		@Inject(ActivitiesService) private readonly activities: ActivitiesService,

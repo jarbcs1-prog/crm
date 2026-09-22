@@ -21,7 +21,6 @@ import {
 import { CompaniesService } from "./companies.service";
 
 @Router({ alias: "companies" })
-@UseMiddlewares(AuthMiddleware)
 export class CompaniesRouter {
 	constructor(
 		@Inject(CompaniesService) private readonly companies: CompaniesService,

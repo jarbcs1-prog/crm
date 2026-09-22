@@ -7,7 +7,6 @@ import { SearchService } from "./search.service";
 const quickInput = z.object({ q: z.string().default("") });
 
 @Router({ alias: "search" })
-@UseMiddlewares(AuthMiddleware)
 export class SearchRouter {
 	constructor(@Inject(SearchService) private readonly search: SearchService) {}
 
