@@ -658,7 +658,42 @@ async function seedActivities(
 	return rows.length;
 }
 
+async function healLegacyData() {
+	const staleDeals = await db.deal.findMany({
+		where: { name: { contains: "Comp AI" } },
+		select: { id: true, name: true, companyId: true },
+	});
+	for (const d of staleDeals) {
+		const c = await db.company.findUnique({ where: { id: d.companyId }, select: { name: true } });
+		const base = c?.name ?? "Deal";
+		const suffix = d.name.includes("expansion") ? " — expansion" : " — Shelf-Thought, Inc.";
+		const healed = d.name.includes(" — ") ? d.name.replace(/Comp AI/g, "Shelf-Thought") : `${base}${suffix}`;
+		await db.deal.update({ where: { id: d.id }, data: { name: healed } });
+	}
+	if (staleDeals.length) console.log(`Healed ${staleDeals.length} deal(s) with stale Comp AI name.`);
+	const legacyEmails = ["ada@shelf-thought.com", "marcus@shelf-thought.com"];
+	const legacyUsers = await db.user.findMany({ where: { email: { in: legacyEmails } }, select: { id: true } });
+	if (legacyUsers.length > 0) {
+		const fallbackOwner = await db.user.findFirst({ where: { email: { in: OWNERS.map((o) => o.email) } }, select: { id: true } });
+		const replacementId = fallbackOwner?.id ?? (await seedOwners())[0];
+		for (const u of legacyUsers) {
+			await db.company.updateMany({ where: { ownerId: u.id }, data: { ownerId: replacementId } });
+			await db.contact.updateMany({ where: { ownerId: u.id }, data: { ownerId: replacementId } });
+			await db.deal.updateMany({ where: { ownerId: u.id }, data: { ownerId: replacementId } });
+			await db.activity.updateMany({ where: { createdById: u.id }, data: { createdById: replacementId } });
+			await db.user.delete({ where: { id: u.id } }).catch(() => {});
+		}
+		console.log(`Healed ${legacyUsers.length} legacy owner(s).`);
+	}
+	const ws = await db.workspace.findFirst();
+	if (ws && ws.name.trim().toLowerCase() === "crm") {
+		await db.workspace.update({ where: { id: ws.id }, data: { name: "Shelf-Thought" } });
+		console.log("Renamed workspace CRM -> Shelf-Thought");
+	}
+}
+
 async function main() {
+	await healLegacyData();
 	const ownerIds = await seedOwners();
 	const companies = await seedCompanies(ownerIds);
 	const contacts = await seedContacts(companies, ownerIds);
