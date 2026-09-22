@@ -712,6 +712,32 @@ async function healLegacyData() {
 		await db.workspace.update({ where: { id: ws.id }, data: { name: "Shelf-Thought" } });
 		console.log("Renamed workspace CRM -> Shelf-Thought");
 	}
+	const org = await db.organization.findFirst({ where: { id: "workspace" } });
+	if (org) {
+		const realOwnerEmail = "jarbcs1@gmail.com";
+		const realUser = await db.user.findFirst({ where: { email: realOwnerEmail } });
+		if (realUser) {
+			await db.member.updateMany({ where: { organizationId: org.id, userId: realUser.id }, data: { role: "owner" } });
+			await db.member.updateMany({ where: { organizationId: org.id, userId: { not: realUser.id }, role: "owner" }, data: { role: "member" } });
+		}
+		const demoEmails = ["ada@trycomp.ai", "marcus@trycomp.ai", "priya@trycomp.ai", "dev@localhost", "ada@shelf-thought.com", "marcus@shelf-thought.com", "priya@shelf-thought.com"];
+		for (const email of demoEmails) {
+			const u = await db.user.findFirst({ where: { email } });
+			if (!u) continue;
+			await db.member.deleteMany({ where: { organizationId: org.id, userId: u.id } });
+			const fallbackId = realUser?.id ?? (await db.user.findFirst({ select: { id: true } }))?.id;
+			if (fallbackId) {
+				await db.company.updateMany({ where: { ownerId: u.id }, data: { ownerId: fallbackId } });
+				await db.contact.updateMany({ where: { ownerId: u.id }, data: { ownerId: fallbackId } });
+				await db.deal.updateMany({ where: { ownerId: u.id }, data: { ownerId: fallbackId } });
+				await db.activity.updateMany({ where: { createdById: u.id }, data: { createdById: fallbackId } });
+			}
+			await db.session.deleteMany({ where: { userId: u.id } });
+			await db.account.deleteMany({ where: { userId: u.id } });
+			await db.user.delete({ where: { id: u.id } }).catch(() => {});
+			console.log(`Removed demo user ${email}`);
+		}
+	}
 }
 
 async function main() {
