@@ -70,7 +70,10 @@ export class ImageMirrorService {
 				c += 1;
 			}
 			if (Object.keys(data).length !== 0) {
-				await this.db.company.updateMany({ where: { id: row.id, ...unchanged(row) }, data });
+				await this.db.company.updateMany({
+					where: { id: row.id, ...unchanged(row) },
+					data,
+				});
 			}
 			return c;
 		});
@@ -88,7 +91,10 @@ export class ImageMirrorService {
 			if (!row.imageUrl) return 0;
 			const stored = await mirror(row.imageUrl, `contacts/${row.id}`);
 			if (!stored || stored === row.imageUrl) return 0;
-			const { count } = await this.db.contact.updateMany({ where: { id: row.id, imageUrl: row.imageUrl }, data: { imageUrl: stored } });
+			const { count } = await this.db.contact.updateMany({
+				where: { id: row.id, imageUrl: row.imageUrl },
+				data: { imageUrl: stored },
+			});
 			return count;
 		});
 		return { scanned: rows.length, copied: counts.reduce((a, b) => a + b, 0) };
@@ -104,7 +110,10 @@ export class ImageMirrorService {
 			if (!row.image) return 0;
 			const stored = await mirror(row.image, `users/${row.id}/avatar`);
 			if (!stored || stored === row.image) return 0;
-			const { count } = await this.db.user.updateMany({ where: { id: row.id, image: row.image }, data: { image: stored } });
+			const { count } = await this.db.user.updateMany({
+				where: { id: row.id, image: row.image },
+				data: { image: stored },
+			});
 			return count;
 		});
 		return { scanned: rows.length, copied: counts.reduce((a, b) => a + b, 0) };

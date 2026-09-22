@@ -1,6 +1,6 @@
-import { defineTool } from "./tool-factory";
 import { z } from "zod";
 import { searchCrm } from "../lib/lookup";
+import { defineTool } from "./tool-factory";
 
 export default defineTool({
 	description:

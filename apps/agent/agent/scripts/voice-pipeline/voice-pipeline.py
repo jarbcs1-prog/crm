@@ -38,7 +38,7 @@ MAX_RECORD_SECONDS = 15.0
 SILENCE_THRESHOLD = 0.015
 
 SYSTEM_PROMPT = (
-    "You are a concise CRM voice assistant. Answer briefly, clearly, and helpfully. "
+    "You are a concise CRM voice assistant. Answer briefly, clearly and helpfully. "
     "Keep responses to one or two sentences when possible."
 )
 

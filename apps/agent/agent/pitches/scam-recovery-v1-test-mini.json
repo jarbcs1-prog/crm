@@ -1,26 +1,26 @@
 {
-  "id": "scam-recovery-v1-test-mini",
-  "name": "Test call - 3 line disclosure",
-  "description": "Minimal test pitch with AI disclosure, no legal representation",
-  "variables": ["firstName"],
-  "segments": [
-    {
-      "id": "s1",
-      "listenAfter": true,
-      "listenMs": 8000,
-      "text": "Hello {firstName}, this is an AI assistant test call from your CRM voice agent via Nonoh SIP — this is a simulated test, not legal advice or representation."
-    },
-    {
-      "id": "s2",
-      "listenAfter": true,
-      "listenMs": 5000,
-      "text": "I'm calling your test profile to verify retrieval from the database and SIP connection — no documents needed for this test."
-    },
-    {
-      "id": "s3",
-      "listenAfter": true,
-      "listenMs": 8000,
-      "text": "If you can hear this clearly, say hello and I'll log the activity and hang up. Thanks for helping test the pipeline, {firstName}."
-    }
-  ]
+	"id": "scam-recovery-v1-test-mini",
+	"name": "Test call - 3 line disclosure",
+	"description": "Minimal test pitch with AI disclosure, no legal representation",
+	"variables": ["firstName"],
+	"segments": [
+		{
+			"id": "s1",
+			"listenAfter": true,
+			"listenMs": 8000,
+			"text": "Hello {firstName}, this is an AI assistant test call from your CRM voice agent via Nonoh SIP — this is a simulated test, not legal advice or representation."
+		},
+		{
+			"id": "s2",
+			"listenAfter": true,
+			"listenMs": 5000,
+			"text": "I'm calling your test profile to verify retrieval from the database and SIP connection — no documents needed for this test."
+		},
+		{
+			"id": "s3",
+			"listenAfter": true,
+			"listenMs": 8000,
+			"text": "If you can hear this clearly, say hello and I'll log the activity and hang up. Thanks for helping test the pipeline, {firstName}."
+		}
+	]
 }

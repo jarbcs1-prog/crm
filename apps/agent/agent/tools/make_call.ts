@@ -6,10 +6,10 @@ import {
 	evaluateOsintRequirement,
 } from "@crm/db";
 import { z } from "zod";
-import { createCallTool } from "./tool-factory";
 import { focusOn } from "../lib/focus";
 import { CallSession } from "../lib/telephony/session";
 import { isNonohConfigured } from "../lib/voice";
+import { createCallTool } from "./tool-factory";
 
 export default createCallTool({
 	description:

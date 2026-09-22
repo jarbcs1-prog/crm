@@ -2,7 +2,7 @@
 
 > Port Eve/CRM agent capabilities into The S.E.A.S. Python orchestration system.
 > The CRM agent (Eve/TypeScript, F:\crm) provides 18 tools, 4 core skills, 18 dev skills,
-> an evidence ledger, capability gating, a task scheduler with dual lanes, and a sandbox.
+> an evidence ledger, capability gating, a task scheduler with dual lanes and a sandbox.
 > The S.E.A.S. (Python, F:\theseas) is the orchestration target.
 
 ---
@@ -65,7 +65,7 @@ All four Phase 1 deliverables are complete and in `F:/theseas/system/`. The Phas
 #### 1. Repository Interface — `system/crm_repository.py` [NOT STARTED]
 Abstract CRM data access behind a Python interface. Model the Prisma query shapes from
 `lib/lookup.ts`, `lib/crm.ts`, `lib/brand.ts`. Define return types for contact lookup,
-company enrichment, deal history, and dossier reads. Mock implementation for tests; real
+company enrichment, deal history and dossier reads. Mock implementation for tests; real
 implementation deferred until CRM data source is available.
 
 **Source signals to read:**

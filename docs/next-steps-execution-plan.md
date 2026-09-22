@@ -2,17 +2,17 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Goal:** Land the committed optimization work, prove it with measurements, finish the deferred items, and add new model/voice providers to the research agent.
+**Goal:** Land the committed optimization work, prove it with measurements, finish the deferred items and add new model/voice providers to the research agent.
 
 **Architecture:** Review-then-merge the `perf/optimization-plan` branch, validate the trigram migration on staging with `EXPLAIN ANALYZE`, re-measure every claimed win against its baseline, then extend the agent's provider surface following the existing `lib/voice.ts` + `lib/capabilities.ts` pattern.
 
 **Tech Stack:** NestJS 11, Prisma 6 Postgres + pg_trgm, eve agent, Vercel AI Gateway, bun:test.
 
-**Spec:** Prior turns — `optimization-execution-plan.md`, `PERF_BASELINE.md`, commit `59f2554`, and the five next steps listed after the app-build verification (3 tasks successful, 26s).
+**Spec:** Prior turns — `optimization-execution-plan.md`, `PERF_BASELINE.md`, commit `59f2554` and the five next steps listed after the app-build verification (3 tasks successful, 26s).
 
 ## Global Constraints
 
-- Single root `.env` only, never per-package `.env`; every new variable goes in `.env.example` with a note, and API-read variables also go in `apps/api/src/config/env.validation.ts`.
+- Single root `.env` only, never per-package `.env`; every new variable goes in `.env.example` with a note and API-read variables also go in `apps/api/src/config/env.validation.ts`.
 - Agent-only keys (model endpoints, voice vendors) are NOT declared in `env.validation.ts` — that schema is the API's, not the repo's.
 - Turbo runs in strict env mode: any variable a process reads must be declared in that package's `turbo.json` `passThroughEnv`.
 - A missing key removes a capability, it never throws — follow `apps/agent/agent/lib/capabilities.ts` and `apps/agent/agent/lib/voice.ts`.
@@ -24,7 +24,7 @@
 
 ---
 
-### Task 1: Push, review, and merge the optimization branch
+### Task 1: Push, review and merge the optimization branch
 
 **Files:**
 - Modify: none (review only)

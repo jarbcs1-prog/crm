@@ -106,9 +106,9 @@ Documentation/
   execution_plan.md                 -> WHEN (phase-wise execution roadmap)
 ```
 
-- The spec doc defines the API surface, data models, and integration flows
+- The spec doc defines the API surface, data models and integration flows
 - The implementation guide provides concrete Python code and architecture
-- The execution plan contextualizes the work with phases, sprints, risks, and dependencies
+- The execution plan contextualizes the work with phases, sprints, risks and dependencies
 
 ## Project Purpose and Objectives
 

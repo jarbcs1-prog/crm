@@ -9,7 +9,8 @@
 		"dev": "eve dev --no-ui",
 		"dev:tui": "eve dev",
 		"dispatch": "curl -fsS -X POST \"${AGENT_URL:-http://127.0.0.1:2000}/eve/v1/dev/schedules/dispatch\"",
-		"build": "eve build",
+		"stt": "python agent/scripts/voice-pipeline/stt-server.py",
+		"build": "node scripts/build.mjs",
 		"start": "eve start",
 		"check-types": "tsc --noEmit",
 		"test": "bun test",
@@ -20,7 +21,7 @@
 		"@crm/db": "workspace:*",
 		"@crm/env": "workspace:*",
 		"context.dev": "^2.7.0",
-		"eve": "^0.29.4",
+		"eve": "0.29.4",
 		"zod": "^4.5.0"
 	},
 	"devDependencies": {

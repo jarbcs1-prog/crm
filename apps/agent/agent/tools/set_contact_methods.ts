@@ -1,9 +1,9 @@
 import { db } from "@crm/db";
-import { defineTool } from "./tool-factory";
 import { z } from "zod";
 import { type Evidence, type EvidenceKind, WEIGHTS } from "../lib/evidence";
 import { recordFact } from "../lib/facts";
 import { focusOn } from "../lib/focus";
+import { defineTool } from "./tool-factory";
 
 const KINDS = ["EMAIL", "PHONE"] as const;
 

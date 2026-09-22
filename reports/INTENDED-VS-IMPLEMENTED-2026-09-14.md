@@ -1,7 +1,7 @@
 # Intended vs. Implemented — Audit of the Gap
 
 **Date:** 2026-09-14
-**Scope:** F:\crm — trust-boundary, permission, and egress claims in the documentation set
+**Scope:** F:\crm — trust-boundary, permission and egress claims in the documentation set
 vs. their enforcement in code.
 **Method:** Read the documentation set as claims to verify; cite a file:line enforcement
 point (or its provable absence) for each; classify by whether crossing the gap lets a
@@ -112,7 +112,7 @@ Victim: the CRM's customers whose private text leaks.
    no-customer-text rule and logs violations.
 
 **Status — partially closed (2026-09-14):** The *minimum* fix is done (`SECURITY.md`
-now states the egress rule is prompt-level, not a hard boundary, and names the
+now states the egress rule is prompt-level, not a hard boundary and names the
 prompt-injection residual). The *better* fix is implemented for the in-repo leak
 vector: `apps/agent/agent/lib/egress-guard.ts` (`guardThirdPartyQuery`) refuses
 queries that look like mailbox/message content (email headers, forwarded markers,
@@ -195,7 +195,7 @@ These are the confirmations the method requires; each cites the enforcement poin
 surface, SSO secret handling, role centralization, last-owner lock) are correctly
 enforced and match their docs. The gaps were (1) `SECURITY.md` stale about roles, (2) the
 agent's egress "constraint" advisory, not technical. Both are now addressed: `SECURITY.md`
-and `api.md` corrected, and a code-level egress guard backs the prompt rule for the
+and `api.md` corrected and a code-level egress guard backs the prompt rule for the
 in-repo research tool. The only remaining residual is the framework-provided
 `web_search`/`web_fetch` tools, which would need an `eve`-level change to harden.
 

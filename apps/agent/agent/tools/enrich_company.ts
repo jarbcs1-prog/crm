@@ -1,7 +1,7 @@
-import { defineTool } from "./tool-factory";
 import { z } from "zod";
 import { runBrand } from "../lib/brand";
 import { spend } from "../lib/focus";
+import { defineTool } from "./tool-factory";
 
 export default defineTool({
 	description:

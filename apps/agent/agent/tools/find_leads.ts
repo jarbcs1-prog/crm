@@ -1,21 +1,19 @@
 import { db, Prisma } from "@crm/db";
-import { defineTool } from "./tool-factory";
 import { z } from "zod";
+import { defineTool } from "./tool-factory";
 
-export async function findLeads(
-	input: {
-		limit?: number;
-		countries?: string[];
-		regions?: string[];
-		nameContains?: string;
-		companyNameContains?: string;
-		onlyWithEmail?: boolean;
-		onlyWithPhone?: boolean;
-		onlyWithCompany?: boolean;
-		minActivityDays?: number;
-		stockNames?: string[];
-	},
-) {
+export async function findLeads(input: {
+	limit?: number;
+	countries?: string[];
+	regions?: string[];
+	nameContains?: string;
+	companyNameContains?: string;
+	onlyWithEmail?: boolean;
+	onlyWithPhone?: boolean;
+	onlyWithCompany?: boolean;
+	minActivityDays?: number;
+	stockNames?: string[];
+}) {
 	const {
 		limit = 50,
 		countries = [],
@@ -68,7 +66,9 @@ export async function findLeads(
 	}
 
 	if (companyNameContains) {
-		where.company = { name: { contains: companyNameContains, mode: "insensitive" } };
+		where.company = {
+			name: { contains: companyNameContains, mode: "insensitive" },
+		};
 	}
 
 	// Build base query
@@ -114,12 +114,16 @@ export async function findLeads(
 
 		// Apply country filter
 		if (countries.length > 0) {
-			filtered = filtered.filter((row) => countries.includes(row.country ?? ""));
+			filtered = filtered.filter((row) =>
+				countries.includes(row.country ?? ""),
+			);
 		}
 
 		// Apply countryCode/region filter
 		if (regions.length > 0) {
-			filtered = filtered.filter((row) => regions.includes(row.countryCode ?? ""));
+			filtered = filtered.filter((row) =>
+				regions.includes(row.countryCode ?? ""),
+			);
 		}
 
 		// Apply onlyWithPhone filter (NOT hard-coded anymore)
@@ -153,8 +157,8 @@ export async function findLeads(
 			const lowerName = nameContains.toLowerCase();
 			filtered = filtered.filter(
 				(row) =>
-					(row.firstName?.toLowerCase().includes(lowerName) ||
-						row.lastName?.toLowerCase().includes(lowerName)) ||
+					row.firstName?.toLowerCase().includes(lowerName) ||
+					row.lastName?.toLowerCase().includes(lowerName) ||
 					false,
 			);
 		}
@@ -170,8 +174,8 @@ export async function findLeads(
 		// Order by lastActivityAt DESC (most recently active first among stale leads)
 		filtered.sort(
 			(a, b) =>
-			((b.lastActivityAt ?? new Date(0)).getTime() -
-					(a.lastActivityAt ?? new Date(0)).getTime()),
+				(b.lastActivityAt ?? new Date(0)).getTime() -
+				(a.lastActivityAt ?? new Date(0)).getTime(),
 		);
 
 		rows = filtered.slice(0, limit);
@@ -235,19 +239,27 @@ export default defineTool({
 		countries: z
 			.array(z.string())
 			.optional()
-			.describe("Filter by country names or ISO country codes (e.g., ['US', 'GB', 'DE', 'Sweden'])."),
+			.describe(
+				"Filter by country names or ISO country codes (e.g., ['US', 'GB', 'DE', 'Sweden']).",
+			),
 		regions: z
 			.array(z.string())
 			.optional()
-			.describe("Filter by country/region groupings (e.g., ['EU', 'NA', 'ASIA'])."),
+			.describe(
+				"Filter by country/region groupings (e.g., ['EU', 'NA', 'ASIA']).",
+			),
 		nameContains: z
 			.string()
 			.optional()
-			.describe("Filter contacts whose first or last name contains this text (case-insensitive)."),
+			.describe(
+				"Filter contacts whose first or last name contains this text (case-insensitive).",
+			),
 		companyNameContains: z
 			.string()
 			.optional()
-			.describe("Filter contacts whose company name contains this text (case-insensitive)."),
+			.describe(
+				"Filter contacts whose company name contains this text (case-insensitive).",
+			),
 		onlyWithEmail: z
 			.boolean()
 			.default(false)
@@ -264,11 +276,15 @@ export default defineTool({
 			.number()
 			.min(0)
 			.default(0)
-			.describe("Minimum days since last activity. Contacts inactive for at least this many days will be included. Default 0 = no filter."),
+			.describe(
+				"Minimum days since last activity. Contacts inactive for at least this many days will be included. Default 0 = no filter.",
+			),
 		stockNames: z
 			.array(z.string())
 			.optional()
-			.describe("Filter contacts who own shares in companies matching these stock names (e.g., ['Apple', 'Microsoft'])."),
+			.describe(
+				"Filter contacts who own shares in companies matching these stock names (e.g., ['Apple', 'Microsoft']).",
+			),
 	}),
 	async execute(input: {
 		limit?: number;

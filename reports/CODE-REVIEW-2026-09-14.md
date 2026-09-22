@@ -28,7 +28,7 @@
 ### [H-03] Facet counts are not cached (ledger claims a 10s cache)
 **Location**: `apps/api/src/contacts/contacts.service.ts:542-568`, `companies/companies.service.ts:471-503`, `deals/deals.service.ts:348-380`
 **Dimension**: Performance
-**Description**: Each list renders 3-7 `groupBy`/count queries on every load, pagination, and search keystroke. `PERF_BASELINE.md` claims a "facetCounts 10s cache" that doesn't exist in code.
+**Description**: Each list renders 3-7 `groupBy`/count queries on every load, pagination and search keystroke. `PERF_BASELINE.md` claims a "facetCounts 10s cache" that doesn't exist in code.
 **Impact**: Re-aggregation of the whole matching set per keystroke; sequential scans under search filters.
 **Fix**: Read-through cache keyed by search filter (10s TTL), invalidated on writes.
 
@@ -114,10 +114,10 @@
 
 ## Recommendation
 
-The codebase is genuinely well-engineered — no unauthenticated/externally exploitable vulnerability, no injection, no committed real secrets, agent egress strongly contained, and the agent + shared-package test suites are behavior-first against real Postgres. The risk is concentrated in three places:
+The codebase is genuinely well-engineered — no unauthenticated/externally exploitable vulnerability, no injection, no committed real secrets, agent egress strongly contained and the agent + shared-package test suites are behavior-first against real Postgres. The risk is concentrated in three places:
 
-1. **Fix H-01 immediately** — it's a committed signing key, a red CI test, and a self-hoster footgun in one.
+1. **Fix H-01 immediately** — it's a committed signing key, a red CI test and a self-hoster footgun in one.
 2. **Reconcile the docs with reality** — H-02/H-03/H-04 and M-04 are all "the baseline ledger says fixed, the code isn't." Either implement the claimed caps/cache/index or correct the ledger; the drift is actively masking regressions.
-3. **Wire up CI and cover the enforcement points** — H-05/H-06/H-07 are the places a sev-1 escapes today: untested revenue paths, an untested auth enforcement point, and no merge gate.
+3. **Wire up CI and cover the enforcement points** — H-05/H-06/H-07 are the places a sev-1 escapes today: untested revenue paths, an untested auth enforcement point and no merge gate.
 
 Priority order: H-01 → H-07 (CI) → H-02/H-03/H-04 (perf claims) → H-05/H-06 (test coverage) → M-01/M-02 (deprovisioning/ownership) → remainder.

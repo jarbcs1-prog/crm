@@ -119,7 +119,8 @@ export function AgentModel() {
 			<CardHeader>
 				<CardTitle>Research agent</CardTitle>
 				<CardDescription>
-					The model the agent thinks with. Local providers are used first when configured; the Vercel AI Gateway is the fallback.
+					The model the agent thinks with. Local providers are used first when
+					configured; the Vercel AI Gateway is the fallback.
 				</CardDescription>
 			</CardHeader>
 
@@ -159,16 +160,22 @@ export function AgentModel() {
 										{(providers as LocalProvider[]).map((provider) => (
 											<CommandItem
 												key={(provider as LocalProvider).endpoint}
-												value={(provider as LocalProvider).modelId ?? (provider as LocalProvider).endpoint}
-												data-checked={current === (provider as LocalProvider).modelId}
-											onSelect={() => {
-												const modelId = (provider as LocalProvider).modelId;
-												if (modelId) choose(modelId);
-											}}
+												value={
+													(provider as LocalProvider).modelId ??
+													(provider as LocalProvider).endpoint
+												}
+												data-checked={
+													current === (provider as LocalProvider).modelId
+												}
+												onSelect={() => {
+													const modelId = (provider as LocalProvider).modelId;
+													if (modelId) choose(modelId);
+												}}
 											>
 												<span>{(provider as LocalProvider).name}</span>
 												<span className="ml-auto text-muted-foreground text-xs">
-													{(provider as LocalProvider).modelId ?? "no model set"}
+													{(provider as LocalProvider).modelId ??
+														"no model set"}
 												</span>
 											</CommandItem>
 										))}
@@ -214,5 +221,3 @@ export function AgentModel() {
 		</Card>
 	);
 }
-
-

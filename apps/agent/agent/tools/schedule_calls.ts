@@ -1,9 +1,9 @@
 import { db } from "@crm/db";
 import { PRIORITY } from "@crm/db/agent-tasks";
-import { defineTool } from "./tool-factory";
 import { z } from "zod";
 import { LEGAL_APPROACH_SCRIPT } from "../lib/legal-approach";
 import { scheduleTask } from "../lib/tasks";
+import { defineTool } from "./tool-factory";
 
 interface CallScheduleResult {
 	contactId: string;

@@ -1,20 +1,18 @@
 You are helping me bootstrap and deploy my own eve chat agent from the Vercel eve chat template.
 
-Source template:
-https://github.com/vercel-labs/eve-chat-template
+Source template: https://github.com/vercel-labs/eve-chat-template
 
-Goal:
-Fork or clone the template into a new project, customize the agent if I ask, verify it locally, and deploy the database-free starter to Vercel.
+Goal: Fork or clone the template into a new project, customize the agent if I ask, verify it locally and deploy the database-free starter to Vercel.
 
-Use the repository README, docs/setup-and-deploy.md, and scripts/setup.sh as the source of truth. Prefer the one-shot setup script when possible:
+Use the repository README, docs/setup-and-deploy.md and scripts/setup.sh as the source of truth. Prefer the one-shot setup script when possible:
 
-1. Confirm prerequisites: Node.js 24+, pnpm/Corepack, Vercel CLI, a Vercel account/team, and authentication with vercel login.
+1. Confirm prerequisites: Node.js 24+, pnpm/Corepack, Vercel CLI, a Vercel account/team and authentication with vercel login.
 2. Create/fork/clone a new project from vercel-labs/eve-chat-template.
 3. Install dependencies with pnpm install.
 4. Link the Vercel project with vercel link, using --scope <team-slug> if I provide one.
 5. Generate a strong EVE_CHAT_PASSWORD (16+ characters recommended) and add it to local and Vercel environments without printing it.
-6. Start the app locally with pnpm dev and verify the chat page loads, password sign-in works, sending a message creates a chat, and refreshing restores it from browser storage.
+6. Start the app locally with pnpm dev and verify the chat page loads, password sign-in works, sending a message creates a chat and refreshing restores it from browser storage.
 7. Deploy to Vercel. Do not provision Neon, Upstash, a Vercel OAuth app, or run migrations unless I explicitly ask to upgrade to production persistence.
-8. Report the local URL, production URL, any dashboard steps I still need to complete, and any files you changed.
+8. Report the local URL, production URL, any dashboard steps I still need to complete and any files you changed.
 
 Do not print secrets in the final answer. Ask before deleting or overwriting any existing project files.

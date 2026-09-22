@@ -1,6 +1,6 @@
 import { db, OsintStatus } from "@crm/db";
-import { defineTool } from "./tool-factory";
 import { z } from "zod";
+import { defineTool } from "./tool-factory";
 
 export default defineTool({
 	description:

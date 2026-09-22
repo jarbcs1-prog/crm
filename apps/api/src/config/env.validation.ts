@@ -90,6 +90,10 @@ export class EnvironmentVariables {
 	BLOB_READ_WRITE_TOKEN?: string;
 
 	@IsOptional()
+	@IsString()
+	VERCEL_BLOB_TOKEN?: string;
+
+	@IsOptional()
 	@IsUrl(
 		{ require_tld: false, require_protocol: true },
 		{
@@ -191,6 +195,27 @@ export class EnvironmentVariables {
 	REPLICATE_API_TOKEN?: string;
 }
 
+function resolveBlobToken(validated: EnvironmentVariables): void {
+	const raw = validated.BLOB_READ_WRITE_TOKEN?.trim();
+	const fallback = validated.VERCEL_BLOB_TOKEN?.trim();
+	if ((!raw || raw.length === 0) && fallback && fallback.length > 0) {
+		console.warn(
+			"[env] VERCEL_BLOB_TOKEN is deprecated — use BLOB_READ_WRITE_TOKEN instead. Falling back to VERCEL_BLOB_TOKEN for now.",
+		);
+		validated.BLOB_READ_WRITE_TOKEN = fallback;
+	} else if (
+		raw &&
+		raw.length > 0 &&
+		fallback &&
+		fallback.length > 0 &&
+		raw !== fallback
+	) {
+		console.warn(
+			"[env] Both BLOB_READ_WRITE_TOKEN and VERCEL_BLOB_TOKEN are set — using BLOB_READ_WRITE_TOKEN.",
+		);
+	}
+}
+
 export function validateEnv(
 	config: Record<string, unknown>,
 ): EnvironmentVariables {
@@ -208,6 +233,8 @@ export function validateEnv(
 			"BETTER_AUTH_SECRET is set to a value that was publicly committed in this repository's .env.example. Generate a new one with: openssl rand -base64 32",
 		);
 	}
+
+	resolveBlobToken(validated);
 
 	const errors = validateSync(validated, {
 		skipMissingProperties: false,

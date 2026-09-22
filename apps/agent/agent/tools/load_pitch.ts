@@ -1,8 +1,8 @@
 import { readdir, readFile } from "node:fs/promises";
 import { join } from "node:path";
 import { fileURLToPath } from "node:url";
-import { defineTool } from "./tool-factory";
 import { z } from "zod";
+import { defineTool } from "./tool-factory";
 
 const PITCHES_DIR = fileURLToPath(new URL("../pitches", import.meta.url));
 const DEFAULT_LISTEN_MS = 8000;
@@ -58,7 +58,9 @@ async function readPitchFiles(): Promise<PitchFile[]> {
 	try {
 		names = await readdir(PITCHES_DIR);
 	} catch (error) {
-		throw new Error(`The pitches directory could not be read: ${describe(error)}`);
+		throw new Error(
+			`The pitches directory could not be read: ${describe(error)}`,
+		);
 	}
 
 	const files = names
@@ -81,12 +83,14 @@ async function readPitchFiles(): Promise<PitchFile[]> {
 function listPitches(files: PitchFile[]): ListedPitch[] {
 	return files.map((file) => {
 		const record = asRecord(file.parsed);
-		const id = record && typeof record.id === "string" && record.id.length > 0
-			? record.id
-			: file.stem;
-		const name = record && typeof record.name === "string" && record.name.length > 0
-			? record.name
-			: file.stem;
+		const id =
+			record && typeof record.id === "string" && record.id.length > 0
+				? record.id
+				: file.stem;
+		const name =
+			record && typeof record.name === "string" && record.name.length > 0
+				? record.name
+				: file.stem;
 		const segments = record?.segments;
 		const conversation = record?.conversation;
 		return {
@@ -120,7 +124,9 @@ function substitute(
 ): { text: string; missing: string[] } {
 	let out = text;
 	for (const variable of variables) {
-		out = out.split(`{${variable}}`).join(variable === "firstName" ? firstName : "");
+		out = out
+			.split(`{${variable}}`)
+			.join(variable === "firstName" ? firstName : "");
 	}
 	if (values) {
 		for (const [key, value] of Object.entries(values)) {
@@ -148,7 +154,9 @@ function entriesOf(value: unknown): Array<[string, string]> {
 	);
 }
 
-function refusalBranchesOf(record: Record<string, unknown>): RefusalBranch[] | undefined {
+function refusalBranchesOf(
+	record: Record<string, unknown>,
+): RefusalBranch[] | undefined {
 	const branches = record.refusal_branches;
 	if (!Array.isArray(branches)) {
 		return undefined;
@@ -166,14 +174,17 @@ function refusalBranchesOf(record: Record<string, unknown>): RefusalBranch[] | u
 		) {
 			return [];
 		}
-		return [{
-			id: branch.id,
-			trigger: branch.trigger.filter(
-				(value): value is string => typeof value === "string" && value.length > 0,
-			),
-			action: branch.action,
-			text: branch.text,
-		}];
+		return [
+			{
+				id: branch.id,
+				trigger: branch.trigger.filter(
+					(value): value is string =>
+						typeof value === "string" && value.length > 0,
+				),
+				action: branch.action,
+				text: branch.text,
+			},
+		];
 	});
 }
 
@@ -253,9 +264,10 @@ export default defineTool({
 			};
 		}
 
-		const name = typeof record.name === "string" && record.name.length > 0
-			? record.name
-			: match.stem;
+		const name =
+			typeof record.name === "string" && record.name.length > 0
+				? record.name
+				: match.stem;
 
 		const rawSegments = Array.isArray(record.segments)
 			? { kind: "segments" as const, entries: record.segments }
@@ -281,9 +293,8 @@ export default defineTool({
 
 		const variables = variablesOf(record);
 		const given = firstName?.trim() ?? "";
-		const supplied = values !== undefined
-			? Object.fromEntries(entriesOf(values))
-			: undefined;
+		const supplied =
+			values !== undefined ? Object.fromEntries(entriesOf(values)) : undefined;
 		const segments: PitchSegment[] = [];
 		let missingName = false;
 		let clearedOther = false;
@@ -295,7 +306,11 @@ export default defineTool({
 				segment && typeof segment.id === "string" && segment.id.length > 0
 					? segment.id
 					: `s${index + 1}`;
-			if (segment === undefined || typeof segment.text !== "string" || segment.text.trim().length === 0) {
+			if (
+				segment === undefined ||
+				typeof segment.text !== "string" ||
+				segment.text.trim().length === 0
+			) {
 				return {
 					pitchId,
 					name,
@@ -316,12 +331,16 @@ export default defineTool({
 				}
 			}
 
-			const substituted = rawSegments.kind === "segments"
-				? {
-					text: substitute(segment.text, variables, given).text.replace(PLACEHOLDER, ""),
-					missing: [] as string[],
-				}
-				: substitute(segment.text, variables, given, supplied);
+			const substituted =
+				rawSegments.kind === "segments"
+					? {
+							text: substitute(segment.text, variables, given).text.replace(
+								PLACEHOLDER,
+								"",
+							),
+							missing: [] as string[],
+						}
+					: substitute(segment.text, variables, given, supplied);
 			for (const key of substituted.missing) {
 				if (!missingRuntime.includes(key)) {
 					missingRuntime.push(key);
@@ -330,7 +349,8 @@ export default defineTool({
 			segments.push({
 				id,
 				text: substituted.text,
-				listenAfter: typeof segment.listenAfter === "boolean" ? segment.listenAfter : true,
+				listenAfter:
+					typeof segment.listenAfter === "boolean" ? segment.listenAfter : true,
 				listenMs: clampListenMs(segment.listenMs),
 			});
 		}
@@ -356,27 +376,42 @@ export default defineTool({
 			});
 			const missing = missingRuntime.filter((key) => key !== "firstName");
 			return {
-				pitchId: typeof record.id === "string" && record.id.length > 0 ? record.id : match.stem,
+				pitchId:
+					typeof record.id === "string" && record.id.length > 0
+						? record.id
+						: match.stem,
 				name,
 				schema: "conversation",
 				segmentCount: segments.length,
 				segments,
-				...(resolvedBranches === undefined ? {} : { refusalBranches: resolvedBranches }),
+				...(resolvedBranches === undefined
+					? {}
+					: { refusalBranches: resolvedBranches }),
 				...(record.consent_rules === undefined
 					? {}
 					: { consentRules: passthroughOf(record, "consent_rules") }),
-				...(record.states === undefined ? {} : { states: passthroughOf(record, "states") }),
-				...(record.policy === undefined ? {} : { policy: passthroughOf(record, "policy") }),
-				...(missing.length === 0 ? {} : {
-					missing,
-					missingNote: "These placeholders have no deployment value yet. Do not read them aloud and do not invent values: ask for verification details or leave the sentence out until values are configured.",
-				}),
+				...(record.states === undefined
+					? {}
+					: { states: passthroughOf(record, "states") }),
+				...(record.policy === undefined
+					? {}
+					: { policy: passthroughOf(record, "policy") }),
+				...(missing.length === 0
+					? {}
+					: {
+							missing,
+							missingNote:
+								"These placeholders have no deployment value yet. Do not read them aloud and do not invent values: ask for verification details or leave the sentence out until values are configured.",
+						}),
 				...(note === undefined ? {} : { note }),
 			};
 		}
 
 		return {
-			pitchId: typeof record.id === "string" && record.id.length > 0 ? record.id : match.stem,
+			pitchId:
+				typeof record.id === "string" && record.id.length > 0
+					? record.id
+					: match.stem,
 			name,
 			schema: "segments",
 			segmentCount: segments.length,

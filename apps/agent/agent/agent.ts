@@ -1,6 +1,6 @@
 import "@crm/env/load";
 
-import { DEFAULT_AGENT_MODEL } from "@crm/db/settings";
+import { selectDefaultModel } from "@crm/db/settings";
 import { defineAgent, defineDynamic } from "eve";
 import { capabilities } from "./lib/capabilities";
 import { selectedModel } from "./lib/model";
@@ -11,10 +11,12 @@ for (const capability of capabilities()) {
 	);
 }
 
+const defaultModel = selectDefaultModel();
+
 export default defineAgent({
 	model: defineDynamic({
-		fallback: DEFAULT_AGENT_MODEL.id,
+		fallback: defaultModel.id,
 		events: { "session.started": () => selectedModel() },
 	}),
-	modelContextWindowTokens: DEFAULT_AGENT_MODEL.contextWindowTokens,
+	modelContextWindowTokens: defaultModel.contextWindowTokens,
 });

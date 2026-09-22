@@ -6,8 +6,8 @@ import { CACHE_MANAGER } from "@nestjs/cache-manager";
 import { Inject, Injectable, Logger, type OnModuleInit } from "@nestjs/common";
 import type { Cache } from "cache-manager";
 import { AgentTriggerService } from "../agent/agent-trigger.service";
-import { FaviconService } from "../companies/favicon.service";
 import { runLimited } from "../common/concurrency";
+import { FaviconService } from "../companies/favicon.service";
 import { InjectDatabase } from "../database/database.constants";
 import { ImageMirrorService } from "./image-mirror.service";
 
@@ -244,7 +244,9 @@ export class BackfillService implements OnModuleInit {
 		if (rows.length === 0) return 0;
 
 		void (async () => {
-			const results = await runLimited(rows, 5, (row) => this.favicon.backfill(row.id, row.domain));
+			const results = await runLimited(rows, 5, (row) =>
+				this.favicon.backfill(row.id, row.domain),
+			);
 			const resolved = results.filter(Boolean).length;
 			this.logger.log({
 				message: "Favicon sweep finished",

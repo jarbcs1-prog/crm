@@ -41,3 +41,18 @@ ABSOLUTELY, no coauthoring commits.
 Read @docs/environment.md
 
 There is **one `.env`, at the root of the repo** and `.env.example` is its documentation. If you add a variable, add it to `.env.example` with a note on what it does — and if the API reads it, declare it in `apps/api/src/config/env.validation.ts` too. Never add a per-package `.env`. Anything a self-hoster might not have is optional and the code must work without it: a missing key removes a capability, it never throws. See `apps/agent/agent/lib/capabilities.ts` for the pattern.
+
+
+<!-- headroom:memory-instructions -->
+## Memory
+
+Use the `headroom_memory` MCP server for persistent cross-session knowledge.
+
+**Before** answering questions about prior decisions, conventions, project context,
+architecture, user preferences, org info, codenames, debugging history, or anything
+from past sessions — call `memory_search` first.
+
+**After** making durable decisions, discovering conventions, or learning important
+facts — call `memory_save` to persist them for future sessions.
+
+Memory is your first source of truth for anything not visible in the current conversation.

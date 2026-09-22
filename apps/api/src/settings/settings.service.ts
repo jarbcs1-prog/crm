@@ -1,8 +1,8 @@
 import { isWorkspaceAdmin } from "@crm/auth";
 import type { Db } from "@crm/db";
 import {
-	selectDefaultModel,
 	readAgentModel,
+	selectDefaultModel,
 	writeAgentModel,
 } from "@crm/db/settings";
 import { WORKSPACE_ID } from "@crm/db/workspace";
@@ -121,18 +121,48 @@ export class SettingsService {
 
 	async localProviders(): Promise<LocalProvider[]> {
 		const providers: LocalProvider[] = [];
-		const checks: Array<{ env: string; modelEnv: string | null; name: string; prefix: string }> = [
-			{ env: "OLLAMA_BASE_URL", modelEnv: "OLLAMA_MODEL", name: "Ollama", prefix: "ollama" },
-			{ env: "LMSTUDIO_BASE_URL", modelEnv: "LMSTUDIO_MODEL", name: "LM Studio", prefix: "lmstudio" },
-			{ env: "KOBOLD_BASE_URL", modelEnv: "KOBOLD_MODEL", name: "KoboldCpp", prefix: "kobold" },
-			{ env: "LLAMA_CPP_BASE_URL", modelEnv: null, name: "llama.cpp", prefix: "llamacpp" },
-			{ env: "OPENCODE_API_URL", modelEnv: null, name: "Opencode", prefix: "opencode" },
+		const checks: Array<{
+			env: string;
+			modelEnv: string | null;
+			name: string;
+			prefix: string;
+		}> = [
+			{
+				env: "OLLAMA_BASE_URL",
+				modelEnv: "OLLAMA_MODEL",
+				name: "Ollama",
+				prefix: "ollama",
+			},
+			{
+				env: "LMSTUDIO_BASE_URL",
+				modelEnv: "LMSTUDIO_MODEL",
+				name: "LM Studio",
+				prefix: "lmstudio",
+			},
+			{
+				env: "KOBOLD_BASE_URL",
+				modelEnv: "KOBOLD_MODEL",
+				name: "KoboldCpp",
+				prefix: "kobold",
+			},
+			{
+				env: "LLAMA_CPP_BASE_URL",
+				modelEnv: null,
+				name: "llama.cpp",
+				prefix: "llamacpp",
+			},
+			{
+				env: "OPENCODE_API_URL",
+				modelEnv: null,
+				name: "Opencode",
+				prefix: "opencode",
+			},
 		];
 
 		for (const p of checks) {
 			const url = process.env[p.env];
 			if (!url?.trim()) continue;
-			const model = p.modelEnv ? process.env[p.modelEnv] ?? null : null;
+			const model = p.modelEnv ? (process.env[p.modelEnv] ?? null) : null;
 			providers.push({
 				name: p.name,
 				endpoint: url.trim(),

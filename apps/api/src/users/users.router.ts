@@ -1,8 +1,7 @@
 import { Inject } from "@nestjs/common";
-import { Ctx, Query, Router, UseMiddlewares } from "nestjs-trpc";
+import { Ctx, Query, Router } from "nestjs-trpc";
 import { AuthService } from "../auth/auth.service";
 import type { AuthedTrpcContext } from "../trpc/context.types";
-import { AuthMiddleware } from "../trpc/middlewares/auth.middleware";
 import { UsersService } from "./users.service";
 
 @Router({ alias: "users" })

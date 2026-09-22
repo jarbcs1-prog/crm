@@ -4,10 +4,10 @@ import {
 	MAX_NARRATIVE,
 	writeWorkspaceProfile,
 } from "@crm/db/workspace";
-import { defineTool } from "./tool-factory";
 import { z } from "zod";
 import { currentFocus } from "../lib/focus";
 import { identity } from "../lib/workspace";
+import { defineTool } from "./tool-factory";
 
 const line = (what: string) =>
 	z.string().max(MAX_LINE).optional().describe(what);

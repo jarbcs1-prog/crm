@@ -1,9 +1,9 @@
 import { afterEach, beforeEach, describe, expect, it } from "bun:test";
 import { db } from "@crm/db";
 import {
-	DEFAULT_AGENT_MODEL,
 	readAgentModel,
 	SETTINGS_ID,
+	selectDefaultModel,
 	writeAgentModel,
 } from "@crm/db/settings";
 import { selectedModel } from "../agent/lib/model";
@@ -19,7 +19,7 @@ describe("the configured model", () => {
 	it("falls back when nothing has ever been chosen", async () => {
 		const setting = await readAgentModel(db);
 
-		expect(setting.id).toBe(DEFAULT_AGENT_MODEL.id);
+		expect(setting.id).toBe(selectDefaultModel().id);
 		expect(setting.isDefault).toBe(true);
 
 		expect(await selectedModel()).toBeNull();
@@ -50,9 +50,12 @@ describe("the configured model", () => {
 
 	it("keeps one row rather than accumulating one per change", async () => {
 		await writeAgentModel(db, { id: "openai/gpt-5.5", contextWindowTokens: 1 });
-		await writeAgentModel(db, { id: "zai/glm-5.2", contextWindowTokens: 2 });
+		await writeAgentModel(db, {
+			id: "ollama/qwen2.5-coder:14b",
+			contextWindowTokens: 2,
+		});
 
 		expect(await db.appSetting.count()).toBe(1);
-		expect((await readAgentModel(db)).id).toBe("zai/glm-5.2");
+		expect((await readAgentModel(db)).id).toBe("ollama/qwen2.5-coder:14b");
 	});
 });

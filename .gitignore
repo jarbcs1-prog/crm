@@ -43,7 +43,30 @@ yarn-error.log*
 .output
 
 # OpenCode session state
-.opencode/goals/
+.opencode/
+.headroom/
+.idea/
+
+# Temp/task state
+.tmp/
+
+# Brandkit generated assets (keep SVGs, ignore raster exports)
+brandkit/**/*.png
+brandkit/**/*.ico
+brandkit/**/*.zip
+
+# Voice pipeline artifacts
+apps/agent/*.wav.*
+apps/agent/*.mp3
+apps/agent/*.wav
+apps/agent/agent.log
+apps/agent/voice-recordings/
+voice-recordings/
+**/__pycache__/
+*.pyc
+
+# OS
+desktop.ini
 
 # Legacy dump extracts (340MB+, may contain credentials - never commit)
 crm_extracted/

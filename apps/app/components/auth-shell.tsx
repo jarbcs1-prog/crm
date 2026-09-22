@@ -27,15 +27,7 @@ export function AuthShell({ children }: { children: ReactNode }) {
 				</div>
 
 				<p className="relative font-mono text-xs/4 text-muted-foreground">
-					Made with love by{" "}
-					<a
-						href="https://trycomp.ai"
-						target="_blank"
-						rel="noreferrer"
-						className="underline underline-offset-4 hover:text-foreground"
-					>
-						Shelf-Thought, Inc.
-					</a>
+					Made with love by Shelf-Thought, Inc.
 				</p>
 			</section>
 

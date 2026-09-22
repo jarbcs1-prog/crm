@@ -30,6 +30,7 @@ const KEYS = [
 	"TWILIO_ACCOUNT_SID",
 	"TWILIO_AUTH_TOKEN",
 	"TELNYX_API_KEY",
+	"FASTER_WHISPER_URL",
 ] as const;
 
 const saved: Record<string, string | undefined> = {};

@@ -7,23 +7,23 @@ export type Answer = {
 
 type Outcome<T> = { ok: true; data: T } | { ok: false; reason: string };
 
-function tavilyEnabled(): boolean {
+function _tavilyEnabled(): boolean {
 	return Boolean(process.env.TAVILY_API_KEY);
 }
 
-function exaEnabled(): boolean {
+function _exaEnabled(): boolean {
 	return Boolean(process.env.EXA_API_KEY);
 }
 
-function braveEnabled(): boolean {
+function _braveEnabled(): boolean {
 	return Boolean(process.env.BRAVE_API_KEY);
 }
 
-function firecrawlEnabled(): boolean {
+function _firecrawlEnabled(): boolean {
 	return Boolean(process.env.FIRECRAWL_API_KEY);
 }
 
-function googleEnabled(): boolean {
+function _googleEnabled(): boolean {
 	return Boolean(process.env.GOOGLE_API_KEY && process.env.GOOGLE_CSE_ID);
 }
 

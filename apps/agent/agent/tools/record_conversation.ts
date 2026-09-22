@@ -1,19 +1,17 @@
 import { db } from "@crm/db";
 import { PRIORITY } from "@crm/db/agent-tasks";
-import { defineTool } from "./tool-factory";
 import { z } from "zod";
 import { writeTimelineNote } from "../lib/crm";
 import { scheduleTask } from "../lib/tasks";
+import { defineTool } from "./tool-factory";
 
-export async function recordConversation(
-	input: {
-		contactId: string;
-		summary: string;
-		outcome?: string;
-		createFollowUpTicket?: boolean;
-		followUpReason?: string;
-	},
-) {
+export async function recordConversation(input: {
+	contactId: string;
+	summary: string;
+	outcome?: string;
+	createFollowUpTicket?: boolean;
+	followUpReason?: string;
+}) {
 	const { contactId, summary, outcome, createFollowUpTicket, followUpReason } =
 		input;
 
@@ -67,11 +65,30 @@ export default defineTool({
 	description:
 		"Records a conversation summary for a contact, optionally creating a follow-up ticket. Use after a call or meeting to persist what was discussed.",
 	inputSchema: z.object({
-		contactId: z.string().min(1).describe("The contact whose conversation is being recorded."),
-		summary: z.string().min(1).describe("What was discussed in the conversation."),
-		outcome: z.string().optional().describe("The outcome of the conversation (e.g., 'interested', 'not interested', 'callback requested')."),
-		createFollowUpTicket: z.boolean().default(false).describe("Whether to create a follow-up ticket."),
-		followUpReason: z.string().optional().describe("Reason for the follow-up ticket, required if createFollowUpTicket is true."),
+		contactId: z
+			.string()
+			.min(1)
+			.describe("The contact whose conversation is being recorded."),
+		summary: z
+			.string()
+			.min(1)
+			.describe("What was discussed in the conversation."),
+		outcome: z
+			.string()
+			.optional()
+			.describe(
+				"The outcome of the conversation (e.g., 'interested', 'not interested', 'callback requested').",
+			),
+		createFollowUpTicket: z
+			.boolean()
+			.default(false)
+			.describe("Whether to create a follow-up ticket."),
+		followUpReason: z
+			.string()
+			.optional()
+			.describe(
+				"Reason for the follow-up ticket, required if createFollowUpTicket is true.",
+			),
 	}),
 	async execute(input: {
 		contactId: string;

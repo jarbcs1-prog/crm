@@ -1,18 +1,20 @@
-import { tool } from "ai";
-import { z } from "zod";
+import type { z } from "zod";
 
 type Ctx = { crm?: unknown; call?: unknown; [k: string]: unknown };
 
-export function defineTool<T extends z.ZodTypeAny>(opts: {
+type ToolDef<T extends z.ZodTypeAny> = {
   description: string;
   inputSchema: T;
   execute: (input: z.infer<T>, ctx: Ctx) => Promise<unknown>;
-}) {
-  return tool({
+  [k: string]: unknown;
+};
+
+export function defineTool<T extends z.ZodTypeAny>(opts: ToolDef<T>) {
+  return {
     description: opts.description,
     inputSchema: opts.inputSchema,
-    execute: async (input, { context }: any) => opts.execute(input, context as Ctx),
-  });
+    execute: (input: z.infer<T>, ctx: Ctx) => opts.execute(input, ctx),
+  };
 }
 
 export function createCrmReadTool<T extends z.ZodTypeAny>(opts: {
@@ -28,10 +30,6 @@ export function createCrmReadTool<T extends z.ZodTypeAny>(opts: {
   });
 }
 
-export function createCallTool<T extends z.ZodTypeAny>(opts: {
-  description: string;
-  inputSchema: T;
-  execute: (input: z.infer<T>, ctx: Ctx) => Promise<unknown>;
-}) {
+export function createCallTool<T extends z.ZodTypeAny>(opts: ToolDef<T>) {
   return defineTool(opts);
 }

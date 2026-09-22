@@ -1,9 +1,9 @@
 import { type ChildProcessWithoutNullStreams, spawn } from "node:child_process";
 import { mkdirSync } from "node:fs";
+import { basename } from "node:path";
 import { fileURLToPath } from "node:url";
-import { dirname, basename } from "node:path";
 import { CallStatus } from "@crm/db";
-import { nonohConfigured, nonohHangup, nonohMakeCall } from "./nonoh-sip";
+import { nonohConfigured, nonohMakeCall } from "./nonoh-sip";
 
 const DEFAULT_BASE_URL = "https://l7api.com/v1.2/voipstudio";
 
@@ -238,31 +238,42 @@ export function callCode(
 	};
 }
 
-export async function transcribe(input: Blob | Buffer, mimeType?: string): Promise<string | null> {
+export async function transcribe(
+	input: Blob | Buffer,
+	_mimeType?: string,
+): Promise<string | null> {
 	// Use Faster-Whisper standalone CLI (reliable local STT)
-	const tempDir = process.env.TEMP || process.env.TMP || "C:/Users/PC Principal/AppData/Local/Temp";
+	const tempDir =
+		process.env.TEMP ||
+		process.env.TMP ||
+		"C:/Users/PC Principal/AppData/Local/Temp";
 	const wavPath = `${tempDir}/crm_stt_${crypto.randomUUID()}.wav`;
 
 	try {
 		const fs = await import("node:fs");
-		const wavBuffer = typeof input === "string"
-			? fs.readFileSync(input)
-			: input instanceof Buffer
-				? input
-				: Buffer.from(await (input as Blob).arrayBuffer());
+		const wavBuffer =
+			typeof input === "string"
+				? fs.readFileSync(input)
+				: input instanceof Buffer
+					? input
+					: Buffer.from(await (input as Blob).arrayBuffer());
 		fs.writeFileSync(wavPath, wavBuffer);
 
 		const fwPath = "F:/Faster-Whisper-XXL/faster-whisper-xxl.exe";
 		const ffmpegPath = "F:/Faster-Whisper-XXL/ffmpeg.exe";
-		const convertedPath = wavPath + ".16k.wav";
+		const convertedPath = `${wavPath}.16k.wav`;
 
 		// Convert to 16kHz mono for Faster-Whisper
-		const convertProc = spawn(ffmpegPath, [
-			"-i", wavPath, "-ac", "1", "-ar", "16000", "-y", convertedPath,
-		], { stdio: ["pipe", "pipe", "pipe"], timeout: 30_000 });
+		const convertProc = spawn(
+			ffmpegPath,
+			["-i", wavPath, "-ac", "1", "-ar", "16000", "-y", convertedPath],
+			{ stdio: ["pipe", "pipe", "pipe"], timeout: 30_000 },
+		);
 
 		let converted = wavPath;
-		const [convertCode, convertErr] = await new Promise<[number | null, string]>((resolve) => {
+		const [convertCode, convertErr] = await new Promise<
+			[number | null, string]
+		>((resolve) => {
 			let err = "";
 			convertProc.stderr?.on("data", (d) => (err += d.toString()));
 			convertProc.on("close", (c) => resolve([c, err]));
@@ -270,22 +281,43 @@ export async function transcribe(input: Blob | Buffer, mimeType?: string): Promi
 		});
 
 		if (convertCode === 0) converted = convertedPath;
-		else console.log("FW: ffmpeg conversion skipped:", convertCode, convertErr.slice(0, 80));
+		else
+			console.log(
+				"FW: ffmpeg conversion skipped:",
+				convertCode,
+				convertErr.slice(0, 80),
+			);
 
 		const inputBase = basename(converted, ".wav");
 		const outputPath = `${tempDir}/${inputBase}.txt`;
-		const proc = spawn(fwPath, [
-			converted, "--model", "tiny", "--model_dir", "F:/Faster-Whisper-XXL/_models",
-			"--language", "en", "--output_format", "txt", "--output_dir", tempDir,
-			"--verbose", "false",
-		], { stdio: ["pipe", "pipe", "pipe"], timeout: 120_000 });
+		const proc = spawn(
+			fwPath,
+			[
+				converted,
+				"--model",
+				"tiny",
+				"--model_dir",
+				"F:/Faster-Whisper-XXL/_models",
+				"--language",
+				"en",
+				"--output_format",
+				"txt",
+				"--output_dir",
+				tempDir,
+				"--verbose",
+				"false",
+			],
+			{ stdio: ["pipe", "pipe", "pipe"], timeout: 120_000 },
+		);
 
-		const [exitCode, stderr] = await new Promise<[number | null, string]>((resolve) => {
-			let err = "";
-			proc.stderr?.on("data", (d) => (err += d.toString()));
-			proc.on("close", (c) => resolve([c, err]));
-			proc.on("error", (e) => resolve([null, e.message]));
-		});
+		const [exitCode, stderr] = await new Promise<[number | null, string]>(
+			(resolve) => {
+				let err = "";
+				proc.stderr?.on("data", (d) => (err += d.toString()));
+				proc.on("close", (c) => resolve([c, err]));
+				proc.on("error", (e) => resolve([null, e.message]));
+			},
+		);
 
 		if (exitCode !== 0) {
 			console.log("FW exit:", exitCode, "stderr:", stderr.slice(0, 200));
@@ -304,7 +336,7 @@ export async function transcribe(input: Blob | Buffer, mimeType?: string): Promi
 	} finally {
 		try {
 			const fs = await import("node:fs");
-			for (const f of [wavPath, wavPath + ".16k.wav"]) {
+			for (const f of [wavPath, `${wavPath}.16k.wav`]) {
 				if (fs.existsSync(f)) fs.unlinkSync(f);
 			}
 		} catch {}
@@ -323,11 +355,11 @@ export async function transcribeDeepGram(input: {
 	form.append("file", input.data, `recording.${ext}`);
 
 	const response = await fetch(
-			`https://api.deepgram.com/v1/listen?model=photon&smart_format=true`,
+		`https://api.deepgram.com/v1/listen?model=photon&smart_format=true`,
 		{
 			method: "POST",
 			headers: {
-				"Authorization": `Token ${apiKey}`,
+				Authorization: `Token ${apiKey}`,
 			},
 			body: form,
 		},
@@ -494,8 +526,10 @@ async function synthesizeSpeechElevenLabs(text: string): Promise<SpeechResult> {
 	const apiKey = process.env.ELEVENLABS_API_KEY?.trim();
 	if (!apiKey) return { ok: false, reason: "ELEVENLABS_API_KEY not set" };
 
-	const voiceId = process.env.ELEVENLABS_VOICE_ID?.trim() || "EXAVITQu4vr4xnSDxMaL";
-	const modelId = process.env.ELEVENLABS_MODEL_ID?.trim() || "eleven_multilingual_v2";
+	const voiceId =
+		process.env.ELEVENLABS_VOICE_ID?.trim() || "EXAVITQu4vr4xnSDxMaL";
+	const modelId =
+		process.env.ELEVENLABS_MODEL_ID?.trim() || "eleven_multilingual_v2";
 
 	const path = recordingPath(crypto.randomUUID(), "wav");
 	mkdirSync(voiceRecordingsDir(), { recursive: true });
@@ -514,13 +548,13 @@ async function synthesizeSpeechElevenLabs(text: string): Promise<SpeechResult> {
 					model_id: modelId,
 					output_format: "wav",
 					voice_settings: {
-									stability: 0.5,
-									similarity_boost: 0.75,
-								},
-							}),
-							signal: AbortSignal.timeout(30_000),
-						},
-					);
+						stability: 0.5,
+						similarity_boost: 0.75,
+					},
+				}),
+				signal: AbortSignal.timeout(30_000),
+			},
+		);
 
 		if (!response.ok) {
 			const errorText = await response.text();

@@ -1,7 +1,7 @@
 import { db, RecordSource } from "@crm/db";
 import { z } from "zod";
-import { defineTool } from "./tool-factory";
 import { focusOn } from "../lib/focus";
+import { defineTool } from "./tool-factory";
 
 const CONTACT_FIELDS = {
 	id: true,

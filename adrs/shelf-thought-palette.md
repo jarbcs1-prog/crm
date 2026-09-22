@@ -1,6 +1,6 @@
-# Put the CRM on Comp's colors
+# Put the CRM on Shelf Thoughts's colors
 
-The CRM currently looks like unstyled shadcn: pure-neutral greys, near-black on every primary action, square corners everywhere. That's a fine default and it is nobody's brand. Comp's is flat white and `#006B4F` while the CRM is the product people see, so it may as well look like it came from the same company as the site.
+The CRM currently looks like unstyled shadcn: pure-neutral greys, near-black on every primary action, square corners everywhere. That's a fine default and it is nobody's brand. Shelf Thought's is flat white and `#006B4F` while the CRM is the product people see, so it may as well look like it came from the same company as the site.
 
 The thing that made me notice was the settings page. A failed Gmail sync renders a red alert with a near-black "Resolve" button and it reads as far more alarming than "an API needs enabling in your Google Cloud project". Once I started pulling on that I found a handful of things that were wrong regardless of palette: `--radius` was `0.625rem` in `:root` and `0.75rem` in `.dark`, so a control quietly changed shape when you switched theme. Focus rings were 1px, 2px and 3px depending on which component you were looking at. The modal scrim is `bg-black/10`, which over a near-black page is invisible, so dialogs in dark mode have nothing separating them from the page underneath. And the deal-stage chart ramp is an amber-to-orange sequence that has no relationship to anything else in the product.
 

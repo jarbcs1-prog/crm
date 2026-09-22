@@ -1,6 +1,6 @@
 # Never upload local environment files to a build.
 #
-# `vercel deploy` from a terminal uploads the working tree and a `.gitignore` entry does not stop it. Without this, a developer's `.env` — real secrets, and `API_URL="http://localhost:3001"` — is shipped into the build container, 
+# `vercel deploy` from a terminal uploads the working tree and a `.gitignore` entry does not stop it. Without this, a developer's `.env` — real secrets and `API_URL="http://localhost:3001"` — is shipped into the build container, 
 # where Next.js loads it and inlines localhost into the browser bundle. The deploy succeeds, the pages render and every request from the browser goes to the reader's own machine.
 #
 # Vercel's own environment variables are the only source of configuration for a deployment. See docs/environment.md.

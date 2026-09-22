@@ -137,7 +137,12 @@ async function main(): Promise<void> {
 }
 
 export function parseArgs(argv: string[]): Options {
-	const options: Options = { dryRun: false, limit: null, userId: null, batchSize: 100 };
+	const options: Options = {
+		dryRun: false,
+		limit: null,
+		userId: null,
+		batchSize: 100,
+	};
 
 	for (let index = 0; index < argv.length; index += 1) {
 		const arg = argv[index];
@@ -162,9 +167,9 @@ export function parseArgs(argv: string[]): Options {
 
 		if (arg === "--batchSize") {
 			const value = Number.parseInt(argv[index + 1] ?? "", 10);
-			options.batchSize = Number.isNaN(value) || value < 1 ? 100 : Math.min(value, 1000);
+			options.batchSize =
+				Number.isNaN(value) || value < 1 ? 100 : Math.min(value, 1000);
 			index += 1;
-			continue;
 		}
 	}
 

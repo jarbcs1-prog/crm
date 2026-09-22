@@ -14,7 +14,11 @@ import { TrpcErrorHandler } from "./trpc-error.handler";
 			context: TrpcContext,
 			logger: new ContextLogger(),
 			onError: TrpcErrorHandler,
-			globalMiddlewares: [LoggingMiddleware, DomainErrorMiddleware, AuthMiddleware],
+			globalMiddlewares: [
+				LoggingMiddleware,
+				DomainErrorMiddleware,
+				AuthMiddleware,
+			],
 		}),
 	],
 	providers: [

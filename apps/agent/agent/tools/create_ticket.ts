@@ -1,19 +1,16 @@
-import { db } from "@crm/db";
-import { defineTool } from "./tool-factory";
 import { z } from "zod";
 import { scheduleTask } from "../lib/tasks";
+import { defineTool } from "./tool-factory";
 
-export async function createTicket(
-	input: {
-		contactId?: string;
-		companyId?: string;
-		kind: string;
-		reason: string;
-		dueAt?: string;
-		priority?: number;
-		budget?: number;
-	},
-) {
+export async function createTicket(input: {
+	contactId?: string;
+	companyId?: string;
+	kind: string;
+	reason: string;
+	dueAt?: string;
+	priority?: number;
+	budget?: number;
+}) {
 	const dueAt = input.dueAt ? new Date(input.dueAt) : new Date();
 
 	const result = await scheduleTask({
@@ -48,12 +45,17 @@ export default defineTool({
 		kind: z
 			.string()
 			.min(1)
-			.describe("Ticket kind (e.g., 'osint-enrichment', 'missing-phone', 'missing-email', 'follow-up-call', 'update-contact')."),
+			.describe(
+				"Ticket kind (e.g., 'osint-enrichment', 'missing-phone', 'missing-email', 'follow-up-call', 'update-contact').",
+			),
 		reason: z
 			.string()
 			.min(1)
 			.describe("Human-readable reason for creating this ticket."),
-		dueAt: z.string().optional().describe("When the ticket is due (ISO string). Defaults to now."),
+		dueAt: z
+			.string()
+			.optional()
+			.describe("When the ticket is due (ISO string). Defaults to now."),
 		priority: z
 			.number()
 			.int()

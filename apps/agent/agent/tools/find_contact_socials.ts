@@ -1,8 +1,8 @@
-import { defineTool } from "./tool-factory";
 import { z } from "zod";
 import { personForVerification, stampSocialsChecked } from "../lib/crm";
 import { focusOn, spend } from "../lib/focus";
 import { findSocialCandidates } from "../lib/socials";
+import { defineTool } from "./tool-factory";
 
 export default defineTool({
 	description:

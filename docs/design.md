@@ -8,7 +8,7 @@
 - `rounded-none` is still correct in one case: an element that must join its neighbour edge to edge. The input inside an input group, the middle cells of a selected date range and the drawer handle are the existing examples.
 - If a component needs a new variant or style, implement it in /packages/ui so the entire application stays consistent.
 
-## Colour
+## Color
 
 Flat white, neutral greys and one brand green (`#006B4F`). The greys are untinted on purpose: there is no scene to tint them toward and a tinted grey without a reason reads as indecision.
 

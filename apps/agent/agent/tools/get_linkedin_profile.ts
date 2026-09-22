@@ -1,10 +1,10 @@
-import { defineTool } from "./tool-factory";
 import { z } from "zod";
 import { enabled, unavailable } from "../lib/capabilities";
 import { spend } from "../lib/focus";
 import { getExperience, getProfile } from "../lib/linkdapi";
 import { looksLikeSameCompany, nameMatchesLocalPart } from "../lib/names";
 import { storePortrait } from "../lib/portrait";
+import { defineTool } from "./tool-factory";
 
 export default defineTool({
 	description:

@@ -1,7 +1,7 @@
-import { readFile, writeFile } from "node:fs/promises";
+import { spawn } from "node:child_process";
+import { readFile } from "node:fs/promises";
 import { synthesizeSpeech, transcribe } from "../voice";
 import { encodeWav, pcmToUlaw, readWav, rms } from "./audio";
-import { spawn } from "node:child_process";
 import { RtpSession, type RtpStats } from "./rtp";
 import { SipClient, type SipDialog } from "./sip-client";
 
@@ -233,9 +233,9 @@ export class CallSession {
 	}
 
 	async transcribeHeard(wav: Buffer): Promise<string | null> {
-			// Use Faster-Whisper locally (DeepGram has permission issues)
-			return await transcribe(wav);
-		}
+		// Use Faster-Whisper locally (DeepGram has permission issues)
+		return await transcribe(wav);
+	}
 
 	recording(): Buffer {
 		return encodeWav(flatten(this.frames, this.frameSamples), SAMPLE_RATE);
@@ -307,27 +307,33 @@ function isWav(buf: Buffer): boolean {
 
 async function convertMp3ToWav(inputPath: string): Promise<Buffer | null> {
 	try {
-		const outputPath = inputPath + ".converted.wav";
+		const outputPath = `${inputPath}.converted.wav`;
 		const ffmpegPath =
 			"C:/Users/PC Principal/AppData/Local/Microsoft/WinGet/Packages/Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe/ffmpeg-9.0.1-full_build/bin/ffmpeg.exe";
-		const proc = spawn(ffmpegPath, [
-			"-i",
-			inputPath,
-			"-acodec",
-			"pcm_s16le",
-			"-ar",
-			"8000",
-			"-ac",
-			"1",
-			"-y",
-			outputPath,
-		], { stdio: ["pipe", "pipe", "pipe"] });
+		const proc = spawn(
+			ffmpegPath,
+			[
+				"-i",
+				inputPath,
+				"-acodec",
+				"pcm_s16le",
+				"-ar",
+				"8000",
+				"-ac",
+				"1",
+				"-y",
+				outputPath,
+			],
+			{ stdio: ["pipe", "pipe", "pipe"] },
+		);
 
-		const [code, stderr] = await new Promise<[number | null, string]>((resolve) => {
-			let err = "";
-			proc.stderr?.on("data", (d) => (err += d.toString()));
-			proc.on("close", (code) => resolve([code, err]));
-		});
+		const [code, stderr] = await new Promise<[number | null, string]>(
+			(resolve) => {
+				let err = "";
+				proc.stderr?.on("data", (d) => (err += d.toString()));
+				proc.on("close", (code) => resolve([code, err]));
+			},
+		);
 
 		if (code !== 0) {
 			console.error("ffmpeg conversion failed:", stderr.slice(0, 200));

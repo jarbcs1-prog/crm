@@ -36,7 +36,10 @@ export type ProxyRouteOptions = {
 	headersToStrip?: string[];
 	responseHeadersToStrip?: string[];
 	decodeResponse?: boolean;
-	beforeRequest?: (req: Request, headers: Headers) => Promise<Response | void>;
+	beforeRequest?: (
+		req: Request,
+		headers: Headers,
+	) => Promise<Response | undefined>;
 	onFetchError?: (error: unknown, req: Request) => Response;
 };
 
@@ -64,7 +67,10 @@ export function createProxyRoute(opts: ProxyRouteOptions) {
 	const handler = async (request: Request): Promise<Response> => {
 		const url = new URL(request.url);
 
-		if (opts.allowedPrefixes && !opts.allowedPrefixes.some((p) => url.pathname.startsWith(p))) {
+		if (
+			opts.allowedPrefixes &&
+			!opts.allowedPrefixes.some((p) => url.pathname.startsWith(p))
+		) {
 			return Response.json({ error: "Not found." }, { status: 404 });
 		}
 
@@ -90,7 +96,10 @@ export function createProxyRoute(opts: ProxyRouteOptions) {
 			signal: request.signal,
 		};
 		if (request.method !== "GET" && request.method !== "HEAD") {
-			init.body = limitedBody(request.body, bodyLimit) as unknown as BodyInit | null;
+			init.body = limitedBody(
+				request.body,
+				bodyLimit,
+			) as unknown as BodyInit | null;
 			init.duplex = "half";
 		}
 
@@ -99,7 +108,10 @@ export function createProxyRoute(opts: ProxyRouteOptions) {
 			upstream = await fetch(target, init);
 		} catch (error) {
 			if (opts.onFetchError) return opts.onFetchError(error, request);
-			return Response.json({ error: "The API is not reachable." }, { status: 502 });
+			return Response.json(
+				{ error: "The API is not reachable." },
+				{ status: 502 },
+			);
 		}
 
 		const responseHeaders = new Headers(upstream.headers);
@@ -136,7 +148,15 @@ export function createProxyRoute(opts: ProxyRouteOptions) {
 		});
 	};
 
-	const methods = ["GET", "POST", "PUT", "PATCH", "DELETE", "HEAD", "OPTIONS"] as const;
+	const methods = [
+		"GET",
+		"POST",
+		"PUT",
+		"PATCH",
+		"DELETE",
+		"HEAD",
+		"OPTIONS",
+	] as const;
 	return Object.fromEntries(methods.map((m) => [m, handler])) as Record<
 		(typeof methods)[number],
 		typeof handler

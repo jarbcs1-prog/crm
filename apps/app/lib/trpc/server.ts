@@ -1,5 +1,5 @@
 import "server-only";
-import { createTRPCClient, httpBatchLink, type TRPCClient } from "@trpc/client";
+import { createTRPCClient, httpBatchLink } from "@trpc/client";
 import {
 	createTRPCOptionsProxy,
 	type TRPCOptionsProxy,

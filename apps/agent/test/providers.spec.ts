@@ -1,10 +1,12 @@
 import { afterEach, beforeEach, describe, expect, it } from "bun:test";
 import {
+	getConfiguredProviders,
 	isProviderConfigured,
 	PROVIDER_NAMES,
 	providerEndpoint,
 	providerKey,
 	providerModel,
+	selectDefaultModel,
 	telnyxCallerId,
 	twilioCallerId,
 } from "../agent/lib/providers";
@@ -107,6 +109,60 @@ describe("remote gateways", () => {
 		expect(providerModel("openrouter")).toBe("anthropic/claude-3.5-sonnet");
 		expect(providerEndpoint("opencode")).toBe("http://runner:8080");
 		expect(providerEndpoint("replicate")).toBeUndefined();
+	});
+});
+
+describe("getConfiguredProviders", () => {
+	it("returns empty array when no providers are configured", () => {
+		expect(getConfiguredProviders()).toEqual([]);
+	});
+
+	it("returns configured providers in priority order", () => {
+		process.env.OLLAMA_BASE_URL = "http://localhost:11434";
+		process.env.OLLAMA_MODEL = "qwen2.5-coder:14b";
+
+		const configured = getConfiguredProviders();
+		expect(configured.length).toBe(1);
+		expect(configured[0].name).toBe("ollama");
+		expect(configured[0].endpoint).toBe("http://localhost:11434");
+		expect(configured[0].modelId).toBe("ollama/qwen2.5-coder:14b");
+	});
+
+	it("includes multiple configured providers in priority order", () => {
+		process.env.OLLAMA_BASE_URL = "http://localhost:11434";
+		process.env.OLLAMA_MODEL = "qwen2.5-coder:14b";
+		process.env.OPENROUTER_API_KEY = "key";
+		process.env.OPENROUTER_MODEL = "anthropic/claude-3.5-sonnet";
+
+		const configured = getConfiguredProviders();
+		expect(configured.length).toBe(2);
+		expect(configured[0].name).toBe("ollama");
+		expect(configured[1].name).toBe("openrouter");
+	});
+});
+
+describe("selectDefaultModel", () => {
+	it("returns the first configured provider's model", () => {
+		process.env.OLLAMA_BASE_URL = "http://localhost:11434";
+		process.env.OLLAMA_MODEL = "qwen2.5-coder:14b";
+
+		const result = selectDefaultModel();
+		expect(result.id).toBe("ollama/qwen2.5-coder:14b");
+		expect(result.contextWindowTokens).toBe(1_000_000);
+	});
+
+	it("returns a fallback when no providers are configured", () => {
+		const result = selectDefaultModel();
+		expect(result.id).toBe("ollama/qwen2.5-coder:14b");
+		expect(result.contextWindowTokens).toBe(1_000_000);
+	});
+
+	it("returns the first configured provider even without a model env", () => {
+		process.env.OLLAMA_BASE_URL = "http://localhost:11434";
+		delete process.env.OLLAMA_MODEL;
+
+		const result = selectDefaultModel();
+		expect(result.id).toBe("ollama/model");
 	});
 });
 

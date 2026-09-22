@@ -1,5 +1,6 @@
 import { describe, expect, it } from "bun:test";
 import { fileURLToPath } from "node:url";
+import { chunkArray, parseArgs } from "../src/import/import-wamp";
 import {
 	capNote,
 	clean,
@@ -14,7 +15,6 @@ import {
 	toRecord,
 } from "../src/import/legacy-map";
 import { parseInsert, readStatements } from "../src/import/sql-scanner";
-import { chunkArray, parseArgs } from "../src/import/import-wamp";
 
 const FIXTURE = fileURLToPath(
 	new URL("./fixtures/wamp-fixture.sql", import.meta.url),

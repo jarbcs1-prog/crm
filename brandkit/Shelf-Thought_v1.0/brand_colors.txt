@@ -1,7 +1,0 @@
-Shelf-Thought, Inc. — Core Color Palette
-
-Deep Navy   #0F2D3D   Trust/Stability/Focus
-Teal        #14B8A6   Innovation/Growth/Clarity
-Amber       #F59E0B   Creativity/Energy/Optimism
-Warm White  #F8F7F4   Simplicity/Space/Balance
-Charcoal    #374151   Professional/Readability/Structure

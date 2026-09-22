@@ -54,7 +54,7 @@ cd apps\agent\agent\scripts\voice-pipeline
 
 ## Usage
 
-Press Enter to start recording, speak, and wait for the assistant to reply. Press Ctrl+C to stop.
+Press Enter to start recording, speak and wait for the assistant to reply. Press Ctrl+C to stop.
 
 ## Files
 

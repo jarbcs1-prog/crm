@@ -1,0 +1,68 @@
+{
+	"id": "scam-recovery-v2",
+	"name": "Scam recovery outreach",
+	"description": "Outbound victim-research call. Conversational delivery with short turns, explicit listening points, and progressive disclosure. The agent must never treat recognition of names or personal information as authentication.",
+	"variables": ["firstName"],
+	"segments": [
+		{
+			"id": "s1",
+			"listenAfter": true,
+			"listenMs": 8000,
+			"text": "Hello {firstName}, I am an AI assistant and this is an automated call in connection with an investigation into investment fraud involving Ronald Shane Flynn and a number of related companies and operators. I know this is an unexpected call, so before I go any further, are you comfortable giving me a minute to explain why I'm calling?"
+		},
+		{
+			"id": "s2",
+			"listenAfter": true,
+			"listenMs": 8000,
+			"text": "Thank you. The reason I'm contacting you is that records available to the investigation contain your name and telephone number alongside information associated with companies you may recognize, including ProfitiX, Trade12 and Fundiza. I want to be careful about something here: the fact that I know those names does not prove who I am or where the information came from. I'll give you whatever information you need to independently verify my identity and the investigation before you send us anything sensitive. Does that make sense so far?"
+		},
+		{
+			"id": "s3",
+			"listenAfter": true,
+			"listenMs": 7000,
+			"text": "There's also been a significant law-enforcement development in Manila this year involving material that may be relevant to the investigation. Investigators now have access to a very large body of seized records. The important part is that some of that material is encrypted and processing a dataset of that size can take a considerable amount of time. We're realistic about that. We may get answers quickly or some of the forensic work could take months or longer."
+		},
+		{
+			"id": "s4",
+			"listenAfter": true,
+			"listenMs": 7000,
+			"text": "And that's actually why I'm calling you now rather than waiting for all of that work to finish. We're trying to determine whether documentation held by people who dealt with these operators can help identify and corroborate what's inside the seized material while the investigation is still developing. Your records aren't being requested because investigators have no evidence. They're potentially useful because they give us an independent evidentiary reference point against which the seized material can be compared."
+		},
+		{
+			"id": "s5",
+			"listenAfter": true,
+			"listenMs": 8000,
+			"text": "For example, if your records show particular payment instructions, accounts, representatives, promises, companies or communications, investigators can compare those details against the material already being examined. And if other people independently provide records showing the same things, that can help establish whether apparently separate complaints actually form part of the same underlying pattern. That's the investigative value we're interested in."
+		},
+		{
+			"id": "s6",
+			"listenAfter": true,
+			"listenMs": 8000,
+			"text": "There's a second reason we're interested in doing this now. Evidence can become more complete with time, but practical recovery opportunities don't necessarily wait for the forensic work to finish. The people involved may still be identifiable, assets may still be traceable and the attention surrounding the enforcement action is relatively recent. A year from now we may know considerably more about what happened but the practical circumstances for recovery could be very different."
+		},
+		{
+			"id": "s7",
+			"listenAfter": true,
+			"listenMs": 8000,
+			"text": "I don't want to give you false expectations. I'm not telling you that providing documents guarantees that you'll recover anything and I'm not asking you to believe that a settlement or recovery is certain. The objective is more straightforward: determine whether the evidence available now can be turned into useful investigative and recovery leverage for the people who suffered losses."
+		},
+		{
+			"id": "s8",
+			"listenAfter": true,
+			"listenMs": 10000,
+			"text": "If you're willing to consider helping, what we're initially interested in is documentation you already have: bank or wire-transfer records, emails, contracts, promotional material, payment instructions, account records or other correspondence with the operators. You don't need to decide anything about a recovery claim during this call. We first need to establish what evidence exists and whether it corresponds with the investigation."
+		},
+		{
+			"id": "s9",
+			"listenAfter": true,
+			"listenMs": 7000,
+			"text": "And before you provide any of that, I'll give you the information necessary to verify who I am, who I'm working with and the basis on which we're conducting the investigation. Please verify those details independently rather than relying on anything I tell you over this call."
+		},
+		{
+			"id": "s10",
+			"listenAfter": true,
+			"listenMs": 10000,
+			"text": "If you'd like, the next step is simply a short follow-up conversation after you have received my email and verified my credentials. I can explain the investigation in more detail, answer your questions and tell you exactly what documentation would be useful and how it should be transferred securely. There's no obligation to participate. If you'd rather not be involved, I'll respect that completely. Would you be open to arranging that follow-up?"
+		}
+	]
+}

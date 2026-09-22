@@ -1,18 +1,16 @@
 import { db } from "@crm/db";
-import { defineTool } from "./tool-factory";
 import { z } from "zod";
 import { writeTimelineNote } from "../lib/crm";
+import { defineTool } from "./tool-factory";
 
-export async function updateContact(
-	input: {
-		contactId: string;
-		phone?: string;
-		email?: string;
-		companyName?: string;
-		notes?: string;
-		verificationStatus?: "UNVERIFIED" | "VERIFYING" | "NEEDS_HUMAN" | "VERIFIED";
-	},
-) {
+export async function updateContact(input: {
+	contactId: string;
+	phone?: string;
+	email?: string;
+	companyName?: string;
+	notes?: string;
+	verificationStatus?: "UNVERIFIED" | "VERIFYING" | "NEEDS_HUMAN" | "VERIFIED";
+}) {
 	const { contactId, phone, email, companyName, notes, verificationStatus } =
 		input;
 
@@ -73,7 +71,10 @@ export default defineTool({
 		phone: z.string().optional().describe("New phone number."),
 		email: z.string().optional().describe("New email address."),
 		companyName: z.string().optional().describe("New company name."),
-		notes: z.string().optional().describe("A note to append to the contact's timeline."),
+		notes: z
+			.string()
+			.optional()
+			.describe("A note to append to the contact's timeline."),
 		verificationStatus: z
 			.enum(["UNVERIFIED", "VERIFYING", "NEEDS_HUMAN", "VERIFIED"])
 			.optional()
@@ -85,7 +86,11 @@ export default defineTool({
 		email?: string;
 		companyName?: string;
 		notes?: string;
-		verificationStatus?: "UNVERIFIED" | "VERIFYING" | "NEEDS_HUMAN" | "VERIFIED";
+		verificationStatus?:
+			| "UNVERIFIED"
+			| "VERIFYING"
+			| "NEEDS_HUMAN"
+			| "VERIFIED";
 	}) {
 		return updateContact(input);
 	},

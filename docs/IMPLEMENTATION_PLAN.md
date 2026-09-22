@@ -1,5 +1,5 @@
 # Implementation and Execution Plan — CRM Code Optimization
-Generated: 2026-09-15 — Branch: `feat/agent-providers` — Stack: Next 16 / NestJS 11 / Prisma 7 / better-auth 1.6 / Turborepo 2.10 / eve 0.29 / Bun 1.3.12
+Generated: 2026-09-15 — Branch: `feat/agent-providers` — Stack: Next 16/NestJS 11/Prisma 7/better-auth 1.6/Turborepo 2.10/eve 0.31.2/Bun 1.3.12
 
 > Source: full-repo optimization scan of `F:\crm` (~430 TS/TSX files, ~35k LOC, 548-lock bun). Evidence references are `path:line`.
 
@@ -7,7 +7,7 @@ Generated: 2026-09-15 — Branch: `feat/agent-providers` — Stack: Next 16 / Ne
 
 ## 1. Objective and Non-Goals
 
-**Objective:** Close measured performance bottlenecks, security gaps, and reliability edge cases without changing user-visible behavior except for measurably faster lists/search, smaller bundles, and hardened headers/rate-limits.
+**Objective:** Close measured performance bottlenecks, security gaps and reliability edge cases without changing user-visible behavior except for measurably faster lists/search, smaller bundles and hardened headers/rate-limits.
 
 **Non-Goals:** No product features, no data model migration beyond `pg_trgm`, no vector/embedding pipeline yet (noted as future lane).
 

@@ -42,14 +42,14 @@ Check for existing `technical-domain.md` and `navigation.md` in the target folde
 
 Ask exactly these six questions, one at a time:
 
-1. **Tech Stack**: Primary language, framework, database, infrastructure, and key libraries with versions.
-2. **API Pattern**: Protocol, auth method, request/response shape, and error format.
-3. **Component Pattern**: UI framework, component file structure, and state management.
-4. **Naming Conventions**: File casing, function naming, variable naming, and predicate patterns.
-5. **Code Standards**: Function size, immutability, error handling, and testing approach.
-6. **Security Requirements**: Auth, validation, secrets handling, rate limiting, and CORS.
+1. **Tech Stack**: Primary language, framework, database, infrastructure and key libraries with versions.
+2. **API Pattern**: Protocol, auth method, request/response shape and error format.
+3. **Component Pattern**: UI framework, component file structure and state management.
+4. **Naming Conventions**: File casing, function naming, variable naming and predicate patterns.
+5. **Code Standards**: Function size, immutability, error handling and testing approach.
+6. **Security Requirements**: Auth, validation, secrets handling, rate limiting and CORS.
 
-For each answer, extract a 1-3 sentence summary, 3-5 key points, and a 5-10 line minimal example.
+For each answer, extract a 1-3 sentence summary, 3-5 key points and a 5-10 line minimal example.
 
 ## Stage 5: Generate technical-domain.md
 
@@ -82,7 +82,7 @@ Ensure `navigation.md` exists with frontmatter and a Quick Routes table includin
 
 | What You Need | File | Description |
 |---------------|------|-------------|
-| Technical patterns | `technical-domain.md` | Stack, architecture, and code standards |
+| Technical patterns | `technical-domain.md` | Stack, architecture and code standards |
 
 If `technical-domain.md` is already present, update the description only.
 

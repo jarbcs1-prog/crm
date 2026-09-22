@@ -135,10 +135,13 @@ export function getConfiguredProviders(): ConfiguredProvider[] {
 	return configured;
 }
 
-export function selectDefaultModel(): { id: string; contextWindowTokens: number } {
+export function selectDefaultModel(): {
+	id: string;
+	contextWindowTokens: number;
+} {
 	const configured = getConfiguredProviders();
 	if (configured.length > 0) {
-		const first = configured[0]!;
+		const first = configured[0] as NonNullable<(typeof configured)[number]>;
 		return { id: first.modelId, contextWindowTokens: 1_000_000 };
 	}
 	return { id: "ollama/qwen2.5-coder:14b", contextWindowTokens: 1_000_000 };

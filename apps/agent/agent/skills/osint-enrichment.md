@@ -5,7 +5,7 @@ description: Verify and enrich CRM contacts with open-source intelligence. Use w
 
 # OSINT Enrichment
 
-Turn uncertain contact data into evidence-backed fields. Every enrichment records what was found, where it came from, and how sure the agent is.
+Turn uncertain contact data into evidence-backed fields. Every enrichment records what was found, where it came from and how sure the agent is.
 
 ## Tools
 
@@ -25,7 +25,7 @@ Below that, do not write the field — record what was attempted and leave it un
 
 ## Workflow
 
-1. `flag_for_osint` when research is needed: a call came back `WRONG_NUMBER` or `DO_NOT_CALL` (the target is then opened once, marked `SKIPPED`, and never re-verified), or a contact's phone/email/title is missing or dubious.
+1. `flag_for_osint` when research is needed: a call came back `WRONG_NUMBER` or `DO_NOT_CALL` (the target is then opened once, marked `SKIPPED` and never re-verified), or a contact's phone/email/title is missing or dubious.
 2. `get_osint_queue` to see what the lane is working on.
 3. Research from primary and independent sources; prefer the company's own channels and the person's own profiles.
 4. `mark_osint` with the corrected fields and the findings that justify them, then state the band in your reply.
@@ -34,4 +34,4 @@ Below that, do not write the field — record what was attempted and leave it un
 
 - A missing phone, email, or title is never invented — there is no "best guess" field.
 - `DO_NOT_CALL` is a hard stop: no calls, no re-verification, no follow-up scheduling.
-- Do not merge lookalike identities; if the research cannot be tied to the actual person, keep it `POSSIBLE`, record the ambiguity, and say so.
+- Do not merge lookalike identities; if the research cannot be tied to the actual person, keep it `POSSIBLE`, record the ambiguity and say so.

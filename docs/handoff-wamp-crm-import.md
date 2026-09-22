@@ -1,4 +1,4 @@
-You are resuming work on the **WAMP CRM legacy data import + agent verification** project in the repo at `F:\OSInt_2026\crm`. No implementation has started yet. This prompt hands you a fully verified starting point so you do NOT need to re-explore, re-verify or rebuild context. Trust the facts below and the two documents they point to. Do the work in the order given.
+You are resuming work on the **WAMP CRM legacy data import + agent verification** project in the repo at `F:\crm`. No implementation has started yet. This prompt hands you a fully verified starting point so you do NOT need to re-explore, re-verify or rebuild context. Trust the facts below and the two documents they point to. Do the work in the order given.
 
 ## Authority
 

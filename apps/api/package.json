@@ -19,7 +19,7 @@
 		"start:prod": "bun dist/main.js",
 		"test": "bun test",
 		"test:watch": "bun test --watch",
-		"trpc:generate": "nestjs-trpc generate -e src/app.module.ts -r \"**/*.router.ts\" -o src/generated",
+		"trpc:generate": "node scripts/trpc-generate.mjs",
 		"clean": "rm -rf .turbo dist node_modules src/generated"
 	},
 	"dependencies": {
@@ -42,7 +42,7 @@
 		"class-validator": "^0.15.1",
 		"context.dev": "^2.7.0",
 		"helmet": "^8.3.0",
-		"nestjs-trpc": "^2.13.0",
+		"nestjs-trpc": "2.13.0",
 		"reflect-metadata": "^0.2.2",
 		"rxjs": "^7.8.1",
 		"zod": "^4.5.0"

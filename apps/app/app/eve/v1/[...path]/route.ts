@@ -1,4 +1,8 @@
-import { AGENT_URL, bridgeConfigured, mintBridgeToken } from "@/lib/agent-bridge";
+import {
+	AGENT_URL,
+	bridgeConfigured,
+	mintBridgeToken,
+} from "@/lib/agent-bridge";
 import { createProxyRoute } from "@/lib/proxy/createProxyRoute";
 import { getSession } from "@/lib/session";
 
@@ -26,15 +30,22 @@ const h = createProxyRoute({
 	],
 	onFetchError: (error) =>
 		Response.json(
-			{ error: "The research agent is not reachable.", detail: error instanceof Error ? error.message : String(error) },
+			{
+				error: "The research agent is not reachable.",
+				detail: error instanceof Error ? error.message : String(error),
+			},
 			{ status: 502 },
 		),
 	beforeRequest: async (request, headers) => {
 		if (!bridgeConfigured()) {
-			return Response.json({ error: "The research agent is not configured for this install." }, { status: 503 });
+			return Response.json(
+				{ error: "The research agent is not configured for this install." },
+				{ status: 503 },
+			);
 		}
 		const session = await getSession();
-		if (!session) return Response.json({ error: "Not signed in." }, { status: 401 });
+		if (!session)
+			return Response.json({ error: "Not signed in." }, { status: 401 });
 
 		const contactId = request.headers.get("x-crm-contact");
 		const companyId = request.headers.get("x-crm-company");
@@ -45,8 +56,16 @@ const h = createProxyRoute({
 		headers.set(
 			"authorization",
 			`Bearer ${await mintBridgeToken(
-				{ id: session.user.id, email: session.user.email, name: session.user.name },
-				{ contactId: cuid(contactId), companyId: cuid(companyId), dealId: cuid(dealId) },
+				{
+					id: session.user.id,
+					email: session.user.email,
+					name: session.user.name,
+				},
+				{
+					contactId: cuid(contactId),
+					companyId: cuid(companyId),
+					dealId: cuid(dealId),
+				},
 			)}`,
 		);
 	},

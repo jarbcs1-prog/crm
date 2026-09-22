@@ -2,7 +2,10 @@ import { ssoClient } from "@better-auth/sso/client";
 import { createAuthClient } from "better-auth/react";
 
 export const authClient = createAuthClient({
-	baseURL: typeof window === "undefined" ? undefined : window.location.origin,
+	baseURL:
+		typeof window === "undefined"
+			? undefined
+			: window.location.origin.replace(":3000", ":3001"),
 	plugins: [ssoClient()],
 });
 

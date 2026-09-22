@@ -5,10 +5,10 @@ import {
 	db,
 	OsintStatus,
 } from "@crm/db";
-import { defineTool } from "./tool-factory";
 import { z } from "zod";
 import { writeTimelineNote } from "../lib/crm";
 import { isTerminalStatus } from "../lib/voice";
+import { defineTool } from "./tool-factory";
 
 const OUTCOME_PORT: Record<string, CallOutcome> = {
 	...(Object.fromEntries(

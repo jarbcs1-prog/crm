@@ -1,15 +1,13 @@
 import { db } from "@crm/db";
-import { defineTool } from "./tool-factory";
 import { z } from "zod";
+import { defineTool } from "./tool-factory";
 
-export async function listTickets(
-	input: {
-		limit?: number;
-		kind?: string;
-		contactId?: string;
-		companyId?: string;
-	},
-) {
+export async function listTickets(input: {
+	limit?: number;
+	kind?: string;
+	contactId?: string;
+	companyId?: string;
+}) {
 	const { limit = 50, kind, contactId, companyId } = input;
 
 	const where: any = { finishedAt: null };
@@ -64,15 +62,11 @@ export default defineTool({
 		kind: z
 			.string()
 			.optional()
-			.describe("Filter by ticket kind (e.g., 'osint-enrichment', 'missing-phone')."),
-		contactId: z
-			.string()
-			.optional()
-			.describe("Filter by contact ID."),
-		companyId: z
-			.string()
-			.optional()
-			.describe("Filter by company ID."),
+			.describe(
+				"Filter by ticket kind (e.g., 'osint-enrichment', 'missing-phone').",
+			),
+		contactId: z.string().optional().describe("Filter by contact ID."),
+		companyId: z.string().optional().describe("Filter by company ID."),
 	}),
 	async execute(input: {
 		limit?: number;
