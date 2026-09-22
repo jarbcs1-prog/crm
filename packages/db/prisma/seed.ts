@@ -671,7 +671,29 @@ async function healLegacyData() {
 		await db.deal.update({ where: { id: d.id }, data: { name: healed } });
 	}
 	if (staleDeals.length) console.log(`Healed ${staleDeals.length} deal(s) with stale Comp AI name.`);
-	const legacyEmails = ["ada@shelf-thought.com", "marcus@shelf-thought.com"];
+	const legacyNameMap: Record<string, { name: string; email: string }> = {
+		"Ada Okafor": { name: "Sofia Delgado", email: "sofia@shelf-thought.com" },
+		"Marcus Lindqvist": { name: "Kenji Tanaka", email: "kenji@shelf-thought.com" },
+		"Priya Raman": { name: "Zara Al-Hassan", email: "zara@shelf-thought.com" },
+	};
+	for (const [legacyName, replacement] of Object.entries(legacyNameMap)) {
+		const legacyUser = await db.user.findFirst({ where: { name: legacyName } });
+		if (!legacyUser) continue;
+		const emailTaken = await db.user.findFirst({ where: { email: replacement.email, id: { not: legacyUser.id } } });
+		if (emailTaken) {
+			const fallbackId = emailTaken.id;
+			await db.company.updateMany({ where: { ownerId: legacyUser.id }, data: { ownerId: fallbackId } });
+			await db.contact.updateMany({ where: { ownerId: legacyUser.id }, data: { ownerId: fallbackId } });
+			await db.deal.updateMany({ where: { ownerId: legacyUser.id }, data: { ownerId: fallbackId } });
+			await db.activity.updateMany({ where: { createdById: legacyUser.id }, data: { createdById: fallbackId } });
+			await db.user.delete({ where: { id: legacyUser.id } }).catch(() => {});
+			console.log(`Reassigned ${legacyName} -> ${replacement.name} (merged into existing user).`);
+		} else {
+			await db.user.update({ where: { id: legacyUser.id }, data: { name: replacement.name, email: replacement.email } });
+			console.log(`Renamed user ${legacyName} -> ${replacement.name}.`);
+		}
+	}
+	const legacyEmails = ["ada@shelf-thought.com", "marcus@shelf-thought.com", "priya@shelf-thought.com"];
 	const legacyUsers = await db.user.findMany({ where: { email: { in: legacyEmails } }, select: { id: true } });
 	if (legacyUsers.length > 0) {
 		const fallbackOwner = await db.user.findFirst({ where: { email: { in: OWNERS.map((o) => o.email) } }, select: { id: true } });
@@ -683,7 +705,7 @@ async function healLegacyData() {
 			await db.activity.updateMany({ where: { createdById: u.id }, data: { createdById: replacementId } });
 			await db.user.delete({ where: { id: u.id } }).catch(() => {});
 		}
-		console.log(`Healed ${legacyUsers.length} legacy owner(s).`);
+		console.log(`Healed ${legacyUsers.length} legacy owner(s) by email.`);
 	}
 	const ws = await db.workspace.findFirst();
 	if (ws && ws.name.trim().toLowerCase() === "crm") {
