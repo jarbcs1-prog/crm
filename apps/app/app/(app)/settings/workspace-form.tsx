@@ -79,8 +79,7 @@ export function WorkspaceForm() {
 							!canRename ||
 							save.isPending ||
 							!dirty ||
-							values.name.trim() === "" ||
-							values.website.trim() === ""
+							values.name.trim() === ""
 						}
 					>
 						{save.isPending ? <Spinner data-icon="inline-start" /> : null}

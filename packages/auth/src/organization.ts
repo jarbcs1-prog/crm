@@ -134,6 +134,17 @@ export async function ensureWorkspaceMembership(
 				});
 			}
 
+			const joiningUser = await tx.user.findUnique({
+				where: { id: userId },
+				select: { email: true },
+			});
+			const joiningEmail = joiningUser?.email.toLowerCase() ?? "";
+			const shouldBeOwner =
+				(joiningEmail && ownerEmails().has(joiningEmail)) ||
+				(ownerEmails().size === 0 &&
+					(await tx.member.count({
+						where: { organizationId: workspace.id, role: "owner" },
+					})) === 0);
 			await tx.member.upsert({
 				where: {
 					organizationId_userId: { organizationId: workspace.id, userId },
@@ -142,11 +153,27 @@ export async function ensureWorkspaceMembership(
 					id: crypto.randomUUID(),
 					organizationId: workspace.id,
 					userId,
-					role: "member",
+					role: shouldBeOwner ? "owner" : "member",
 					createdAt: new Date(),
 				},
 				update: {},
 			});
+			if (shouldBeOwner) {
+				const existing = await tx.member.findUnique({
+					where: {
+						organizationId_userId: { organizationId: workspace.id, userId },
+					},
+					select: { role: true },
+				});
+				if (existing?.role === "member") {
+					await tx.member.update({
+						where: {
+							organizationId_userId: { organizationId: workspace.id, userId },
+						},
+						data: { role: "owner" },
+					});
+				}
+			}
 
 			return workspace.id;
 		});
