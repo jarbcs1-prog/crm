@@ -1,3 +1,8 @@
+/**
+ * In-memory TTL cache — SINGLE_INSTANCE_ONLY.
+ * Per-process; not shared across replicas. Set REDIS_URL and swap to
+ * a Redis-backed impl before scaling beyond 1 instance (see P2-1).
+ */
 export class TtlCache<T> {
 	private readonly entries = new Map<string, { value: T; expiresAt: number }>();
 
