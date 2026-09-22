@@ -139,12 +139,12 @@ export async function ensureWorkspaceMembership(
 				select: { email: true },
 			});
 			const joiningEmail = joiningUser?.email.toLowerCase() ?? "";
+			const ownerCount = await tx.member.count({
+				where: { organizationId: workspace.id, role: "owner" },
+			});
 			const shouldBeOwner =
 				(joiningEmail && ownerEmails().has(joiningEmail)) ||
-				(ownerEmails().size === 0 &&
-					(await tx.member.count({
-						where: { organizationId: workspace.id, role: "owner" },
-					})) === 0);
+				(ownerEmails().size === 0 && ownerCount === 0);
 			await tx.member.upsert({
 				where: {
 					organizationId_userId: { organizationId: workspace.id, userId },
@@ -172,6 +172,27 @@ export async function ensureWorkspaceMembership(
 						},
 						data: { role: "owner" },
 					});
+				}
+			}
+			if (ownerCount === 0) {
+				const owners = ownerEmails();
+				if (owners.size === 0) {
+					const earliest = await tx.member.findFirst({
+						where: { organizationId: workspace.id },
+						orderBy: [{ createdAt: "asc" }, { id: "asc" }],
+						select: { userId: true, role: true },
+					});
+					if (earliest && earliest.role !== "owner") {
+						await tx.member.update({
+							where: {
+								organizationId_userId: {
+									organizationId: workspace.id,
+									userId: earliest.userId,
+								},
+							},
+							data: { role: "owner" },
+						});
+					}
 				}
 			}
 
