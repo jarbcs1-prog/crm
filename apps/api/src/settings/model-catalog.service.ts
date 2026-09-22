@@ -34,11 +34,9 @@ function rate(value: unknown): number | null {
 }
 
 function usable(model: GatewayModel): boolean {
-	const tags = Array.isArray(model.tags) ? model.tags : [];
 	return (
 		typeof model.id === "string" &&
 		model.type === "language" &&
-		tags.includes("tool-use") &&
 		typeof model.context_window === "number"
 	);
 }

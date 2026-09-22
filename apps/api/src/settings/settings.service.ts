@@ -98,18 +98,23 @@ export class SettingsService {
 
 		const chosen = models.find((model) => model.id === modelId);
 
-		if (!chosen) {
-			throw new BadRequestException(
-				`The AI Gateway does not serve a tool-using model called "${modelId}".`,
-			);
+		if (chosen) {
+			await writeAgentModel(this.db, {
+				id: chosen.id,
+				contextWindowTokens: chosen.contextWindowTokens,
+			});
+		} else {
+			this.logger.warn({
+				message: "Saving agent model not in catalog",
+				modelId,
+			});
+			await writeAgentModel(this.db, {
+				id: modelId,
+				contextWindowTokens: 128_000,
+			});
 		}
 
-		await writeAgentModel(this.db, {
-			id: chosen.id,
-			contextWindowTokens: chosen.contextWindowTokens,
-		});
-
-		this.logger.log({ message: "Agent model changed", modelId: chosen.id });
+		this.logger.log({ message: "Agent model changed", modelId });
 
 		return this.agentModel();
 	}
@@ -126,6 +131,7 @@ export class SettingsService {
 			modelEnv: string | null;
 			name: string;
 			prefix: string;
+			requiredEnv?: string;
 		}> = [
 			{
 				env: "OLLAMA_BASE_URL",
@@ -156,16 +162,32 @@ export class SettingsService {
 				modelEnv: null,
 				name: "Opencode",
 				prefix: "opencode",
+				requiredEnv: "OPENCODE_API_KEY",
+			},
+			{
+				env: "OPENROUTER_API_KEY",
+				modelEnv: "OPENROUTER_MODEL",
+				name: "OpenRouter",
+				prefix: "openrouter",
+			},
+			{
+				env: "REPLICATE_API_TOKEN",
+				modelEnv: null,
+				name: "Replicate",
+				prefix: "replicate",
 			},
 		];
 
 		for (const p of checks) {
-			const url = process.env[p.env];
-			if (!url?.trim()) continue;
+			if (p.requiredEnv && !process.env[p.requiredEnv]?.trim()) continue;
+			const raw = process.env[p.env]?.trim();
+			if (!raw) continue;
+			const isUrl = p.env.endsWith("_BASE_URL") || p.env.endsWith("_API_URL");
+			const endpoint = isUrl ? raw : `configured:${p.env}`;
 			const model = p.modelEnv ? (process.env[p.modelEnv] ?? null) : null;
 			providers.push({
 				name: p.name,
-				endpoint: url.trim(),
+				endpoint,
 				modelId: model ? `${p.prefix}/${model}` : null,
 			});
 		}
