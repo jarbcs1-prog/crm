@@ -1,0 +1,57 @@
+{
+	"name": "crm",
+	"private": true,
+	"license": "MIT",
+	"version": "1.0.0",
+	"scripts": {
+		"build": "turbo run build",
+		"dev": "turbo run dev",
+		"lint": "turbo run lint",
+		"format": "biome format --write .",
+		"check-types": "turbo run check-types",
+		"test": "turbo run test",
+		"auth:generate": "turbo run auth:generate",
+		"db:deploy": "turbo run db:deploy",
+		"db:generate": "turbo run db:generate",
+		"db:migrate": "turbo run db:migrate",
+		"db:push": "turbo run db:push",
+		"db:reset": "turbo run db:reset",
+		"db:seed": "turbo run db:seed",
+		"db:studio": "turbo run db:studio",
+		"import:wamp": "bun run --filter=api import:wamp"
+	},
+	"devDependencies": {
+		"@biomejs/biome": "^2.5.6",
+		"@next/swc-wasm-nodejs": "^16.3.5",
+		"lightningcss-wasm": "^1.33.0",
+		"turbo": "^2.10.13",
+		"typescript": "5.9.2"
+	},
+	"engines": {
+		"node": "22.x"
+	},
+	"volta": {
+		"node": "22.18.0",
+		"bun": "1.4.2"
+	},
+	"packageManager": "bun@1.4.2",
+	"devEngines": {
+		"packageManager": {
+			"name": "bun",
+			"version": "1.4.2"
+		}
+	},
+	"workspaces": [
+		"apps/*",
+		"packages/*"
+	],
+	"overrides": {
+		"deepmerge-ts": "^8.0.1"
+	},
+	"resolutions": {
+		"deepmerge-ts": "^8.0.1"
+	},
+	"dependencies": {
+		"next": "16.3.5"
+	}
+}
