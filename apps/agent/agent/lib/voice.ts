@@ -578,7 +578,7 @@ async function synthesizeSpeechElevenLabs(text: string): Promise<SpeechResult> {
 }
 
 function kokoroScriptPath(): string {
-	return fileURLToPath(new URL("../scripts/kokoro-tts.py", import.meta.url));
+	return fileURLToPath(new URL("../../scripts/kokoro-tts.py", import.meta.url));
 }
 
 function pythonArgs(): string[] {
