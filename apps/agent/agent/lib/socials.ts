@@ -166,7 +166,7 @@ async function fetchGithubUser(
 			{
 				headers: {
 					accept: "application/vnd.github+json",
-					"user-agent": "comp-ai-crm-research-agent",
+					"user-agent": "shelf-thought-crm-research-agent",
 					...(token ? { authorization: `Bearer ${token}` } : {}),
 				},
 				signal: AbortSignal.timeout(15_000),
