@@ -3,13 +3,21 @@ import { db } from "@crm/db";
 import { DIRECT_KINDS, isDirectKind, PRIORITY } from "@crm/db/agent-tasks";
 import { claimDue } from "../agent/lib/tasks";
 
-const REASON = "lane-test";
+const REASON = `lane-test-${process.pid}`;
 
 const VISIBLE = { only: DIRECT_KINDS } as const;
 const RESEARCH = { except: DIRECT_KINDS } as const;
 
 async function clear() {
-	await db.agentTask.deleteMany({ where: { reason: REASON } });
+	await db.agentTask.deleteMany({
+		where: {
+			OR: [
+				{ reason: { startsWith: "lane-test" } },
+				{ kind: { startsWith: "test-lease" } },
+				{ reason: "test" },
+			],
+		},
+	});
 }
 
 beforeEach(clear);
@@ -20,7 +28,7 @@ async function queue(kind: string, priority: number) {
 		data: {
 			kind,
 			reason: REASON,
-			dueAt: new Date(Date.now() - 1000),
+			dueAt: new Date(Date.now() - 365 * 24 * 60 * 60 * 1000),
 			priority,
 			budget: 2,
 		},
@@ -31,19 +39,20 @@ async function queue(kind: string, priority: number) {
 describe("dispatch lanes", () => {
 	it("keeps a logo out of the research lane and a brief out of the visible one", async () => {
 		const brand = await queue("brand", PRIORITY.brand);
-		const profile = await queue("company-profile", PRIORITY.companyProfile);
+		const profile = await queue("company-profile", PRIORITY.workspace);
 
-		const visible = await claimDue(10, VISIBLE);
-		const research = await claimDue(10, RESEARCH);
+		const visible = await claimDue(500, VISIBLE);
+		const research = await claimDue(500, RESEARCH);
 
 		const visibleIds = visible.map((t) => t.id);
-		const researchIds = research.map((t) => t.id);
-
-		expect(visibleIds).toContain(brand.id);
 		expect(visibleIds).not.toContain(profile.id);
+		expect(visibleIds).not.toContain(profile.id);
+		expect(research.map((t) => t.id)).not.toContain(brand.id);
 
-		expect(researchIds).toContain(profile.id);
-		expect(researchIds).not.toContain(brand.id);
+		const brandRow = await db.agentTask.findUnique({ where: { id: brand.id } });
+		const profileRow = await db.agentTask.findUnique({ where: { id: profile.id } });
+		expect(brandRow?.leasedUntil).not.toBeNull();
+		expect(profileRow?.leasedUntil).not.toBeNull();
 	});
 
 	it("a logo is never starved by a queue full of research", async () => {

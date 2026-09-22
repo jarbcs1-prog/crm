@@ -9,12 +9,20 @@ import {
 	scheduleTask,
 } from "../agent/lib/tasks";
 
-const kind = "test-lease";
+const kind = `test-lease-${process.pid}`;
 
-const RESEARCH = { except: DIRECT_KINDS } as const;
+const RESEARCH = { only: [kind] } as const;
 
 async function clear() {
-	await db.agentTask.deleteMany({ where: { kind } });
+	await db.agentTask.deleteMany({
+		where: {
+			OR: [
+				{ kind: { startsWith: "test-lease" } },
+				{ reason: { startsWith: "lane-test" } },
+				{ reason: "test" },
+			],
+		},
+	});
 	await db.contact.deleteMany({ where: { email: { startsWith: "lease-" } } });
 }
 
