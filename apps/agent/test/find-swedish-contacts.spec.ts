@@ -2,39 +2,54 @@ import { afterEach, beforeEach, describe, expect, it } from "bun:test";
 import { db } from "@crm/db";
 import { findSwedishContacts } from "../agent/tools/find_swedish_contacts";
 
+const createdContactIds = new Set<string>();
+
+function track<T extends { id: string }>(contact: T): T {
+	createdContactIds.add(contact.id);
+	return contact;
+}
+
 async function clear(): Promise<void> {
-	await db.contact.deleteMany({});
+	const ids = [...createdContactIds];
+	if (ids.length > 0) {
+		await db.contact.deleteMany({ where: { id: { in: ids } } });
+	}
+	createdContactIds.clear();
 }
 
 beforeEach(clear);
 afterEach(clear);
 
 async function swedish(firstName: string): Promise<{ id: string }> {
-	return db.contact.create({
-		data: {
-			firstName,
-			lastName: "Lead",
-			email: `swedish-${crypto.randomUUID()}@example.test`,
-			phone: "+46701946961",
-			country: "Sweden",
-			lastActivityAt: new Date(),
-		},
-		select: { id: true },
-	});
+	return track(
+		await db.contact.create({
+			data: {
+				firstName,
+				lastName: "Lead",
+				email: `swedish-${crypto.randomUUID()}@example.test`,
+				phone: "+46701946961",
+				country: "Sweden",
+				lastActivityAt: new Date(),
+			},
+			select: { id: true },
+		}),
+	);
 }
 
 async function norwegian(): Promise<{ id: string }> {
-	return db.contact.create({
-		data: {
-			firstName: "Norwegian",
-			lastName: "Lead",
-			email: `norwegian-${crypto.randomUUID()}@example.test`,
-			phone: "+4712345678",
-			country: "Norway",
-			lastActivityAt: new Date(),
-		},
-		select: { id: true },
-	});
+	return track(
+		await db.contact.create({
+			data: {
+				firstName: "Norwegian",
+				lastName: "Lead",
+				email: `norwegian-${crypto.randomUUID()}@example.test`,
+				phone: "+4712345678",
+				country: "Norway",
+				lastActivityAt: new Date(),
+			},
+			select: { id: true },
+		}),
+	);
 }
 
 describe("find_swedish_contacts", () => {
@@ -53,17 +68,19 @@ describe("find_swedish_contacts", () => {
 
 	it("excludes contacts without a phone when requirePhone is true", async () => {
 		const withPhone = await swedish("B");
-		const withoutPhone = await db.contact.create({
-			data: {
-				firstName: "NoPhone",
-				lastName: "Lead",
-				email: `nophone-${crypto.randomUUID()}@example.test`,
-				phone: null,
-				country: "Sweden",
-				lastActivityAt: new Date(),
-			},
-			select: { id: true },
-		});
+		const withoutPhone = track(
+			await db.contact.create({
+				data: {
+					firstName: "NoPhone",
+					lastName: "Lead",
+					email: `nophone-${crypto.randomUUID()}@example.test`,
+					phone: null,
+					country: "Sweden",
+					lastActivityAt: new Date(),
+				},
+				select: { id: true },
+			}),
+		);
 
 		const result = await findSwedishContacts({
 			limit: 1000,
@@ -77,17 +94,19 @@ describe("find_swedish_contacts", () => {
 
 	it("includes contacts without a phone when requirePhone is false", async () => {
 		const withPhone = await swedish("C");
-		const withoutPhone = await db.contact.create({
-			data: {
-				firstName: "NoPhone",
-				lastName: "Lead",
-				email: `nophone2-${crypto.randomUUID()}@example.test`,
-				phone: null,
-				country: "Sweden",
-				lastActivityAt: new Date(),
-			},
-			select: { id: true },
-		});
+		const withoutPhone = track(
+			await db.contact.create({
+				data: {
+					firstName: "NoPhone",
+					lastName: "Lead",
+					email: `nophone2-${crypto.randomUUID()}@example.test`,
+					phone: null,
+					country: "Sweden",
+					lastActivityAt: new Date(),
+				},
+				select: { id: true },
+			}),
+		);
 
 		const result = await findSwedishContacts({
 			limit: 1000,
