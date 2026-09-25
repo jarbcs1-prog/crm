@@ -81,3 +81,10 @@ sql_dump/
 *.dump
 apps/agent/agent/scripts/voice-pipeline/whisper-models/
 .env.local
+.learnings/
+packages/session-datasets/data/
+*.parquet
+*.tgz
+*.7z
+demo/demo.db
+demo/installer/dist/
