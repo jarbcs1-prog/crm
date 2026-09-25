@@ -17,17 +17,24 @@ To stop: close the "CRM Demo Server" window.
 
 ## 2. Test contacts (already seeded)
 
-| Contact    | Phone          |
-|------------|----------------|
-| John B.    | +639686774401  |
-| Dan Da Man | +639495771881  |
+The demo ships with two test contact profiles under **Demo Co** with an owner
+assigned — the same three things the real agent's `make_call` requires: valid
+E.164 number, owner, company.
 
-Both belong to **Demo Co** with owner **John B.** — the same three things the
-real agent's `make_call` requires: valid E.164 number, owner, company.
+### Set up your own test numbers
 
-You can edit a phone number inline in the UI. It must stay valid E.164:
-starts with `+`, 7–15 digits. Anything else is rejected with HTTP 400, exactly
-like the real `normalizeToE164` gate.
+1. Open the demo UI and find the seeded test contacts (Contacts tab).
+2. Click a contact's phone number and type the real destination number you
+   want to dial for SIP testing.
+3. It must stay valid E.164: starts with `+`, 7–15 digits
+   (e.g. `+` + country code + number, never a local `0...` format).
+   Anything else is rejected with HTTP 400, exactly like the real
+   `normalizeToE164` gate.
+
+To add a brand-new test contact instead of editing a seeded one, insert it
+into the local SQLite DB (`demo/demo.db`, table `contacts`) with an `ownerId`
+and `companyId`, then restart the server — or reset everything with
+`node server.mjs --reseed` to restore the seeded profiles.
 
 ## 3. Enter your Nonoh SIP settings (required)
 
@@ -88,7 +95,7 @@ NONOH_PASSWORD="..."
 NONOH_DISPLAY_NAME="..."
 ```
 
-3. Make sure the contact's phone is E.164 (`+639...`, not `0639...`).
+3. Make sure the contact's phone is E.164 (`+` + country code + number, not a local `0...` format).
 4. Prompt the agent with one of the prompts in `AGENT-PROMPTS.md`.
 5. The agent runs `load_pitch` (`research-first-cold-call-v1`) then
    `make_call`. If it returns `queued`, a hosted provider is dialing and

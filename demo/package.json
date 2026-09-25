@@ -2,7 +2,7 @@
   "name": "crm-demo",
   "version": "0.1.0",
   "private": true,
-  "description": "Standalone SQLite demo of the CRM — no auth, no Postgres, no Bun required. Test contacts John B. and Dan Da Man included for SIP testing.",
+  "description": "Standalone SQLite demo of the CRM — no auth, no Postgres, no Bun required. Seeded test contact profiles included for SIP testing.",
   "type": "module",
   "engines": {
     "node": ">=22.5"

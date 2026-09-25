@@ -4,7 +4,7 @@ Limited working demo of the CRM. No Postgres, no Bun, no auth, no Docker.
 
 - Runtime: Node 22.5+ only (uses built-in `node:sqlite`, zero npm dependencies)
 - DB: local SQLite file `demo/demo.db` (auto-created + seeded)
-- Test profiles: **John B.** (`+639686774401`) and **Dan Da Man** (`+639495771881`) — edit their phones in the UI, must stay valid E.164
+- Test profiles: two seeded contacts under **Demo Co** for SIP testing — edit their phones in the UI, must stay valid E.164. See `SETUP.md` §2 for how to set up your own test numbers
 - SIP test flow mirrors `apps/agent/agent/tools/make_call.ts`: E.164 validation → owner check → provider queue → `QUEUED` call row with `calleeNumber` + `sipCallId` + activity entry
 
 ## Install & run (Windows)
