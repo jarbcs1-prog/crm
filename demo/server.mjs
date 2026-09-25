@@ -30,7 +30,8 @@ function migrate() {
     CREATE TABLE IF NOT EXISTS companies (
       id TEXT PRIMARY KEY,
       name TEXT NOT NULL,
-      domain TEXT
+      domain TEXT,
+      address TEXT
     );
     CREATE TABLE IF NOT EXISTS contacts (
       id TEXT PRIMARY KEY,
@@ -69,6 +70,8 @@ function migrate() {
       value TEXT NOT NULL
     );
   `);
+  const cols = db.prepare("PRAGMA table_info(companies)").all().map((c) => c.name);
+  if (!cols.includes("address")) db.exec("ALTER TABLE companies ADD COLUMN address TEXT");
 }
 
 function count(table) {
@@ -77,6 +80,11 @@ function count(table) {
 
 function seed() {
   migrate();
+  db.prepare("UPDATE companies SET name = ?, domain = '', address = ? WHERE id = 'co-demo' AND name = 'Demo Co'").run(
+    "J.A.R.B. Research Consultancy Services", "10 Bulacan St. Angeles City 2009 Philippines",
+  );
+  db.prepare("UPDATE companies SET domain = '' WHERE id = 'co-demo' AND domain = 'example.com'").run();
+  db.prepare("UPDATE contacts SET email = ? WHERE id = 'c-john' AND email = 'john.b@example.com'").run("jarbcs1@gmail.com");
   if (count("contacts") > 0 && !process.argv.includes("--reseed")) return;
   if (process.argv.includes("--reseed")) {
     for (const t of ["calls", "activities", "deals", "contacts", "companies", "users"]) {
@@ -85,9 +93,9 @@ function seed() {
   }
   const now = new Date().toISOString();
   db.prepare("INSERT OR REPLACE INTO users (id, name, email) VALUES (?, ?, ?)").run("u-owner", "John B.", "jarbcs1@gmail.com");
-  db.prepare("INSERT OR REPLACE INTO companies (id, name, domain) VALUES (?, ?, ?)").run("co-demo", "Demo Co", "example.com");
+  db.prepare("INSERT OR REPLACE INTO companies (id, name, domain, address) VALUES (?, ?, ?, ?)").run("co-demo", "J.A.R.B. Research Consultancy Services", "", "10 Bulacan St. Angeles City 2009 Philippines");
   db.prepare("INSERT OR REPLACE INTO contacts (id, name, email, phone, company_id, owner_id) VALUES (?, ?, ?, ?, ?, ?)").run(
-    "c-john", "John B.", "john.b@example.com", "+639686774401", "co-demo", "u-owner",
+    "c-john", "John B.", "jarbcs1@gmail.com", "+639686774401", "co-demo", "u-owner",
   );
   db.prepare("INSERT OR REPLACE INTO contacts (id, name, email, phone, company_id, owner_id) VALUES (?, ?, ?, ?, ?, ?)").run(
     "c-dan", "Dan Da Man", "dan.da.man@example.com", "+639495771881", "co-demo", "u-owner",

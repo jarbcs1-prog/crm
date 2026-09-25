@@ -17,7 +17,7 @@ To stop: close the "CRM Demo Server" window.
 
 ## 2. Test contacts (already seeded)
 
-The demo ships with two test contact profiles under **Demo Co** with an owner
+The demo ships with two test contact profiles under **J.A.R.B. Research Consultancy Services** with an owner
 assigned — the same three things the real agent's `make_call` requires: valid
 E.164 number, owner, company.
 

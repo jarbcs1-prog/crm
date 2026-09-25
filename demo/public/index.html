@@ -16,6 +16,9 @@ input, select, button { padding: 0.35rem 0.5rem; font-size: 0.9rem; }
 <h1>CRM Demo (SQLite, no auth)</h1>
 <p>Test contacts for SIP: <strong>John B.</strong> and <strong>Dan Da Man</strong>. Phones must stay valid E.164 (e.g. +15551234567).</p>
 
+<h2>Company</h2>
+<p id="company">loading…</p>
+
 <h2>Voice provider</h2>
 <select id="provider">
   <option value="nonoh">nonoh (direct SIP dial)</option>
@@ -51,7 +54,7 @@ input, select, button { padding: 0.35rem 0.5rem; font-size: 0.9rem; }
 
 <h2>Pitch — research-first-cold-call-v1</h2>
 <p>Preview of the exact script a SIP call would speak, with {firstName}, {company_name}, {call_purpose} filled per contact. Mirrors <code>load_pitch</code> in the real agent.</p>
-<label>company_name <input id="pitch-company" value="Demo Co" size="18" /></label>
+<label>company_name <input id="pitch-company" value="" size="42" /></label>
 <label>call_purpose <input id="pitch-purpose" value="a brief introduction to how we help teams follow up faster" size="48" /></label>
 <button onclick="previewPitch()">Preview pitch</button>
 <div class="log" id="pitch">pick a contact, then preview</div>
@@ -63,12 +66,18 @@ input, select, button { padding: 0.35rem 0.5rem; font-size: 0.9rem; }
 const log = (m) => document.getElementById("log").textContent = typeof m === "string" ? m : JSON.stringify(m, null, 2);
 
 async function load() {
-  const [contacts, calls, prov, sip] = await Promise.all([
+  const [contacts, calls, prov, sip, companies] = await Promise.all([
     fetch("/api/contacts").then(r => r.json()),
     fetch("/api/calls").then(r => r.json()),
     fetch("/api/provider").then(r => r.json()),
     fetch("/api/sip/nonoh").then(r => r.json()),
+    fetch("/api/companies").then(r => r.json()),
   ]);
+  const co = (companies[0] && companies[0].name) || "";
+  const coAddr = (companies[0] && companies[0].address) || "";
+  document.getElementById("company").textContent = co + (coAddr ? " — " + coAddr : "");
+  const pc = document.getElementById("pitch-company");
+  if (!pc.value) pc.value = co;
   document.getElementById("provider").value = prov.provider;
   document.getElementById("sip-server").value = sip.sip_server || "";
   document.getElementById("sip-port").value = sip.sip_port || "5060";

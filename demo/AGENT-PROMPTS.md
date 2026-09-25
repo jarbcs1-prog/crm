@@ -8,7 +8,7 @@ Fill in the bracketed values before sending.
 Shared values for every prompt below:
 
 - `[CONTACT]` — `John B.` or `Dan Da Man`
-- `[COMPANY]` — verified company name, e.g. `Demo Co`
+- `[COMPANY]` — verified company name, e.g. `J.A.R.B. Research Consultancy Services`
 - `[PURPOSE]` — verified call purpose, e.g.
   `a brief introduction to how we help teams follow up faster`
 - Never invent `[COMPANY]` or `[PURPOSE]`. If unverified, stop and ask.
