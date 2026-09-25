@@ -7,7 +7,7 @@ inside the installer.
 
 ## 1. Install
 
-1. Download `CRMDemo-Setup-0.1.0.exe` from the GitHub release.
+1. Download `CRMDemo-Setup-0.1.2.exe` from the GitHub release.
 2. Run it. No admin rights needed — installs to `%LOCALAPPDATA%\CRMDemo`.
 3. Start Menu → **CRM Demo** → **Start CRM Demo**.
    A server window opens (minimized) and your browser opens
