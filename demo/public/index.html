@@ -1,0 +1,165 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>CRM Demo — SIP test</title>
+<style>
+body { font-family: system-ui, sans-serif; max-width: 860px; margin: 2rem auto; padding: 0 1rem; }
+table { border-collapse: collapse; width: 100%; margin: 1rem 0; }
+th, td { border: 1px solid #ccc; padding: 0.4rem 0.6rem; text-align: left; font-size: 0.9rem; }
+input, select, button { padding: 0.35rem 0.5rem; font-size: 0.9rem; }
+.log { background: #f6f6f6; padding: 0.6rem; white-space: pre-wrap; font-size: 0.85rem; }
+</style>
+</head>
+<body>
+<h1>CRM Demo (SQLite, no auth)</h1>
+<p>Test contacts for SIP: <strong>John B.</strong> and <strong>Dan Da Man</strong>. Phones must stay valid E.164 (e.g. +15551234567).</p>
+
+<h2>Company</h2>
+<p id="company">loading…</p>
+
+<h2>Voice provider</h2>
+<select id="provider">
+  <option value="nonoh">nonoh (direct SIP dial)</option>
+  <option value="voipstudio">voipstudio</option>
+  <option value="twilio">twilio</option>
+  <option value="plivo">plivo</option>
+  <option value="vapi">vapi</option>
+</select>
+<button onclick="saveProvider()">Save provider</button>
+
+<h2>Nonoh SIP settings</h2>
+<p>Required for calls via <strong>nonoh</strong>. Same fields as the full CRM's
+<code>NONOH_SIP_*</code> env block. Stored locally in <code>demo.db</code> only — never sent anywhere.</p>
+<table>
+<tr><td>SIP server</td><td><input id="sip-server" placeholder="sip.nonoh.net" size="24" /></td>
+<td>Port</td><td><input id="sip-port" value="5060" size="6" /></td>
+<td><label><input type="checkbox" id="sip-tls" /> TLS</label></td></tr>
+<tr><td>Username</td><td><input id="sip-user" size="24" /></td>
+<td>Password</td><td><input id="sip-pass" type="password" size="24" /></td>
+<td id="sip-pass-state"></td></tr>
+<tr><td>Display name</td><td><input id="sip-display" value="CRM Demo" size="24" /></td>
+<td>STUN server</td><td><input id="sip-stun" size="24" /></td>
+<td>Port <input id="sip-stun-port" value="3478" size="6" /></td></tr>
+</table>
+<button onclick="saveSip()">Save Nonoh settings</button>
+<span id="sip-status"></span>
+
+<h2>Contacts</h2>
+<table id="contacts"><thead><tr><th>Name</th><th>Phone (E.164)</th><th>Email</th><th></th><th></th></tr></thead><tbody></tbody></table>
+
+<h2>Call log</h2>
+<table id="calls"><thead><tr><th>When</th><th>Contact</th><th>calleeNumber</th><th>sipCallId</th><th>provider</th><th>status</th></tr></thead><tbody></tbody></table>
+
+<h2>Pitch — research-first-cold-call-v1</h2>
+<p>Preview of the exact script a SIP call would speak, with {firstName}, {company_name}, {call_purpose} filled per contact. Mirrors <code>load_pitch</code> in the real agent.</p>
+<label>company_name <input id="pitch-company" value="" size="42" /></label>
+<label>call_purpose <input id="pitch-purpose" value="a brief introduction to how we help teams follow up faster" size="48" /></label>
+<button onclick="previewPitch()">Preview pitch</button>
+<div class="log" id="pitch">pick a contact, then preview</div>
+
+<h2>Output</h2>
+<div class="log" id="log">ready</div>
+
+<script>
+const log = (m) => document.getElementById("log").textContent = typeof m === "string" ? m : JSON.stringify(m, null, 2);
+
+async function load() {
+  const [contacts, calls, prov, sip, companies] = await Promise.all([
+    fetch("/api/contacts").then(r => r.json()),
+    fetch("/api/calls").then(r => r.json()),
+    fetch("/api/provider").then(r => r.json()),
+    fetch("/api/sip/nonoh").then(r => r.json()),
+    fetch("/api/companies").then(r => r.json()),
+  ]);
+  const co = (companies[0] && companies[0].name) || "";
+  const coAddr = (companies[0] && companies[0].address) || "";
+  document.getElementById("company").textContent = co + (coAddr ? " — " + coAddr : "");
+  const pc = document.getElementById("pitch-company");
+  if (!pc.value) pc.value = co;
+  document.getElementById("provider").value = prov.provider;
+  document.getElementById("sip-server").value = sip.sip_server || "";
+  document.getElementById("sip-port").value = sip.sip_port || "5060";
+  document.getElementById("sip-tls").checked = !!sip.use_tls;
+  document.getElementById("sip-user").value = sip.username || "";
+  document.getElementById("sip-display").value = sip.display_name || "CRM Demo";
+  document.getElementById("sip-stun").value = sip.stun_server || "";
+  document.getElementById("sip-stun-port").value = sip.stun_port || "3478";
+  document.getElementById("sip-pass-state").textContent = sip.passwordConfigured ? "password saved" : "no password saved";
+  document.getElementById("sip-status").textContent = sip.configured ? "Nonoh ready" : "Nonoh NOT configured — calls via nonoh will be refused";
+  const tb = document.querySelector("#contacts tbody");
+  tb.innerHTML = "";
+  for (const c of contacts) {
+    const tr = document.createElement("tr");
+    tr.innerHTML = `<td>${c.name}</td>
+      <td><input id="phone-${c.id}" value="${c.phone}" size="16" /></td>
+      <td>${c.email || ""}</td>
+      <td><button onclick="savePhone('${c.id}')">Save phone</button></td>
+      <td><button onclick="callContact('${c.id}')">Call</button></td>`;
+    tb.appendChild(tr);
+  }
+  const cb = document.querySelector("#calls tbody");
+  cb.innerHTML = "";
+  for (const k of calls) {
+    const tr = document.createElement("tr");
+    tr.innerHTML = `<td>${k.created_at}</td><td>${k.contact_name || k.contact_id}</td><td>${k.callee_number}</td><td>${k.sip_call_id}</td><td>${k.provider}</td><td>${k.status}</td>`;
+    cb.appendChild(tr);
+  }
+}
+
+async function savePhone(id) {
+  const phone = document.getElementById("phone-" + id).value;
+  const r = await fetch("/api/contacts/" + id, { method: "PUT", headers: { "content-type": "application/json" }, body: JSON.stringify({ phone }) });
+  log(await r.json());
+  load();
+}
+
+async function saveProvider() {
+  const provider = document.getElementById("provider").value;
+  const r = await fetch("/api/provider", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ provider }) });
+  log(await r.json());
+}
+
+async function saveSip() {
+  const body = {
+    sip_server: document.getElementById("sip-server").value,
+    sip_port: document.getElementById("sip-port").value,
+    use_tls: document.getElementById("sip-tls").checked,
+    username: document.getElementById("sip-user").value,
+    display_name: document.getElementById("sip-display").value,
+    stun_server: document.getElementById("sip-stun").value,
+    stun_port: document.getElementById("sip-stun-port").value,
+  };
+  const pass = document.getElementById("sip-pass").value;
+  if (pass) body.password = pass;
+  const r = await fetch("/api/sip/nonoh", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(body) });
+  const j = await r.json();
+  document.getElementById("sip-pass").value = "";
+  log(j);
+  load();
+}
+
+async function callContact(contactId) {
+  const provider = document.getElementById("provider").value;
+  const r = await fetch("/api/calls", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ contactId, provider }) });
+  log(await r.json());
+  load();
+  previewPitch(contactId);
+}
+
+async function previewPitch(contactId) {
+  const contacts = await fetch("/api/contacts").then(r => r.json());
+  const id = contactId || (contacts[0] && contacts[0].id);
+  if (!id) return;
+  const company_name = document.getElementById("pitch-company").value;
+  const call_purpose = document.getElementById("pitch-purpose").value;
+  const r = await fetch(`/api/pitch?contactId=${id}&company_name=${encodeURIComponent(company_name)}&call_purpose=${encodeURIComponent(call_purpose)}`).then(r => r.json());
+  document.getElementById("pitch").textContent = (r.segments || []).map(s => `[${s.id}] ${s.text}`).join("\n\n")
+    + "\n\n— refusal branches: " + (r.refusalBranches || []).map(b => b.id).join(", ");
+}
+
+load();
+</script>
+</body>
+</html>

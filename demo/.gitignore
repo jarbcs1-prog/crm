@@ -1,0 +1,7 @@
+demo.db
+demo.db-journal
+node_modules/
+installer/staging/
+installer/dist/
+installer/node-*.zip
+installer/node-tmp/
