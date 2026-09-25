@@ -230,9 +230,16 @@ export async function readCrmHistory(
 
 	if (!contact) return null;
 
-	const [threads, meetings, colleagues, recentCalls, callAggregate, callOutcomes, connectedCalls] =
-		await Promise.all([
-			db.emailThread.findMany({
+	const [
+		threads,
+		meetings,
+		colleagues,
+		recentCalls,
+		callAggregate,
+		callOutcomes,
+		connectedCalls,
+	] = await Promise.all([
+		db.emailThread.findMany({
 			where: { contactId },
 			orderBy: { lastMessageAt: "desc" },
 			take: options.threads ?? 5,

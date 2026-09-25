@@ -53,7 +53,9 @@ export function VoiceProvider() {
 	const trpc = useTRPC();
 	const cache = useCrmCache();
 	const settings = useQuery(trpc.settings.voiceProvider.queryOptions());
-	const [draft, setDraft] = useState<VoiceProviderId | null | undefined>(undefined);
+	const [draft, setDraft] = useState<VoiceProviderId | null | undefined>(
+		undefined,
+	);
 
 	const save = useMutation(
 		trpc.settings.setVoiceProvider.mutationOptions({
@@ -71,7 +73,9 @@ export function VoiceProvider() {
 	const selectedId = draft === undefined ? data.selectedId : draft;
 	const selected = selectedId ?? AUTOMATIC;
 	const dirty = draft !== undefined && draft !== data.selectedId;
-	const selectedOption = data.options.find((option) => option.id === selectedId);
+	const selectedOption = data.options.find(
+		(option) => option.id === selectedId,
+	);
 	const hasUnavailableSelection = Boolean(
 		selectedOption && !selectedOption.configured,
 	);
@@ -88,7 +92,12 @@ export function VoiceProvider() {
 					<Button
 						type="button"
 						variant="outline"
-						disabled={save.isPending || settings.isFetching || !data.canConfigure || !dirty}
+						disabled={
+							save.isPending ||
+							settings.isFetching ||
+							!data.canConfigure ||
+							!dirty
+						}
 						onClick={() => save.mutate({ provider: selectedId })}
 					>
 						{save.isPending ? <Spinner data-icon="inline-start" /> : null}
@@ -107,7 +116,9 @@ export function VoiceProvider() {
 									value === AUTOMATIC ? null : (value as VoiceProviderId),
 								)
 							}
-							disabled={save.isPending || settings.isFetching || !data.canConfigure}
+							disabled={
+								save.isPending || settings.isFetching || !data.canConfigure
+							}
 						>
 							<SelectTrigger id="voice-provider" className="w-full">
 								<SelectValue placeholder="Choose a provider" />
@@ -123,7 +134,8 @@ export function VoiceProvider() {
 											value={option.id}
 											disabled={!option.configured}
 										>
-											{option.label} — {option.configured ? "configured" : "not configured"}
+											{option.label} —{" "}
+											{option.configured ? "configured" : "not configured"}
 										</SelectItem>
 									))}
 								</SelectGroup>
@@ -147,8 +159,8 @@ export function VoiceProvider() {
 					<Alert variant="destructive">
 						<AlertTitle>Saved provider is invalid</AlertTitle>
 						<AlertDescription>
-							The saved value is not a supported provider. Choose a valid option before
-							making calls.
+							The saved value is not a supported provider. Choose a valid option
+							before making calls.
 						</AlertDescription>
 					</Alert>
 				) : null}
@@ -156,8 +168,8 @@ export function VoiceProvider() {
 					<Alert variant="destructive">
 						<AlertTitle>Selected provider unavailable</AlertTitle>
 						<AlertDescription>
-							Complete its environment settings or choose another provider before
-							making calls.
+							Complete its environment settings or choose another provider
+							before making calls.
 						</AlertDescription>
 					</Alert>
 				) : null}

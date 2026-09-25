@@ -89,9 +89,9 @@ describe("voice provider settings", () => {
 			}),
 		).toBe(true);
 		expect(voiceProviderConfigured("voipstudio", {})).toBe(false);
-		expect(voiceProviderConfigured("voipstudio", { VOIPSTUDIO_API_KEY: "key" })).toBe(
-			true,
-		);
+		expect(
+			voiceProviderConfigured("voipstudio", { VOIPSTUDIO_API_KEY: "key" }),
+		).toBe(true);
 		expect(
 			voiceProviderConfigured("plivo", {
 				PLIVO_AUTH_ID: "MA1",
@@ -106,7 +106,9 @@ describe("voice provider settings", () => {
 				PLIVO_ANSWER_URL: "https://example.test/answer",
 			}),
 		).toBe(true);
-		expect(voiceProviderConfigured("vapi", { VAPI_API_KEY: "key" })).toBe(false);
+		expect(voiceProviderConfigured("vapi", { VAPI_API_KEY: "key" })).toBe(
+			false,
+		);
 		expect(
 			voiceProviderConfigured("vapi", {
 				VAPI_API_KEY: "key",

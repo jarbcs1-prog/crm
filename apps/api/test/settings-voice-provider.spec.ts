@@ -42,7 +42,10 @@ beforeEach(() => {
 	delete process.env.VAPI_PHONE_NUMBER_ID;
 });
 
-function makeService(role: string | null = "owner", provider: string | null = null) {
+function makeService(
+	role: string | null = "owner",
+	provider: string | null = null,
+) {
 	let row: { voiceProvider: string | null; updatedAt: Date } = {
 		voiceProvider: provider,
 		updatedAt: new Date("2026-01-01T00:00:00.000Z"),
@@ -87,12 +90,12 @@ describe("SettingsService voice providers", () => {
 			"plivo",
 			"vapi",
 		]);
-		expect(result.options.find((option) => option.id === "voipstudio")?.configured).toBe(
-			true,
-		);
-		expect(result.options.find((option) => option.id === "twilio")?.configured).toBe(
-			false,
-		);
+		expect(
+			result.options.find((option) => option.id === "voipstudio")?.configured,
+		).toBe(true);
+		expect(
+			result.options.find((option) => option.id === "twilio")?.configured,
+		).toBe(false);
 	});
 
 	it("reports members as read-only", async () => {

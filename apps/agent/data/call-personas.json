@@ -45,10 +45,7 @@
 		"id": "deferral-no-time",
 		"label": "Vague deferral without a time",
 		"objective": "Push the caller off with an unspecific later.",
-		"script": [
-			"I can't talk right now, call me later.",
-			"Just call me later."
-		],
+		"script": ["I can't talk right now, call me later.", "Just call me later."],
 		"defaultReply": "Call me later."
 	},
 	{

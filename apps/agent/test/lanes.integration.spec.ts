@@ -50,7 +50,9 @@ describe("dispatch lanes", () => {
 		expect(research.map((t) => t.id)).not.toContain(brand.id);
 
 		const brandRow = await db.agentTask.findUnique({ where: { id: brand.id } });
-		const profileRow = await db.agentTask.findUnique({ where: { id: profile.id } });
+		const profileRow = await db.agentTask.findUnique({
+			where: { id: profile.id },
+		});
 		expect(brandRow?.leasedUntil).not.toBeNull();
 		expect(profileRow?.leasedUntil).not.toBeNull();
 	});

@@ -111,9 +111,7 @@ export class SettingsService {
 		return {
 			selectedId: state.selectedId,
 			invalid: !state.valid,
-			canConfigure: Boolean(
-				member && isWorkspaceAdmin(member.role as never),
-			),
+			canConfigure: Boolean(member && isWorkspaceAdmin(member.role as never)),
 			options: VOICE_PROVIDERS.map((id) => ({
 				id,
 				label: VOICE_PROVIDER_LABELS[id],

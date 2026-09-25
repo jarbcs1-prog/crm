@@ -15,11 +15,36 @@ const SEGMENTS: SimSegment[] = [
 ];
 
 const BRANCHES: SimBranch[] = [
-	{ id: "r1", trigger: ["I don't want to participate", "No"], action: "TERMINATE", text: "Understood, goodbye." },
-	{ id: "r2", trigger: ["Don't call me again"], action: "TERMINATE_AND_OPTOUT", text: "Recorded, goodbye." },
-	{ id: "r3", trigger: ["not interested"], action: "CLARIFY_ONCE", text: "May I ask what puts you off?" },
-	{ id: "r5", trigger: ["Wrong number"], action: "TERMINATE", text: "Wrong number, goodbye." },
-	{ id: "r7", trigger: ["call me later", "busy"], action: "CLARIFY_ONCE", text: "Would tomorrow or the day after work?" },
+	{
+		id: "r1",
+		trigger: ["I don't want to participate", "No"],
+		action: "TERMINATE",
+		text: "Understood, goodbye.",
+	},
+	{
+		id: "r2",
+		trigger: ["Don't call me again"],
+		action: "TERMINATE_AND_OPTOUT",
+		text: "Recorded, goodbye.",
+	},
+	{
+		id: "r3",
+		trigger: ["not interested"],
+		action: "CLARIFY_ONCE",
+		text: "May I ask what puts you off?",
+	},
+	{
+		id: "r5",
+		trigger: ["Wrong number"],
+		action: "TERMINATE",
+		text: "Wrong number, goodbye.",
+	},
+	{
+		id: "r7",
+		trigger: ["call me later", "busy"],
+		action: "CLARIFY_ONCE",
+		text: "Would tomorrow or the day after work?",
+	},
 ];
 
 function persona(id: string, script: string[]): SimPersona {
@@ -31,7 +56,11 @@ describe("call-sim", () => {
 		const result = runSimulation(
 			SEGMENTS,
 			BRANCHES,
-			persona("cooperative", ["Yes, I have a moment.", "Go on.", "Yes, arrange it."]),
+			persona("cooperative", [
+				"Yes, I have a moment.",
+				"Go on.",
+				"Yes, arrange it.",
+			]),
 		);
 		expect(result.terminalKind).toBe("consent");
 		expect(result.consentGranted).toBe(true);
@@ -62,14 +91,19 @@ describe("call-sim", () => {
 		const result = runSimulation(
 			SEGMENTS,
 			BRANCHES,
-			persona("brush-off", ["I'm not interested.", "I said I'm not interested."]),
+			persona("brush-off", [
+				"I'm not interested.",
+				"I said I'm not interested.",
+			]),
 		);
 		expect(result.clarifyUsed).toBe(true);
 		expect(result.clarifyTwice).toBe(true);
 		expect(result.terminalBranchId).toBe("r3");
 		expect(result.turns.at(-1)?.text).toBe("May I ask what puts you off?");
 		const scores = scoreSimulation(result, SEGMENTS.length, "CLARIFY_ONCE");
-		expect(scores.compliance.find((entry) => entry.check === "clarify-once")?.pass).toBe(false);
+		expect(
+			scores.compliance.find((entry) => entry.check === "clarify-once")?.pass,
+		).toBe(false);
 		expect(scores.pass).toBe(false);
 	});
 
@@ -86,19 +120,33 @@ describe("call-sim", () => {
 
 	it("fails compliance when a segment requests documents without consent", () => {
 		const docSegments: SimSegment[] = [
-			{ id: "s1", text: "Please send me your bank statements.", listenAfter: true },
+			{
+				id: "s1",
+				text: "Please send me your bank statements.",
+				listenAfter: true,
+			},
 		];
-		const result = runSimulation(docSegments, BRANCHES, persona("any", ["Hello?"]));
+		const result = runSimulation(
+			docSegments,
+			BRANCHES,
+			persona("any", ["Hello?"]),
+		);
 		expect(result.documentRequestedWithoutConsent).toBe(true);
 		const scores = scoreSimulation(result, docSegments.length);
 		expect(
-			scores.compliance.find((entry) => entry.check === "no-document-without-consent")?.pass,
+			scores.compliance.find(
+				(entry) => entry.check === "no-document-without-consent",
+			)?.pass,
 		).toBe(false);
 	});
 
 	it("does not flag segments that disavow document collection", () => {
 		const clean: SimSegment[] = [
-			{ id: "s1", text: "I will not ask you to provide documents on this call.", listenAfter: true },
+			{
+				id: "s1",
+				text: "I will not ask you to provide documents on this call.",
+				listenAfter: true,
+			},
 		];
 		const result = runSimulation(clean, BRANCHES, persona("any", ["Okay."]));
 		expect(result.documentRequestedWithoutConsent).toBe(false);
@@ -111,9 +159,15 @@ describe("call-sim", () => {
 			persona("dnc", ["Don't call me again."]),
 		);
 		expect(result.terminalBranchId).toBe("r2");
-		const scores = scoreSimulation(result, SEGMENTS.length, "TERMINATE_AND_OPTOUT");
+		const scores = scoreSimulation(
+			result,
+			SEGMENTS.length,
+			"TERMINATE_AND_OPTOUT",
+		);
 		expect(
-			scores.compliance.find((entry) => entry.check === "do-not-contact-honored")?.pass,
+			scores.compliance.find(
+				(entry) => entry.check === "do-not-contact-honored",
+			)?.pass,
 		).toBe(true);
 	});
 
@@ -128,7 +182,10 @@ describe("call-sim", () => {
 	});
 
 	it("is deterministic for the same inputs", () => {
-		const caller = persona("brush-off", ["I'm not interested.", "Still not interested."]);
+		const caller = persona("brush-off", [
+			"I'm not interested.",
+			"Still not interested.",
+		]);
 		const first = runSimulation(SEGMENTS, BRANCHES, caller);
 		const second = runSimulation(SEGMENTS, BRANCHES, caller);
 		expect(second).toEqual(first);

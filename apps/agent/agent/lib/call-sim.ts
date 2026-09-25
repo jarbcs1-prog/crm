@@ -61,7 +61,8 @@ const AFFIRM =
 const DOC_REQUEST =
 	/\b(send|provide|share|upload|forward|give|read out|confirm|tell me) .{0,40}?\b(documents?|statements?|accounts?|bank|financial|passport|records?|credentials?|funds?)\b/i;
 
-const NEGATION = /(\bnot\b|\bnever\b|won't|don't|no .*?\b(need|ask|request|collect|provide)\b|without )/i;
+const NEGATION =
+	/(\bnot\b|\bnever\b|won't|don't|no .*?\b(need|ask|request|collect|provide)\b|without )/i;
 
 function stripNegatedSentences(text: string): string {
 	return text
@@ -82,14 +83,17 @@ function triggerMatches(reply: string, trigger: string): boolean {
 	const lower = reply.toLowerCase();
 	const needle = cleanTrigger.toLowerCase();
 	if (needle.length <= 3) {
-		return new RegExp(`\\b${needle.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}\\b`).test(
-			lower,
-		);
+		return new RegExp(
+			`\\b${needle.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}\\b`,
+		).test(lower);
 	}
 	return lower.includes(needle);
 }
 
-function matchBranch(reply: string, branches: SimBranch[]): SimBranch | undefined {
+function matchBranch(
+	reply: string,
+	branches: SimBranch[],
+): SimBranch | undefined {
 	for (const branch of branches) {
 		if (branch.trigger.some((trigger) => triggerMatches(reply, trigger))) {
 			return branch;
@@ -122,7 +126,10 @@ export function runSimulation(
 		if (!segment.listenAfter) {
 			continue;
 		}
-		const line = scriptIndex < persona.script.length ? persona.script[scriptIndex] : undefined;
+		const line =
+			scriptIndex < persona.script.length
+				? persona.script[scriptIndex]
+				: undefined;
 		const reply = line ?? persona.defaultReply;
 		scriptIndex += 1;
 		turns.push({ speaker: "caller", text: reply });
@@ -223,22 +230,42 @@ export function scoreSimulation(
 		: result.segmentsSpoken >= Math.ceil(segmentCount / 2)
 			? 0.5
 			: 0.2;
-	const efficiency = result.clarifyTwice
-		? 0.4
-		: result.clarifyUsed
-			? 0.7
-			: 1;
+	const efficiency = result.clarifyTwice ? 0.4 : result.clarifyUsed ? 0.7 : 1;
 
 	const estimates =
 		result.terminalKind === "consent"
-			? { interest: 0.9, motivation: 0.8, urgency: 0.7, experience: 0.8, budget: 0.6 }
+			? {
+					interest: 0.9,
+					motivation: 0.8,
+					urgency: 0.7,
+					experience: 0.8,
+					budget: 0.6,
+				}
 			: result.terminalBranchId !== undefined &&
-				  (terminalAction === "TERMINATE_AND_OPTOUT" ||
+					(terminalAction === "TERMINATE_AND_OPTOUT" ||
 						result.terminalBranchId.includes("wrong"))
-				? { interest: 0.1, motivation: 0.1, urgency: 0.1, experience: 0.3, budget: 0.1 }
+				? {
+						interest: 0.1,
+						motivation: 0.1,
+						urgency: 0.1,
+						experience: 0.3,
+						budget: 0.1,
+					}
 				: result.terminalBranchId !== undefined
-					? { interest: 0.3, motivation: 0.2, urgency: 0.2, experience: 0.4, budget: 0.2 }
-					: { interest: 0.5, motivation: 0.4, urgency: 0.3, experience: 0.5, budget: 0.3 };
+					? {
+							interest: 0.3,
+							motivation: 0.2,
+							urgency: 0.2,
+							experience: 0.4,
+							budget: 0.2,
+						}
+					: {
+							interest: 0.5,
+							motivation: 0.4,
+							urgency: 0.3,
+							experience: 0.5,
+							budget: 0.3,
+						};
 
 	return {
 		taskCompletion: round2(taskCompletion),

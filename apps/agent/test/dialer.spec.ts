@@ -164,7 +164,10 @@ describe("plivo dialer", () => {
 		expect(result.providerCallId).toBe("req-1");
 		expect(result.queued).toBe(true);
 		expect(calls[0]?.url).toBe("https://api.plivo.com/v1/Account/MA123/Call/");
-		const body = JSON.parse(String(calls[0]?.init.body)) as Record<string, string>;
+		const body = JSON.parse(String(calls[0]?.init.body)) as Record<
+			string,
+			string
+		>;
 		expect(body.to).toBe("+15552223333");
 		expect(body.answer_url).toBe("https://example.com/answer");
 	});
@@ -193,7 +196,10 @@ describe("vapi dialer", () => {
 		expect(calls[0]?.url).toBe("https://api.vapi.ai/call/phone");
 		const headers = calls[0]?.init.headers as Record<string, string>;
 		expect(headers.Authorization).toBe("Bearer key");
-		const body = JSON.parse(String(calls[0]?.init.body)) as Record<string, unknown>;
+		const body = JSON.parse(String(calls[0]?.init.body)) as Record<
+			string,
+			unknown
+		>;
 		expect(body.assistantId).toBe("as-1");
 		expect(body).toMatchObject({ customer: { number: "+15552223333" } });
 	});
@@ -202,9 +208,14 @@ describe("vapi dialer", () => {
 		jsonResponse({ id: "call-2" });
 		delete process.env.VAPI_ASSISTANT_ID;
 		const assistant = { model: { provider: "openai", model: "gpt-4o-mini" } };
-		const result = await dialerFor("vapi").placeCall("+15552223333", { assistant });
+		const result = await dialerFor("vapi").placeCall("+15552223333", {
+			assistant,
+		});
 		expect(result.ok).toBe(true);
-		const body = JSON.parse(String(calls[0]?.init.body)) as Record<string, unknown>;
+		const body = JSON.parse(String(calls[0]?.init.body)) as Record<
+			string,
+			unknown
+		>;
 		expect(body.assistant).toEqual(assistant);
 	});
 
@@ -239,7 +250,10 @@ describe("voipstudio dialer", () => {
 		expect(calls[0]?.url).toBe("https://l7api.com/v1.2/voipstudio/calls");
 		const headers = calls[0]?.init.headers as Record<string, string>;
 		expect(headers["X-Auth-Token"]).toBe("key");
-		const body = JSON.parse(String(calls[0]?.init.body)) as Record<string, string>;
+		const body = JSON.parse(String(calls[0]?.init.body)) as Record<
+			string,
+			string
+		>;
 		expect(body).toEqual({ to: "+15552223333", caller_id: "+15550001111" });
 	});
 
@@ -277,7 +291,8 @@ describe("hangup routing", () => {
 		const invalid = await hangupCall({ provider: "unknown" }, "legacy-2");
 		expect(missing).toEqual({
 			ok: false,
-			reason: "Call has no valid provider metadata; refusing to guess how to hang it up.",
+			reason:
+				"Call has no valid provider metadata; refusing to guess how to hang it up.",
 		});
 		expect(invalid).toEqual(missing);
 		expect(calls).toHaveLength(0);
@@ -332,10 +347,17 @@ describe("hosted provider status", () => {
 
 describe("tool surface stability", () => {
 	it("make_call keeps its input schema with keys but no provider", () => {
-		const shape = (makeCall.inputSchema as unknown as { shape: Record<string, unknown> })
-			.shape;
+		const shape = (
+			makeCall.inputSchema as unknown as { shape: Record<string, unknown> }
+		).shape;
 		expect(Object.keys(shape).sort()).toEqual(
-			["assistant", "contactId", "phone", "provider", "requiresOsintCheck"].sort(),
+			[
+				"assistant",
+				"contactId",
+				"phone",
+				"provider",
+				"requiresOsintCheck",
+			].sort(),
 		);
 	});
 });

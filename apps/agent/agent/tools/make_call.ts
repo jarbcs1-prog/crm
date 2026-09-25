@@ -5,10 +5,7 @@ import {
 	db,
 	evaluateOsintRequirement,
 } from "@crm/db";
-import {
-	readVoiceProviderState,
-	VOICE_PROVIDERS,
-} from "@crm/db/settings";
+import { readVoiceProviderState, VOICE_PROVIDERS } from "@crm/db/settings";
 import { z } from "zod";
 import { selectDialer } from "../lib/dialer";
 import { focusOn } from "../lib/focus";
@@ -28,11 +25,15 @@ export default createCallTool({
 		provider: z
 			.enum(VOICE_PROVIDERS)
 			.optional()
-			.describe("Optional provider override; otherwise use the human-selected default."),
+			.describe(
+				"Optional provider override; otherwise use the human-selected default.",
+			),
 		assistant: z
 			.unknown()
 			.optional()
-			.describe("Optional hosted-provider assistant, such as the Vapi object returned by load_pitch."),
+			.describe(
+				"Optional hosted-provider assistant, such as the Vapi object returned by load_pitch.",
+			),
 		requiresOsintCheck: z
 			.boolean()
 			.optional()
@@ -195,7 +196,9 @@ export default createCallTool({
 		if (dialer.name !== "nonoh" || !("session" in dialed)) {
 			const now = new Date();
 			const note =
-				"note" in dialed && typeof dialed.note === "string" ? dialed.note : undefined;
+				"note" in dialed && typeof dialed.note === "string"
+					? dialed.note
+					: undefined;
 			await db.call.update({
 				where: { id: call.id },
 				data: {
@@ -208,7 +211,10 @@ export default createCallTool({
 				data: {
 					callId: call.id,
 					type: CallEventType.RING,
-					payload: { provider: dialer.name, providerCallId: dialed.providerCallId },
+					payload: {
+						provider: dialer.name,
+						providerCallId: dialed.providerCallId,
+					},
 				},
 			});
 			await focusOn({ contactId: contact.id });

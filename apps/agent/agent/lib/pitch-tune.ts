@@ -25,7 +25,11 @@ export type FailedEval = {
 };
 
 export type PatchOp = {
-	op: "add-clarify-beat" | "add-closing-line" | "add-consent-gate" | "tighten-segment";
+	op:
+		| "add-clarify-beat"
+		| "add-closing-line"
+		| "add-consent-gate"
+		| "tighten-segment";
 	segmentId?: string;
 	afterSegmentId?: string;
 	text: string;
@@ -70,10 +74,14 @@ export function hashCorpus(parts: string[]): string {
 	return createHash("sha256").update(parts.join("\n")).digest("hex");
 }
 
-export async function loadSimPitch(
-	pitchId: string,
-): Promise<
-	| { ok: true; stem: string; raw: string; segments: SimSegment[]; branches: SimBranch[] }
+export async function loadSimPitch(pitchId: string): Promise<
+	| {
+			ok: true;
+			stem: string;
+			raw: string;
+			segments: SimSegment[];
+			branches: SimBranch[];
+	  }
 	| { ok: false; reason: string }
 > {
 	let stems: string[];
@@ -84,19 +92,24 @@ export async function loadSimPitch(
 			.map((name) => name.slice(0, -".json".length))
 			.sort();
 	} catch (error) {
-		return { ok: false, reason: `The pitches directory could not be read: ${describe(error)}` };
+		return {
+			ok: false,
+			reason: `The pitches directory could not be read: ${describe(error)}`,
+		};
 	}
 	let stem = stems.find((entry) => entry === pitchId);
 	if (stem === undefined) {
 		for (const entry of stems) {
 			try {
-				const raw = await readFile(join(DATA_DIR, "pitches", `${entry}.json`), "utf8");
+				const raw = await readFile(
+					join(DATA_DIR, "pitches", `${entry}.json`),
+					"utf8",
+				);
 				if (asRecord(JSON.parse(raw))?.id === pitchId) {
 					stem = entry;
 					break;
 				}
-			} catch {
-			}
+			} catch {}
 		}
 	}
 	if (stem === undefined) {
@@ -106,11 +119,17 @@ export async function loadSimPitch(
 	try {
 		raw = await readFile(join(DATA_DIR, "pitches", `${stem}.json`), "utf8");
 	} catch (error) {
-		return { ok: false, reason: `The pitch file "${stem}.json" could not be read: ${describe(error)}` };
+		return {
+			ok: false,
+			reason: `The pitch file "${stem}.json" could not be read: ${describe(error)}`,
+		};
 	}
 	const record = asRecord(JSON.parse(raw) as unknown);
 	if (record === undefined) {
-		return { ok: false, reason: `The pitch file "${stem}.json" is not a JSON object.` };
+		return {
+			ok: false,
+			reason: `The pitch file "${stem}.json" is not a JSON object.`,
+		};
 	}
 	const entries = Array.isArray(record.segments)
 		? record.segments
@@ -118,18 +137,32 @@ export async function loadSimPitch(
 			? record.conversation
 			: undefined;
 	if (!Array.isArray(entries) || entries.length === 0) {
-		return { ok: false, reason: `The pitch "${stem}" has no segments or conversation array.` };
+		return {
+			ok: false,
+			reason: `The pitch "${stem}" has no segments or conversation array.`,
+		};
 	}
 	const segments: SimSegment[] = [];
 	for (const [index, entry] of entries.entries()) {
 		const segment = asRecord(entry);
-		if (segment === undefined || typeof segment.text !== "string" || segment.text.trim().length === 0) {
-			return { ok: false, reason: `Segment ${index + 1} of the pitch "${stem}" has no text.` };
+		if (
+			segment === undefined ||
+			typeof segment.text !== "string" ||
+			segment.text.trim().length === 0
+		) {
+			return {
+				ok: false,
+				reason: `Segment ${index + 1} of the pitch "${stem}" has no text.`,
+			};
 		}
 		segments.push({
-			id: typeof segment.id === "string" && segment.id.length > 0 ? segment.id : `s${index + 1}`,
+			id:
+				typeof segment.id === "string" && segment.id.length > 0
+					? segment.id
+					: `s${index + 1}`,
 			text: segment.text,
-			listenAfter: typeof segment.listenAfter === "boolean" ? segment.listenAfter : true,
+			listenAfter:
+				typeof segment.listenAfter === "boolean" ? segment.listenAfter : true,
 		});
 	}
 	const branches: SimBranch[] = Array.isArray(record.refusal_branches)
@@ -148,7 +181,8 @@ export async function loadSimPitch(
 					{
 						id: branch.id,
 						trigger: branch.trigger.filter(
-							(value): value is string => typeof value === "string" && value.length > 0,
+							(value): value is string =>
+								typeof value === "string" && value.length > 0,
 						),
 						action: branch.action,
 						text: branch.text,
@@ -167,7 +201,10 @@ export async function loadPersonas(): Promise<
 	try {
 		raw = await readFile(join(DATA_DIR, "call-personas.json"), "utf8");
 	} catch (error) {
-		return { ok: false, reason: `The persona fixtures could not be read: ${describe(error)}` };
+		return {
+			ok: false,
+			reason: `The persona fixtures could not be read: ${describe(error)}`,
+		};
 	}
 	const parsed = JSON.parse(raw) as unknown;
 	if (!Array.isArray(parsed)) {
@@ -184,13 +221,19 @@ export async function loadPersonas(): Promise<
 			!Array.isArray(record.script) ||
 			typeof record.defaultReply !== "string"
 		) {
-			return { ok: false, reason: "A persona fixture is missing id, label, objective, script or defaultReply." };
+			return {
+				ok: false,
+				reason:
+					"A persona fixture is missing id, label, objective, script or defaultReply.",
+			};
 		}
 		personas.push({
 			id: record.id,
 			label: record.label,
 			objective: record.objective,
-			script: record.script.filter((line): line is string => typeof line === "string"),
+			script: record.script.filter(
+				(line): line is string => typeof line === "string",
+			),
 			defaultReply: record.defaultReply,
 		});
 	}
@@ -205,7 +248,9 @@ export function evaluatePitch(
 ): Array<{ persona: SimPersona; scores: SimScores; excerpt: string }> {
 	return personas.map((persona) => {
 		const result = runSimulation(segments, branches, persona);
-		const action = branches.find((branch) => branch.id === result.terminalBranchId)?.action;
+		const action = branches.find(
+			(branch) => branch.id === result.terminalBranchId,
+		)?.action;
 		const scores = scoreSimulation(result, segments.length, action);
 		return { persona, scores, excerpt: transcriptExcerpt(result) };
 	});
@@ -236,52 +281,67 @@ export function buildContextPackage(
 export function draftPatchesFor(failed: FailedEval): PatchOp[] {
 	const patches: PatchOp[] = [];
 	const failedChecks = new Set(
-		failed.scores.compliance.filter((check) => !check.pass).map((check) => check.check),
+		failed.scores.compliance
+			.filter((check) => !check.pass)
+			.map((check) => check.check),
 	);
 	if (failedChecks.has("no-document-without-consent")) {
 		patches.push({
 			op: "add-consent-gate",
 			text: "Before any document or financial detail is discussed, ask for an explicit affirmative and record it; silence, ambiguity and recognition are never consent.",
-			rationale: "A simulated segment requested documents before consent was recorded.",
+			rationale:
+				"A simulated segment requested documents before consent was recorded.",
 		});
 	}
 	if (failedChecks.has("clarify-once")) {
 		patches.push({
 			op: "tighten-segment",
 			text: "Remove any second clarify probe: after the single clarify allowance is spent, the next brush-off, deferral, silence or deflection terminates the call with the branch closing line.",
-			rationale: "The simulation probed again after the clarify budget was spent.",
+			rationale:
+				"The simulation probed again after the clarify budget was spent.",
 		});
 	}
 	if (failedChecks.has("closing-line-spoken")) {
 		patches.push({
 			op: "add-closing-line",
 			text: "Every terminal branch ends by speaking its own closing line before end_call; no terminal path ends in silence.",
-			rationale: "A simulated call ended without the terminal closing line spoken last.",
+			rationale:
+				"A simulated call ended without the terminal closing line spoken last.",
 		});
 	}
 	if (failed.scores.taskCompletion < failed.targetScore) {
 		patches.push({
 			op: "add-clarify-beat",
 			text: "After the first brush-off, ask exactly one neutral diagnostic question before continuing; record that clarification was used.",
-			rationale: "Task completion scored below target; the single clarify probe was missing or misplaced.",
+			rationale:
+				"Task completion scored below target; the single clarify probe was missing or misplaced.",
 		});
 	}
 	if (failed.scores.efficiency < failed.targetScore) {
 		patches.push({
 			op: "tighten-segment",
 			text: "Merge repeated explanation segments so the consent question arrives within the same turn count; drop filler acknowledgements.",
-			rationale: "Efficiency scored below target; the script takes too many turns to reach consent.",
+			rationale:
+				"Efficiency scored below target; the script takes too many turns to reach consent.",
 		});
 	}
 	return patches;
 }
 
-const PRESSURE = /(overcome|ignore|push past|wear down).{0,30}(refusal|objection|no\b)|convince them|pressure|don't take no|do not take no/i;
+const PRESSURE =
+	/(overcome|ignore|push past|wear down).{0,30}(refusal|objection|no\b)|convince them|pressure|don't take no|do not take no/i;
 
-export function critiquePatches(patches: PatchOp[], failedIndexes: number[] = []): CritiqueRound {
+export function critiquePatches(
+	patches: PatchOp[],
+	failedIndexes: number[] = [],
+): CritiqueRound {
 	const active = patches.filter((_, index) => !failedIndexes.includes(index));
 	if (active.length === 0) {
-		return { pass: false, feedback: "No patch candidates remain after revision.", droppedIndexes: failedIndexes };
+		return {
+			pass: false,
+			feedback: "No patch candidates remain after revision.",
+			droppedIndexes: failedIndexes,
+		};
 	}
 	const dropped = [...failedIndexes];
 	for (const [index, patch] of patches.entries()) {
@@ -290,15 +350,27 @@ export function critiquePatches(patches: PatchOp[], failedIndexes: number[] = []
 		}
 		if (patch.text.trim().length === 0) {
 			dropped.push(index);
-			return { pass: false, feedback: `Patch ${index} (${patch.op}) has no text and was dropped.`, droppedIndexes: dropped };
+			return {
+				pass: false,
+				feedback: `Patch ${index} (${patch.op}) has no text and was dropped.`,
+				droppedIndexes: dropped,
+			};
 		}
 		if (requestsDocuments(patch.text)) {
 			dropped.push(index);
-			return { pass: false, feedback: `Patch ${index} (${patch.op}) requests documents and was dropped: cold calls never solicit documents.`, droppedIndexes: dropped };
+			return {
+				pass: false,
+				feedback: `Patch ${index} (${patch.op}) requests documents and was dropped: cold calls never solicit documents.`,
+				droppedIndexes: dropped,
+			};
 		}
 		if (PRESSURE.test(patch.text)) {
 			dropped.push(index);
-			return { pass: false, feedback: `Patch ${index} (${patch.op}) pressures past a refusal and was dropped.`, droppedIndexes: dropped };
+			return {
+				pass: false,
+				feedback: `Patch ${index} (${patch.op}) pressures past a refusal and was dropped.`,
+				droppedIndexes: dropped,
+			};
 		}
 	}
 	return {
@@ -373,6 +445,9 @@ export async function writePitchProposal(
 		await writeFile(path, `${JSON.stringify(proposal, null, 2)}\n`, "utf8");
 		return { ok: true, path };
 	} catch (error) {
-		return { ok: false, reason: `The pitch proposal could not be written: ${describe(error)}` };
+		return {
+			ok: false,
+			reason: `The pitch proposal could not be written: ${describe(error)}`,
+		};
 	}
 }

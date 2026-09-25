@@ -32,7 +32,9 @@ describe("layout-ingest", () => {
 		expect(kinds).toContain("table");
 		expect(kinds).toContain("figure");
 		expect(kinds).toContain("text");
-		const table = doc.pages.flatMap((p) => p.cells).find((c) => c.kind === "table")!;
+		const table = doc.pages
+			.flatMap((p) => p.cells)
+			.find((c) => c.kind === "table")!;
 		expect(table.rows).toBe(2);
 		expect(table.text).toContain("Plan");
 	});
@@ -49,14 +51,18 @@ describe("layout-ingest", () => {
 	});
 
 	it("returns [] for a missing collateral dir", async () => {
-		await expect(chunksFromCollateral("/nonexistent-collateral-dir")).resolves.toEqual([]);
+		await expect(
+			chunksFromCollateral("/nonexistent-collateral-dir"),
+		).resolves.toEqual([]);
 	});
 });
 
 describe("pitch-rag collateral merge", () => {
 	it("adds no chunks when collateral is disabled", async () => {
 		const base = await loadPitchCorpus({ collateralDir: false });
-		const merged = await loadPitchCorpus({ collateralDir: "/nonexistent-collateral-dir" });
+		const merged = await loadPitchCorpus({
+			collateralDir: "/nonexistent-collateral-dir",
+		});
 		expect(merged.length).toBe(base.length);
 	});
 });

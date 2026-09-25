@@ -9,10 +9,7 @@ describe("schedule_calls batch cap", () => {
 			{ length: SCHEDULE_BATCH_CAP + 5 },
 			(_, index) => `no-such-contact-${process.pid}-${index}`,
 		);
-		const result = (await scheduleCalls.execute(
-			{ contactIds },
-			{},
-		)) as {
+		const result = (await scheduleCalls.execute({ contactIds }, {})) as {
 			scheduled: number;
 			kind: string;
 			capped?: boolean;

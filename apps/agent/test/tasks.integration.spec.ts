@@ -214,9 +214,7 @@ describe("releaseLease", () => {
 
 		await releaseLease(task.id);
 
-		expect((await claimDue(10, RESEARCH)).map((t) => t.id)).toContain(
-			task.id,
-		);
+		expect((await claimDue(10, RESEARCH)).map((t) => t.id)).toContain(task.id);
 	});
 
 	it("leaves a finished row alone", async () => {
@@ -247,9 +245,7 @@ describe("deferTask", () => {
 			where: { id: task.id },
 			data: { dueAt: new Date(Date.now() - 1000) },
 		});
-		expect((await claimDue(10, RESEARCH)).map((t) => t.id)).toContain(
-			task.id,
-		);
+		expect((await claimDue(10, RESEARCH)).map((t) => t.id)).toContain(task.id);
 	});
 });
 

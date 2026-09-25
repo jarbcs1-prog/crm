@@ -82,14 +82,16 @@ export default defineTool({
 		if (call.sipCallId && !provider) {
 			return {
 				ok: false as const,
-				reason: "Call has no valid provider metadata; refusing to guess its status.",
+				reason:
+					"Call has no valid provider metadata; refusing to guess its status.",
 			};
 		}
 
 		if (call.sipCallId && provider) {
 			const providerResult = await providerStatus(provider, call.sipCallId);
 			if (!providerResult.ok) {
-				codephrase = providerResult.reason ?? "The provider status is unavailable.";
+				codephrase =
+					providerResult.reason ?? "The provider status is unavailable.";
 			} else if (providerResult.code) {
 				status = providerResult.code.status;
 				codephrase = providerResult.code.codephrase;
@@ -124,6 +126,11 @@ export default defineTool({
 			}
 		}
 
-		return { ok: true as const, final: isTerminalStatus(status), status, codephrase };
+		return {
+			ok: true as const,
+			final: isTerminalStatus(status),
+			status,
+			codephrase,
+		};
 	},
 });

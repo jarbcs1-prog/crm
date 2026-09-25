@@ -45,7 +45,9 @@ describe("pitch-tune", () => {
 		expect(pitch.ok).toBe(true);
 		if (pitch.ok) {
 			expect(pitch.segments.length).toBeGreaterThan(0);
-			expect(pitch.branches.map((branch) => branch.id)).toContain("r1_explicit_refusal");
+			expect(pitch.branches.map((branch) => branch.id)).toContain(
+				"r1_explicit_refusal",
+			);
 		}
 		const fixtures = await loadPersonas();
 		expect(fixtures.ok).toBe(true);
@@ -111,7 +113,9 @@ describe("pitch-tune", () => {
 			0.8,
 		);
 		expect(proposal.status).toBe("DRAFT");
-		expect(proposal.corpusHash).toBe(hashCorpus(["PITCH TEXT", "PERSONAS RAW"]));
+		expect(proposal.corpusHash).toBe(
+			hashCorpus(["PITCH TEXT", "PERSONAS RAW"]),
+		);
 		expect(proposal.evalScores[0]?.personaId).toBe("brush-off");
 		expect(proposal.critique.length).toBeGreaterThan(0);
 		expect(proposal.patches.length).toBeGreaterThan(0);
@@ -140,7 +144,7 @@ describe("pitch-tune", () => {
 			expect(parsed.status).toBe("DRAFT");
 			expect(parsed.corpusHash).toBe(proposal.corpusHash);
 			expect(written.path.startsWith(dir)).toBe(true);
-			expect((await readdir(dir))).toHaveLength(1);
+			expect(await readdir(dir)).toHaveLength(1);
 		}
 	});
 });

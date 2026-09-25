@@ -13,7 +13,10 @@ export const VOICE_PROVIDERS = [
 export type VoiceProvider = (typeof VOICE_PROVIDERS)[number];
 
 export function isVoiceProvider(value: unknown): value is VoiceProvider {
-	return typeof value === "string" && VOICE_PROVIDERS.includes(value as VoiceProvider);
+	return (
+		typeof value === "string" &&
+		VOICE_PROVIDERS.includes(value as VoiceProvider)
+	);
 }
 
 function hasEnv(
@@ -29,13 +32,24 @@ export function voiceProviderConfigured(
 ): boolean {
 	switch (provider) {
 		case "nonoh":
-			return hasEnv(env, "NONOH_SIP_SERVER", "NONOH_USERNAME", "NONOH_PASSWORD");
+			return hasEnv(
+				env,
+				"NONOH_SIP_SERVER",
+				"NONOH_USERNAME",
+				"NONOH_PASSWORD",
+			);
 		case "voipstudio":
 			return hasEnv(env, "VOIPSTUDIO_API_KEY");
 		case "twilio":
 			return (
-				hasEnv(env, "TWILIO_ACCOUNT_SID", "TWILIO_AUTH_TOKEN", "TWILIO_CALLER_ID") &&
-				(Boolean(env.TWILIO_TWIML_URL?.trim()) || Boolean(env.TWILIO_TWIML?.trim()))
+				hasEnv(
+					env,
+					"TWILIO_ACCOUNT_SID",
+					"TWILIO_AUTH_TOKEN",
+					"TWILIO_CALLER_ID",
+				) &&
+				(Boolean(env.TWILIO_TWIML_URL?.trim()) ||
+					Boolean(env.TWILIO_TWIML?.trim()))
 			);
 		case "plivo":
 			return (
@@ -133,7 +147,9 @@ export interface VoiceProviderState {
 	valid: boolean;
 }
 
-export async function readVoiceProviderState(db: Db): Promise<VoiceProviderState> {
+export async function readVoiceProviderState(
+	db: Db,
+): Promise<VoiceProviderState> {
 	const row = await db.appSetting.findUnique({
 		where: { id: SETTINGS_ID },
 		select: { voiceProvider: true },

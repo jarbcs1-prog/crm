@@ -114,7 +114,8 @@ export async function deferTask(taskId: string, until: Date): Promise<void> {
 	});
 }
 
-export async function taskSubject(taskId: string): Promise<TaskSubject | null> {	return db.agentTask.findUnique({
+export async function taskSubject(taskId: string): Promise<TaskSubject | null> {
+	return db.agentTask.findUnique({
 		where: { id: taskId },
 		select: { id: true, contactId: true, companyId: true, kind: true },
 	});

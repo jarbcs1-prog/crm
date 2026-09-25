@@ -172,8 +172,7 @@ async function chunksFromHandlers(file: string): Promise<PitchChunk[]> {
 			: [];
 		const beats = Array.isArray(handler.beats)
 			? handler.beats.filter(
-					(beat): beat is string =>
-						typeof beat === "string" && beat.length > 0,
+					(beat): beat is string => typeof beat === "string" && beat.length > 0,
 				)
 			: [];
 		const text = [...triggers, ...beats].join(" ").trim();
@@ -190,13 +189,17 @@ async function chunksFromHandlers(file: string): Promise<PitchChunk[]> {
 	return chunks;
 }
 
-export async function loadPitchCorpus(
-	override?: { pitchesDir?: string; handlersFile?: string; collateralDir?: string | false },
-): Promise<PitchChunk[]> {
+export async function loadPitchCorpus(override?: {
+	pitchesDir?: string;
+	handlersFile?: string;
+	collateralDir?: string | false;
+}): Promise<PitchChunk[]> {
 	const [pitchChunks, handlerChunks, collateralChunks] = await Promise.all([
 		chunksFromPitches(override?.pitchesDir ?? PITCHES_DIR),
 		chunksFromHandlers(override?.handlersFile ?? HANDLERS_FILE),
-		override?.collateralDir === false ? [] : chunksFromCollateral(override?.collateralDir),
+		override?.collateralDir === false
+			? []
+			: chunksFromCollateral(override?.collateralDir),
 	]);
 	return [...pitchChunks, ...handlerChunks, ...collateralChunks];
 }

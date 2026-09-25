@@ -19,7 +19,10 @@ export interface ProviderDialResult {
 export interface VoiceDialer {
 	readonly name: VoiceProvider;
 	isConfigured(): boolean;
-	placeCall(toE164: string, opts?: { assistant?: unknown }): Promise<ProviderDialResult>;
+	placeCall(
+		toE164: string,
+		opts?: { assistant?: unknown },
+	): Promise<ProviderDialResult>;
 	hangup(providerCallId: string): Promise<{ ok: boolean; reason?: string }>;
 }
 
@@ -79,7 +82,9 @@ class NonohDialer implements VoiceDialer {
 		};
 	}
 
-	async hangup(providerCallId: string): Promise<{ ok: boolean; reason?: string }> {
+	async hangup(
+		providerCallId: string,
+	): Promise<{ ok: boolean; reason?: string }> {
 		const session =
 			getSession(providerCallId) ?? getSession(`nonoh:${providerCallId}`);
 		if (!session) return { ok: false, reason: "No live Nonoh session." };
@@ -97,7 +102,11 @@ class VoipStudioDialer implements VoiceDialer {
 
 	async placeCall(toE164: string): Promise<ProviderDialResult> {
 		const key = required("VOIPSTUDIO_API_KEY");
-		if (!key) return { ok: false, reason: "VoIP Studio dialing needs VOIPSTUDIO_API_KEY." };
+		if (!key)
+			return {
+				ok: false,
+				reason: "VoIP Studio dialing needs VOIPSTUDIO_API_KEY.",
+			};
 		const baseUrl = (
 			required("VOIPSTUDIO_BASE_URL") ?? "https://l7api.com/v1.2/voipstudio"
 		).replace(/\/+$/, "");
@@ -121,7 +130,11 @@ class VoipStudioDialer implements VoiceDialer {
 			};
 		}
 		if (!response.ok) {
-			return { ok: false, status: response.status, reason: await readErrorText(response) };
+			return {
+				ok: false,
+				status: response.status,
+				reason: await readErrorText(response),
+			};
 		}
 		const result = (await response.json()) as {
 			data?: { id?: string };
@@ -139,7 +152,9 @@ class VoipStudioDialer implements VoiceDialer {
 		};
 	}
 
-	async hangup(providerCallId: string): Promise<{ ok: boolean; reason?: string }> {
+	async hangup(
+		providerCallId: string,
+	): Promise<{ ok: boolean; reason?: string }> {
 		const key = required("VOIPSTUDIO_API_KEY");
 		if (!key) return { ok: false, reason: "VoIP Studio is not configured." };
 		const baseUrl = (
@@ -209,10 +224,15 @@ class TwilioDialer implements VoiceDialer {
 			};
 		}
 		if (!response.ok) {
-			return { ok: false, status: response.status, reason: await readErrorText(response) };
+			return {
+				ok: false,
+				status: response.status,
+				reason: await readErrorText(response),
+			};
 		}
 		const body = (await response.json()) as { sid?: string };
-		if (!body.sid) return { ok: false, reason: "Twilio answered without a call SID." };
+		if (!body.sid)
+			return { ok: false, reason: "Twilio answered without a call SID." };
 		return {
 			ok: true,
 			providerCallId: body.sid,
@@ -221,10 +241,13 @@ class TwilioDialer implements VoiceDialer {
 		};
 	}
 
-	async hangup(providerCallId: string): Promise<{ ok: boolean; reason?: string }> {
+	async hangup(
+		providerCallId: string,
+	): Promise<{ ok: boolean; reason?: string }> {
 		const sid = required("TWILIO_ACCOUNT_SID");
 		const token = required("TWILIO_AUTH_TOKEN");
-		if (!sid || !token) return { ok: false, reason: "Twilio is not configured." };
+		if (!sid || !token)
+			return { ok: false, reason: "Twilio is not configured." };
 		const response = await fetch(
 			`https://api.twilio.com/2010-04-01/Accounts/${sid}/Calls/${providerCallId}.json`,
 			{
@@ -256,33 +279,39 @@ class PlivoDialer implements VoiceDialer {
 		if (!authId || !token) {
 			return {
 				ok: false,
-				reason: "Plivo dialing needs PLIVO_AUTH_ID and PLIVO_AUTH_TOKEN set together.",
+				reason:
+					"Plivo dialing needs PLIVO_AUTH_ID and PLIVO_AUTH_TOKEN set together.",
 			};
 		}
 		const answerUrl = required("PLIVO_ANSWER_URL");
 		if (!answerUrl) {
 			return {
 				ok: false,
-				reason: "Plivo dialing needs PLIVO_ANSWER_URL call instructions. No call was placed.",
+				reason:
+					"Plivo dialing needs PLIVO_ANSWER_URL call instructions. No call was placed.",
 			};
 		}
 		const from = required("PLIVO_CALLER_ID") ?? required("TWILIO_CALLER_ID");
 		if (!from) {
 			return {
 				ok: false,
-				reason: "Plivo dialing needs PLIVO_CALLER_ID (or TWILIO_CALLER_ID). No call was placed.",
+				reason:
+					"Plivo dialing needs PLIVO_CALLER_ID (or TWILIO_CALLER_ID). No call was placed.",
 			};
 		}
 		let response: Response;
 		try {
-			response = await fetch(`https://api.plivo.com/v1/Account/${authId}/Call/`, {
-				method: "POST",
-				headers: {
-					Authorization: basicAuth(authId, token),
-					"Content-Type": "application/json",
+			response = await fetch(
+				`https://api.plivo.com/v1/Account/${authId}/Call/`,
+				{
+					method: "POST",
+					headers: {
+						Authorization: basicAuth(authId, token),
+						"Content-Type": "application/json",
+					},
+					body: JSON.stringify({ to: toE164, from, answer_url: answerUrl }),
 				},
-				body: JSON.stringify({ to: toE164, from, answer_url: answerUrl }),
-			});
+			);
 		} catch (error) {
 			return {
 				ok: false,
@@ -290,10 +319,15 @@ class PlivoDialer implements VoiceDialer {
 			};
 		}
 		if (!response.ok) {
-			return { ok: false, status: response.status, reason: await readErrorText(response) };
+			return {
+				ok: false,
+				status: response.status,
+				reason: await readErrorText(response),
+			};
 		}
 		const body = (await response.json()) as { request_uuid?: string };
-		if (!body.request_uuid) return { ok: false, reason: "Plivo answered without a request UUID." };
+		if (!body.request_uuid)
+			return { ok: false, reason: "Plivo answered without a request UUID." };
 		return {
 			ok: true,
 			providerCallId: body.request_uuid,
@@ -302,10 +336,13 @@ class PlivoDialer implements VoiceDialer {
 		};
 	}
 
-	async hangup(providerCallId: string): Promise<{ ok: boolean; reason?: string }> {
+	async hangup(
+		providerCallId: string,
+	): Promise<{ ok: boolean; reason?: string }> {
 		const authId = required("PLIVO_AUTH_ID");
 		const token = required("PLIVO_AUTH_TOKEN");
-		if (!authId || !token) return { ok: false, reason: "Plivo is not configured." };
+		if (!authId || !token)
+			return { ok: false, reason: "Plivo is not configured." };
 		const response = await fetch(
 			`https://api.plivo.com/v1/Account/${authId}/Call/${providerCallId}/`,
 			{
@@ -352,7 +389,10 @@ class VapiDialer implements VoiceDialer {
 		try {
 			response = await fetch("https://api.vapi.ai/call/phone", {
 				method: "POST",
-				headers: { Authorization: `Bearer ${key}`, "Content-Type": "application/json" },
+				headers: {
+					Authorization: `Bearer ${key}`,
+					"Content-Type": "application/json",
+				},
 				body: JSON.stringify({
 					phoneNumberId,
 					customer: { number: toE164 },
@@ -368,10 +408,15 @@ class VapiDialer implements VoiceDialer {
 			};
 		}
 		if (!response.ok) {
-			return { ok: false, status: response.status, reason: await readErrorText(response) };
+			return {
+				ok: false,
+				status: response.status,
+				reason: await readErrorText(response),
+			};
 		}
 		const body = (await response.json()) as { id?: string };
-		if (!body.id) return { ok: false, reason: "Vapi answered without a call id." };
+		if (!body.id)
+			return { ok: false, reason: "Vapi answered without a call id." };
 		return {
 			ok: true,
 			providerCallId: body.id,
@@ -380,7 +425,9 @@ class VapiDialer implements VoiceDialer {
 		};
 	}
 
-	async hangup(providerCallId: string): Promise<{ ok: boolean; reason?: string }> {
+	async hangup(
+		providerCallId: string,
+	): Promise<{ ok: boolean; reason?: string }> {
 		const key = required("VAPI_API_KEY");
 		if (!key) return { ok: false, reason: "Vapi is not configured." };
 		const response = await fetch(
@@ -428,7 +475,9 @@ export function dialerFor(name: VoiceProvider): VoiceDialer {
 	}
 }
 
-export function selectDialer(preferred?: VoiceProvider | null): VoiceDialer | null {
+export function selectDialer(
+	preferred?: VoiceProvider | null,
+): VoiceDialer | null {
 	if (preferred) {
 		const dialer = dialerFor(preferred);
 		return dialer.isConfigured() ? dialer : null;
@@ -440,7 +489,8 @@ export function selectDialer(preferred?: VoiceProvider | null): VoiceDialer | nu
 }
 
 export function providerFromMeta(meta: unknown): VoiceProvider | null {
-	if (typeof meta !== "object" || meta === null || Array.isArray(meta)) return null;
+	if (typeof meta !== "object" || meta === null || Array.isArray(meta))
+		return null;
 	const provider = (meta as Record<string, unknown>).provider;
 	return provider === "nonoh" ||
 		provider === "voipstudio" ||
@@ -473,7 +523,10 @@ export async function providerStatus(
 	const id = providerCallId.trim();
 	if (!id) return { ok: false, reason: "Provider call id is missing." };
 	if (provider === "nonoh") {
-		return { ok: false, reason: "Nonoh status comes from its local SIP session." };
+		return {
+			ok: false,
+			reason: "Nonoh status comes from its local SIP session.",
+		};
 	}
 
 	let url: string;
@@ -492,7 +545,8 @@ export async function providerStatus(
 		case "twilio": {
 			const sid = required("TWILIO_ACCOUNT_SID");
 			const token = required("TWILIO_AUTH_TOKEN");
-			if (!sid || !token) return { ok: false, reason: "Twilio is not configured." };
+			if (!sid || !token)
+				return { ok: false, reason: "Twilio is not configured." };
 			url = `https://api.twilio.com/2010-04-01/Accounts/${encodeURIComponent(sid)}/Calls/${encodeURIComponent(id)}.json`;
 			init = { headers: { Authorization: basicAuth(sid, token) } };
 			break;
@@ -500,7 +554,8 @@ export async function providerStatus(
 		case "plivo": {
 			const authId = required("PLIVO_AUTH_ID");
 			const token = required("PLIVO_AUTH_TOKEN");
-			if (!authId || !token) return { ok: false, reason: "Plivo is not configured." };
+			if (!authId || !token)
+				return { ok: false, reason: "Plivo is not configured." };
 			url = `https://api.plivo.com/v1/Account/${encodeURIComponent(authId)}/Call/${encodeURIComponent(id)}/`;
 			init = { headers: { Authorization: basicAuth(authId, token) } };
 			break;
@@ -527,7 +582,10 @@ export async function providerStatus(
 	try {
 		body = (await response.json()) as Record<string, unknown>;
 	} catch {
-		return { ok: false, reason: "The provider returned an invalid status response." };
+		return {
+			ok: false,
+			reason: "The provider returned an invalid status response.",
+		};
 	}
 	const state = providerState(body);
 	return { ok: true, code: callCode(state, null) };
@@ -541,7 +599,8 @@ export async function hangupCall(
 	if (!provider) {
 		return {
 			ok: false,
-			reason: "Call has no valid provider metadata; refusing to guess how to hang it up.",
+			reason:
+				"Call has no valid provider metadata; refusing to guess how to hang it up.",
 		};
 	}
 	if (!providerCallId) {

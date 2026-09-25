@@ -40,7 +40,10 @@ function figureOf(block: string): LayoutCell | undefined {
 
 function cellsFromPage(pageText: string): LayoutCell[] {
 	const cells: LayoutCell[] = [];
-	const blocks = pageText.split(/\n\s*\n/).map((b) => b.trim()).filter((b) => b.length > 0);
+	const blocks = pageText
+		.split(/\n\s*\n/)
+		.map((b) => b.trim())
+		.filter((b) => b.length > 0);
 	for (const block of blocks) {
 		const figure = figureOf(block);
 		if (figure) {
@@ -50,8 +53,17 @@ function cellsFromPage(pageText: string): LayoutCell[] {
 		const lines = block.split("\n");
 		const first = lines[0];
 		if (lines.length > 1 && first !== undefined && lines.every(isTableRow)) {
-			const header = first.replace(/^\||\|$/g, "").split("|").map((c) => c.trim()).filter(Boolean).join(" | ");
-			cells.push({ kind: "table", text: header, rows: lines.length - 2 > 0 ? lines.length - 2 : 0 });
+			const header = first
+				.replace(/^\||\|$/g, "")
+				.split("|")
+				.map((c) => c.trim())
+				.filter(Boolean)
+				.join(" | ");
+			cells.push({
+				kind: "table",
+				text: header,
+				rows: lines.length - 2 > 0 ? lines.length - 2 : 0,
+			});
 			continue;
 		}
 		cells.push({ kind: "text", text: block });
@@ -67,12 +79,20 @@ function titleOf(markdown: string, stem: string): string {
 	return stem;
 }
 
-export function parseMarkdownCollateral(markdown: string, stem: string): LayoutDocument {
-	const rawPages = markdown.split(/\n---+\n/).map((p) => p.trim()).filter((p) => p.length > 0);
-	const pages: LayoutPage[] = (rawPages.length > 0 ? rawPages : []).map((pageText, index) => ({
-		page: index + 1,
-		cells: cellsFromPage(pageText),
-	}));
+export function parseMarkdownCollateral(
+	markdown: string,
+	stem: string,
+): LayoutDocument {
+	const rawPages = markdown
+		.split(/\n---+\n/)
+		.map((p) => p.trim())
+		.filter((p) => p.length > 0);
+	const pages: LayoutPage[] = (rawPages.length > 0 ? rawPages : []).map(
+		(pageText, index) => ({
+			page: index + 1,
+			cells: cellsFromPage(pageText),
+		}),
+	);
 	return { document: stem, title: titleOf(markdown, stem), pages };
 }
 
@@ -113,10 +133,14 @@ export function toPitchChunks(doc: LayoutDocument): PitchChunk[] {
 	}));
 }
 
-export async function chunksFromCollateral(dir: string = COLLATERAL_DIR): Promise<PitchChunk[]> {
+export async function chunksFromCollateral(
+	dir: string = COLLATERAL_DIR,
+): Promise<PitchChunk[]> {
 	let names: string[];
 	try {
-		names = (await readdir(dir)).filter((n) => n.toLowerCase().endsWith(".md")).sort();
+		names = (await readdir(dir))
+			.filter((n) => n.toLowerCase().endsWith(".md"))
+			.sort();
 	} catch {
 		return [];
 	}
@@ -129,7 +153,8 @@ export async function chunksFromCollateral(dir: string = COLLATERAL_DIR): Promis
 		} catch {
 			continue;
 		}
-		for (const chunk of toPitchChunks(parseMarkdownCollateral(markdown, stem))) chunks.push(chunk);
+		for (const chunk of toPitchChunks(parseMarkdownCollateral(markdown, stem)))
+			chunks.push(chunk);
 	}
 	return chunks;
 }

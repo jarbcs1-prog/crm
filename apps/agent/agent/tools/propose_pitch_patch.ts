@@ -22,13 +22,17 @@ export default defineTool({
 			.string()
 			.min(1)
 			.optional()
-			.describe("Simulate one persona only. Omit it to run the full fixture set."),
+			.describe(
+				"Simulate one persona only. Omit it to run the full fixture set.",
+			),
 		targetScore: z
 			.number()
 			.min(0)
 			.max(1)
 			.optional()
-			.describe("Task completion and efficiency target between 0 and 1. Defaults to 0.8."),
+			.describe(
+				"Task completion and efficiency target between 0 and 1. Defaults to 0.8.",
+			),
 	}),
 	approval: sensitiveWrite(
 		"Proposals change what the agent says on live calls once applied: review the DRAFT file and apply it by hand instead of running this unattended.",
@@ -48,9 +52,17 @@ export default defineTool({
 				? fixtures.personas
 				: fixtures.personas.filter((persona) => persona.id === personaId);
 		if (personas.length === 0) {
-			return { proposed: false as const, reason: `No persona matched "${personaId}".` };
+			return {
+				proposed: false as const,
+				reason: `No persona matched "${personaId}".`,
+			};
 		}
-		const results = evaluatePitch(pitch.segments, pitch.branches, personas, target);
+		const results = evaluatePitch(
+			pitch.segments,
+			pitch.branches,
+			personas,
+			target,
+		);
 		const failed = results
 			.filter(
 				(entry) =>
@@ -73,7 +85,12 @@ export default defineTool({
 				reason: `All ${personas.length} simulated persona${personas.length === 1 ? "" : "s"} met target ${target}.`,
 			};
 		}
-		const contextPackage = buildContextPackage(pitch.stem, pitch.raw, target, failed);
+		const contextPackage = buildContextPackage(
+			pitch.stem,
+			pitch.raw,
+			target,
+			failed,
+		);
 		const proposal = runWriterCritiqueCycle(
 			pitch.stem,
 			pitch.raw,

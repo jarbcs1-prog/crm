@@ -39,9 +39,7 @@ describe("isValidE164", () => {
 	it("accepts clean E.164 and rejects the rest", () => {
 		expect(isValidE164("+14155552671")).toBe(true);
 		expect(isValidE164("+1 (415) 555-2671")).toBe(false);
-		expect(isValidE164(normalizeToE164("+1 (415) 555-2671") ?? "")).toBe(
-			true,
-		);
+		expect(isValidE164(normalizeToE164("+1 (415) 555-2671") ?? "")).toBe(true);
 		expect(isValidE164("4155552671")).toBe(false);
 		expect(isValidE164("not a number")).toBe(false);
 	});

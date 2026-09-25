@@ -257,27 +257,27 @@ export default defineTool({
 										"No refusal determination was made: treat the caller's words as unknown and never as consent to request or transfer documents. Agreement to hear the explanation is not consent to provide documents.",
 								}
 							: (() => {
-						const match = matchBranch(transcript, branches);
-						if (match === null) {
-							return {
-								consent: "unknown" as const,
-								guidance:
-									"No refusal trigger matched: continue with the next pitch segment. This is not consent to request documents; document requests require a separate explicit affirmative.",
-							};
-						}
-						return {
-							consent: match.terminate
-								? ("refused" as const)
-								: ("unknown" as const),
-							match,
-							guidance: match.terminate
-								? `Speak the matched reply verbatim and let it finish playing — that closing line is the graceful professional exit, never hang up without it. Only then end the call${match.optOut ? " and record a do-not-contact" : ""}. Do not persuade, schedule, or collect anything further.`
-								: match.clarifyOnce
-									? "First brush-off: speak the matched diagnostic question verbatim, exactly once. Record that clarification was used: any further negative, silence, irritation or deflection after it ends the call with no third attempt. Do-not-contact language at any point bypasses clarification and ends the call immediately."
-									: "Verification concern or deferral: speak the matched reply verbatim, provide only approved verification information, and do not request documents on this turn.",
-						};
-					})()),
-				}),
+									const match = matchBranch(transcript, branches);
+									if (match === null) {
+										return {
+											consent: "unknown" as const,
+											guidance:
+												"No refusal trigger matched: continue with the next pitch segment. This is not consent to request documents; document requests require a separate explicit affirmative.",
+										};
+									}
+									return {
+										consent: match.terminate
+											? ("refused" as const)
+											: ("unknown" as const),
+										match,
+										guidance: match.terminate
+											? `Speak the matched reply verbatim and let it finish playing — that closing line is the graceful professional exit, never hang up without it. Only then end the call${match.optOut ? " and record a do-not-contact" : ""}. Do not persuade, schedule, or collect anything further.`
+											: match.clarifyOnce
+												? "First brush-off: speak the matched diagnostic question verbatim, exactly once. Record that clarification was used: any further negative, silence, irritation or deflection after it ends the call with no third attempt. Do-not-contact language at any point bypasses clarification and ends the call immediately."
+												: "Verification concern or deferral: speak the matched reply verbatim, provide only approved verification information, and do not request documents on this turn.",
+									};
+								})()),
+					}),
 			...(consentRules === undefined ? {} : { consentRules }),
 		};
 	},

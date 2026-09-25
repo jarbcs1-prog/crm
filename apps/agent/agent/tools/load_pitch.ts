@@ -4,7 +4,9 @@ import { fileURLToPath } from "node:url";
 import { z } from "zod";
 import { defineTool } from "../lib/tool-factory";
 
-const PITCHES_DIR = fileURLToPath(new URL("../../data/pitches", import.meta.url));
+const PITCHES_DIR = fileURLToPath(
+	new URL("../../data/pitches", import.meta.url),
+);
 const DEFAULT_LISTEN_MS = 8000;
 const MIN_LISTEN_MS = 1000;
 const MAX_LISTEN_MS = 30_000;
