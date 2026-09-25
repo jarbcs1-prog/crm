@@ -1,7 +1,8 @@
 import { CallEventType, CallStatus, db } from "@crm/db";
 import { z } from "zod";
-import { transfer } from "../lib/voice";
+import { providerFromMeta } from "../lib/dialer";
 import { defineTool } from "../lib/tool-factory";
+import { transfer } from "../lib/voice";
 
 export default defineTool({
 	description:
@@ -18,9 +19,15 @@ export default defineTool({
 	async execute({ callId, destination }) {
 		const call = await db.call.findUnique({
 			where: { id: callId },
-			select: { id: true, status: true, sipCallId: true },
+			select: { id: true, status: true, sipCallId: true, meta: true },
 		});
 		if (!call) return { ok: false as const, reason: "No such call." };
+		if (providerFromMeta(call.meta) !== "voipstudio") {
+			return {
+				ok: false as const,
+				reason: "Transferring is supported only for VoIP Studio calls.",
+			};
+		}
 
 		if (
 			call.status !== CallStatus.IN_PROGRESS &&

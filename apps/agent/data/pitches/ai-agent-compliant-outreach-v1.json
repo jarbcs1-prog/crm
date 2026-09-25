@@ -1,7 +1,7 @@
 {
 	"id": "ai-agent-compliant-outreach-v1",
 	"name": "Compliant AI outreach template (example)",
-	"description": "Buyer-configurable template for AI voice agents. The template carries no real org name, number, URL, or case ID — those come from the buyer's deployment config at render time. The agent may only state a contact reason whose evidence is already in the CRM ledger. Never use for legal threats, debt collection, or unverifiable claims.",
+	"description": "Buyer-configurable template for AI voice agents. The template carries no real org name, number, URL or case ID — those come from the buyer's deployment config at render time. The agent may only state a contact reason whose evidence is already in the CRM ledger. Never use for legal threats, debt collection, or unverifiable claims.",
 	"variables": ["firstName"],
 	"policy": {
 		"reason_taxonomy": {

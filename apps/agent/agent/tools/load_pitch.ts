@@ -124,9 +124,13 @@ function substitute(
 ): { text: string; missing: string[] } {
 	let out = text;
 	for (const variable of variables) {
-		out = out
-			.split(`{${variable}}`)
-			.join(variable === "firstName" ? firstName : "");
+		const value =
+			variable === "firstName"
+				? firstName
+				: values?.[variable] === undefined
+					? ""
+					: values[variable];
+		out = out.split(`{${variable}}`).join(value);
 	}
 	if (values) {
 		for (const [key, value] of Object.entries(values)) {
@@ -191,6 +195,31 @@ function refusalBranchesOf(
 function passthroughOf(record: Record<string, unknown>, key: string): unknown {
 	const value = record[key];
 	return value === undefined ? undefined : value;
+}
+
+function vapiOf(
+	segments: PitchSegment[],
+	extra?: {
+		refusalBranches?: RefusalBranch[];
+		consentRules?: unknown;
+	},
+): {
+	messages: Array<{ role: string; content: string }>;
+	refusalBranches?: RefusalBranch[];
+	consentRules?: unknown;
+} {
+	return {
+		messages: segments.map((segment) => ({
+			role: "assistant",
+			content: segment.text,
+		})),
+		...(extra?.refusalBranches === undefined
+			? {}
+			: { refusalBranches: extra.refusalBranches }),
+		...(extra?.consentRules === undefined
+			? {}
+			: { consentRules: extra.consentRules }),
+	};
 }
 
 export default defineTool({
@@ -326,7 +355,7 @@ export default defineTool({
 					if (given.length === 0) {
 						missingName = true;
 					}
-				} else {
+				} else if (supplied?.[variable] === undefined) {
 					clearedOther = true;
 				}
 			}
@@ -375,6 +404,7 @@ export default defineTool({
 				return { ...branch, text: resolved.text };
 			});
 			const missing = missingRuntime.filter((key) => key !== "firstName");
+			const consentRules = passthroughOf(record, "consent_rules");
 			return {
 				pitchId:
 					typeof record.id === "string" && record.id.length > 0
@@ -384,6 +414,12 @@ export default defineTool({
 				schema: "conversation",
 				segmentCount: segments.length,
 				segments,
+				vapi: vapiOf(segments, {
+					...(resolvedBranches === undefined
+						? {}
+						: { refusalBranches: resolvedBranches }),
+					...(consentRules === undefined ? {} : { consentRules }),
+				}),
 				...(resolvedBranches === undefined
 					? {}
 					: { refusalBranches: resolvedBranches }),
@@ -416,6 +452,7 @@ export default defineTool({
 			schema: "segments",
 			segmentCount: segments.length,
 			segments,
+			vapi: vapiOf(segments),
 			...(note === undefined ? {} : { note }),
 		};
 	},

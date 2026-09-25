@@ -103,6 +103,27 @@ describe("dispatch lanes", () => {
 
 		expect(again.map((t) => t.id)).not.toContain(brand.id);
 	});
+
+	it("a bulk call batch never delays a logo and never enters the visible lane", async () => {
+		const batch: { id: string }[] = [];
+		for (let i = 0; i < 30; i += 1) {
+			batch.push(await queue("voice-batch", PRIORITY.voiceBatch));
+		}
+
+		const brand = await queue("brand", PRIORITY.brand);
+
+		const visible = await claimDue(5, VISIBLE);
+		expect(visible.map((t) => t.id)).toContain(brand.id);
+		expect(
+			visible.map((t) => t.id).some((id) => batch.some((b) => b.id === id)),
+		).toBe(false);
+
+		const research = await claimDue(40, RESEARCH);
+		expect(
+			research.map((t) => t.id).filter((id) => batch.some((b) => b.id === id))
+				.length,
+		).toBe(30);
+	});
 });
 
 describe("kind vocabulary", () => {
@@ -111,12 +132,15 @@ describe("kind vocabulary", () => {
 		expect(isDirectKind("portrait")).toBe(true);
 		expect(isDirectKind("company-profile")).toBe(false);
 		expect(isDirectKind("identify")).toBe(false);
+		expect(isDirectKind("voice-batch")).toBe(false);
 		expect(isDirectKind("workspace-profile")).toBe(false);
 	});
 
 	it("puts what a rep sees first above what they have to click for", () => {
 		expect(PRIORITY.brand).toBeGreaterThan(PRIORITY.requested);
 		expect(PRIORITY.portrait).toBeGreaterThan(PRIORITY.requested);
+		expect(PRIORITY.requested).toBeGreaterThan(PRIORITY.voiceBatch);
+		expect(PRIORITY.voiceBatch).toBeGreaterThan(PRIORITY.call);
 		expect(PRIORITY.requested).toBeGreaterThan(PRIORITY.companyProfile);
 		expect(PRIORITY.companyProfile).toBeGreaterThan(PRIORITY.recheck);
 	});

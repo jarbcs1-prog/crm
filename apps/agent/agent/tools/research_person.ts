@@ -2,8 +2,8 @@ import { z } from "zod";
 import { enabled, unavailable } from "../lib/capabilities";
 import { guardThirdPartyQuery } from "../lib/egress-guard";
 import { spend } from "../lib/focus";
-import { ask } from "../lib/web-search";
 import { defineTool } from "../lib/tool-factory";
+import { ask } from "../lib/web-search";
 
 function searchEnabled(): boolean {
 	return (

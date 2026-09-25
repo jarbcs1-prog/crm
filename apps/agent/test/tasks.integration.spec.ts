@@ -4,7 +4,9 @@ import { DIRECT_KINDS } from "@crm/db/agent-tasks";
 import {
 	claimDue,
 	completeTask,
+	deferTask,
 	MAX_ATTEMPTS,
+	releaseLease,
 	retireExhausted,
 	scheduleTask,
 } from "../agent/lib/tasks";
@@ -201,6 +203,53 @@ describe("completeTask", () => {
 		expect(await completeTask(task.id, "ran again")).toBeNull();
 		const row = await db.agentTask.findUnique({ where: { id: task.id } });
 		expect(row?.outcome).toBe("ran");
+	});
+});
+
+describe("releaseLease", () => {
+	it("hands a claimed row straight back to the next dispatcher", async () => {
+		const task = await queue();
+		await claimDue(10, RESEARCH);
+		expect(await claimDue(10, RESEARCH)).toHaveLength(0);
+
+		await releaseLease(task.id);
+
+		expect((await claimDue(10, RESEARCH)).map((t) => t.id)).toContain(
+			task.id,
+		);
+	});
+
+	it("leaves a finished row alone", async () => {
+		const task = await queue();
+		await completeTask(task.id, "ran");
+
+		await releaseLease(task.id);
+
+		const row = await db.agentTask.findUnique({ where: { id: task.id } });
+		expect(row?.finishedAt).not.toBeNull();
+	});
+});
+
+describe("deferTask", () => {
+	it("parks a row until later and makes it claimable again after", async () => {
+		const task = await queue();
+		await claimDue(10, RESEARCH);
+
+		await deferTask(task.id, new Date(Date.now() + 60_000));
+		expect(await claimDue(10, RESEARCH)).toHaveLength(0);
+
+		const parked = await db.agentTask.findUnique({
+			where: { id: task.id },
+		});
+		expect(parked?.leasedUntil).toBeNull();
+
+		await db.agentTask.update({
+			where: { id: task.id },
+			data: { dueAt: new Date(Date.now() - 1000) },
+		});
+		expect((await claimDue(10, RESEARCH)).map((t) => t.id)).toContain(
+			task.id,
+		);
 	});
 });
 

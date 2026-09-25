@@ -154,6 +154,43 @@ export type CrmHistory = {
 		nextMeetingAt: string | null;
 	};
 	colleagues: { id: string; name: string; title: string | null }[];
+	calls: {
+		id: string;
+		direction: string;
+		status: string;
+		outcome: string | null;
+		durationSecs: number | null;
+		startedAt: string | null;
+		endedAt: string | null;
+		summary: string | null;
+		scores: {
+			control: number | null;
+			liquidity: number | null;
+			interest: number | null;
+			decisionMaker: number | null;
+			motivation: number | null;
+			urgency: number | null;
+			experience: number | null;
+			budget: number | null;
+		};
+		companyId: string | null;
+	}[];
+	callAnalytics: {
+		totalCalls: number;
+		connected: number;
+		outcomes: Record<string, number>;
+		avgDurationSecs: number | null;
+		avgScores: {
+			control: number | null;
+			liquidity: number | null;
+			interest: number | null;
+			decisionMaker: number | null;
+			motivation: number | null;
+			urgency: number | null;
+			experience: number | null;
+			budget: number | null;
+		};
+	};
 };
 
 export async function readCrmHistory(
@@ -193,8 +230,9 @@ export async function readCrmHistory(
 
 	if (!contact) return null;
 
-	const [threads, meetings, colleagues] = await Promise.all([
-		db.emailThread.findMany({
+	const [threads, meetings, colleagues, recentCalls, callAggregate, callOutcomes, connectedCalls] =
+		await Promise.all([
+			db.emailThread.findMany({
 			where: { contactId },
 			orderBy: { lastMessageAt: "desc" },
 			take: options.threads ?? 5,
@@ -243,6 +281,51 @@ export async function readCrmHistory(
 					orderBy: { lastActivityAt: "desc" },
 				})
 			: Promise.resolve([]),
+		db.call.findMany({
+			where: { contactId },
+			orderBy: [{ startedAt: "desc" }, { createdAt: "desc" }],
+			take: 10,
+			select: {
+				id: true,
+				direction: true,
+				status: true,
+				outcome: true,
+				durationSecs: true,
+				startedAt: true,
+				endedAt: true,
+				summary: true,
+				companyId: true,
+				clidControlScore: true,
+				clidLiquidityScore: true,
+				clidInterestScore: true,
+				clidDecisionMakerScore: true,
+				clidMotivationScore: true,
+				clidUrgencyScore: true,
+				clidExperienceScore: true,
+				clidBudgetScore: true,
+			},
+		}),
+		db.call.aggregate({
+			where: { contactId },
+			_count: { _all: true },
+			_avg: {
+				durationSecs: true,
+				clidControlScore: true,
+				clidLiquidityScore: true,
+				clidInterestScore: true,
+				clidDecisionMakerScore: true,
+				clidMotivationScore: true,
+				clidUrgencyScore: true,
+				clidExperienceScore: true,
+				clidBudgetScore: true,
+			},
+		}),
+		db.call.groupBy({
+			by: ["outcome"],
+			where: { contactId },
+			_count: { _all: true },
+		}),
+		db.call.count({ where: { contactId, answeredAt: { not: null } } }),
 	]);
 
 	const inbound = threads
@@ -309,6 +392,45 @@ export async function readCrmHistory(
 			name: [colleague.firstName, colleague.lastName].filter(Boolean).join(" "),
 			title: colleague.title,
 		})),
+		calls: recentCalls.map((call) => ({
+			id: call.id,
+			direction: call.direction,
+			status: call.status,
+			outcome: call.outcome,
+			durationSecs: call.durationSecs,
+			startedAt: call.startedAt?.toISOString() ?? null,
+			endedAt: call.endedAt?.toISOString() ?? null,
+			summary: call.summary,
+			scores: {
+				control: call.clidControlScore,
+				liquidity: call.clidLiquidityScore,
+				interest: call.clidInterestScore,
+				decisionMaker: call.clidDecisionMakerScore,
+				motivation: call.clidMotivationScore,
+				urgency: call.clidUrgencyScore,
+				experience: call.clidExperienceScore,
+				budget: call.clidBudgetScore,
+			},
+			companyId: call.companyId,
+		})),
+		callAnalytics: {
+			totalCalls: callAggregate._count._all,
+			connected: connectedCalls,
+			outcomes: Object.fromEntries(
+				callOutcomes.map((row) => [row.outcome ?? "none", row._count._all]),
+			),
+			avgDurationSecs: callAggregate._avg.durationSecs,
+			avgScores: {
+				control: callAggregate._avg.clidControlScore,
+				liquidity: callAggregate._avg.clidLiquidityScore,
+				interest: callAggregate._avg.clidInterestScore,
+				decisionMaker: callAggregate._avg.clidDecisionMakerScore,
+				motivation: callAggregate._avg.clidMotivationScore,
+				urgency: callAggregate._avg.clidUrgencyScore,
+				experience: callAggregate._avg.clidExperienceScore,
+				budget: callAggregate._avg.clidBudgetScore,
+			},
+		},
 	};
 }
 

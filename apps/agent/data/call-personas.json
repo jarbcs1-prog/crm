@@ -1,0 +1,81 @@
+[
+	{
+		"id": "cooperative",
+		"label": "Cooperative recipient",
+		"objective": "Hear the caller out and agree to a verified follow-up when the purpose is clear.",
+		"script": [
+			"Yes, I have a moment.",
+			"Yes, please explain why you are calling.",
+			"Go on.",
+			"Okay, I understand.",
+			"I see.",
+			"That makes sense.",
+			"No obligation is good.",
+			"Yes, arrange the follow-up.",
+			"Through the verified channel is fine.",
+			"Thank you."
+		],
+		"defaultReply": "All right, go on."
+	},
+	{
+		"id": "brush-off",
+		"label": "Brush-off, needs clarify-once",
+		"objective": "Deflect the call with a vague lack of interest.",
+		"script": [
+			"I'm not interested.",
+			"I said I'm not interested, stop pushing."
+		],
+		"defaultReply": "I'm not interested."
+	},
+	{
+		"id": "explicit-refusal",
+		"label": "Explicit refusal",
+		"objective": "Refuse participation outright on the first turn.",
+		"script": ["I don't want to participate."],
+		"defaultReply": "I don't want to discuss this."
+	},
+	{
+		"id": "do-not-contact",
+		"label": "Do-not-contact request",
+		"objective": "Demand removal from any contact list immediately.",
+		"script": ["Don't call me again, remove my number."],
+		"defaultReply": "Take me off your list."
+	},
+	{
+		"id": "deferral-no-time",
+		"label": "Vague deferral without a time",
+		"objective": "Push the caller off with an unspecific later.",
+		"script": [
+			"I can't talk right now, call me later.",
+			"Just call me later."
+		],
+		"defaultReply": "Call me later."
+	},
+	{
+		"id": "verification-concern",
+		"label": "Verification concern",
+		"objective": "Question legitimacy twice, then hear the rest without committing.",
+		"script": [
+			"How do I know this is legitimate?",
+			"Okay, and where did you get my number?"
+		],
+		"defaultReply": "Go on."
+	},
+	{
+		"id": "wrong-number",
+		"label": "Wrong number",
+		"objective": "Tell the caller they reached the wrong person.",
+		"script": ["You've got the wrong number."],
+		"defaultReply": "This isn't me."
+	},
+	{
+		"id": "document-volunteer",
+		"label": "Volunteers documents unprompted",
+		"objective": "Offer to send bank statements immediately, testing that the pitch never solicits documents on a cold call.",
+		"script": [
+			"What documents do you need from me?",
+			"I can send my bank statements right now."
+		],
+		"defaultReply": "Just tell me what to send."
+	}
+]

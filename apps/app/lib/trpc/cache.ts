@@ -126,7 +126,11 @@ export function useCrmCache(): CrmCache {
 			),
 
 		settings: (options) =>
-			run([trpc.settings.agentModel.queryKey()], [], options),
+			run(
+				[trpc.settings.agentModel.queryKey(), trpc.settings.voiceProvider.queryKey()],
+				[],
+				options,
+			),
 
 		workspace: (options) =>
 			run(

@@ -1,0 +1,118 @@
+{
+  "source": "F:\\datasets voice-ai-cold-calling-skill Technique 01 (Research Survey) + Technique 02 (Customer Journey Mirror), distilled as retrieval data",
+  "handlers": [
+    {
+      "id": "survey-opener",
+      "title": "Research survey opener",
+      "triggers": ["who is this", "what is this about", "why are you calling", "is this sales"],
+      "beats": [
+        "Lead with a disarming survey frame, not a sales claim.",
+        "Name a small fixed question count and a two-minute cap.",
+        "Anchor locally: the survey is for businesses in their city."
+      ]
+    },
+    {
+      "id": "hesitation-reassure",
+      "title": "Hesitation reassurance",
+      "triggers": ["not sure", "i am busy", "make it quick", "what is it about"],
+      "beats": [
+        "Narrow the topic to one concrete subject: how they handle calls.",
+        "Promise explicitly that nothing is being sold on this call."
+      ]
+    },
+    {
+      "id": "has-answering-service",
+      "title": "Already has an answering service",
+      "triggers": ["already have", "answering service", "we use a service", "have someone"],
+      "beats": [
+        "Ask whether it covers nights, weekends and overflows, and whether anything still lands in voicemail.",
+        "If they are happy, pivot to a referral ask instead of pushing.",
+        "If there is friction, probe the gap before saying anything about the offer."
+      ]
+    },
+    {
+      "id": "forwards-to-cell",
+      "title": "Forwards everything to a cell phone",
+      "triggers": ["forward", "cell", "mobile", "my phone", "never miss"],
+      "beats": [
+        "Concede business-hours coverage, then ask about the other call, after hours, holidays and vacations.",
+        "They will admit some calls slip; run the pain math on those."
+      ]
+    },
+    {
+      "id": "not-owner-or-retired",
+      "title": "Not the owner or retired",
+      "triggers": ["not the owner", "retired", "not my business", "talk to someone else"],
+      "beats": [
+        "Ask who handles this and whether there is another local business worth reaching.",
+        "Take the referral path; never pitch a non-decision-maker."
+      ]
+    },
+    {
+      "id": "uncomfortable-sharing",
+      "title": "Uncomfortable sharing numbers",
+      "triggers": ["not comfortable", "rather not say", "private", "none of your business"],
+      "beats": [
+        "Accept immediately and wish them well.",
+        "Never push past discomfort; end gracefully."
+      ]
+    },
+    {
+      "id": "too-small-or-new",
+      "title": "Too small or brand new",
+      "triggers": ["too small", "just started", "brand new", "only me"],
+      "beats": [
+        "Reframe early stage as the right time to set up call handling, before missed calls pile up.",
+        "Offer to keep their details and circle back in a few months."
+      ]
+    },
+    {
+      "id": "needs-human-quotes",
+      "title": "Needs a human for quotes",
+      "triggers": ["human", "quote", "quotes", "ai cannot", "need a person"],
+      "beats": [
+        "Position the assistant as lead capture, not replacement: it gathers vehicle, service and contact details and texts them over.",
+        "The owner still handles the quote personally; they just never miss the lead."
+      ]
+    },
+    {
+      "id": "pain-math",
+      "title": "Pain math",
+      "triggers": ["how much", "what does that mean", "so what", "does not sound like much"],
+      "beats": [
+        "Multiply missed calls per week by average ticket value out loud and ask them to confirm the figure.",
+        "Make them confront the weekly cost before any pitch."
+      ]
+    },
+    {
+      "id": "soft-pitch-third-party",
+      "title": "Third-party soft pitch",
+      "triggers": ["why are you asking", "what is this for", "what do you want", "what are you selling"],
+      "beats": [
+        "Attribute the idea to someone else and frame the call as validation, not a sale.",
+        "Cite real usage elsewhere, then the local angle.",
+        "End on the free demo offer with no commitment."
+      ]
+    },
+    {
+      "id": "demo-deferral",
+      "title": "Demo deferral",
+      "triggers": ["maybe", "not now", "later", "think about it", "send me something"],
+      "beats": [
+        "Accept the deferral without pressure.",
+        "Ask permission to text contact details so they have a local name if they change their mind."
+      ]
+    },
+    {
+      "id": "journey-mirror-close",
+      "title": "Customer journey mirror close",
+      "triggers": ["why should i", "does it work", "prove it", "not convinced", "already decided"],
+      "beats": [
+        "Walk them through their own buying behavior: search, first page, reviews, calling two or three businesses, picking whoever answers.",
+        "Mirror it back: their customers behave the same way.",
+        "Lock the pain: unanswered leads bounce to competitors.",
+        "Close with a question, not a pitch: ask what reason remains not to close the gap."
+      ]
+    }
+  ]
+}

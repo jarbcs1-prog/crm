@@ -1,4 +1,10 @@
 import { z } from "zod";
+import {
+	loadPitchCorpus,
+	type MatchedHandler,
+	type PitchChunk,
+	searchPitchCorpus,
+} from "../lib/pitch-rag";
 import { encodeWav, readWav } from "../lib/telephony/audio";
 import { getSession } from "../lib/telephony/session";
 import { defineTool } from "../lib/tool-factory";
@@ -110,6 +116,17 @@ export function matchBranch(
 
 function describe(error: unknown): string {
 	return error instanceof Error ? error.message : String(error);
+}
+
+let cachedCorpus: PitchChunk[] | null = null;
+
+async function matchedHandlers(transcript: string): Promise<MatchedHandler[]> {
+	try {
+		cachedCorpus ??= await loadPitchCorpus();
+		return searchPitchCorpus(cachedCorpus, transcript, 2);
+	} catch {
+		return [];
+	}
 }
 
 function round(value: number): number {
@@ -225,13 +242,21 @@ export default defineTool({
 			transcript,
 			seconds,
 			...(reason === undefined ? {} : { reason }),
-			...(transcript === null || branches === undefined || branches.length === 0
+			...(transcript === null
 				? {
 						consent: "unknown" as const,
 						guidance:
 							"No refusal determination was made: treat the caller's words as unknown and never as consent to request or transfer documents. Agreement to hear the explanation is not consent to provide documents.",
 					}
-				: (() => {
+				: {
+						handlers: await matchedHandlers(transcript),
+						...(branches === undefined || branches.length === 0
+							? {
+									consent: "unknown" as const,
+									guidance:
+										"No refusal determination was made: treat the caller's words as unknown and never as consent to request or transfer documents. Agreement to hear the explanation is not consent to provide documents.",
+								}
+							: (() => {
 						const match = matchBranch(transcript, branches);
 						if (match === null) {
 							return {
@@ -252,6 +277,7 @@ export default defineTool({
 									: "Verification concern or deferral: speak the matched reply verbatim, provide only approved verification information, and do not request documents on this turn.",
 						};
 					})()),
+				}),
 			...(consentRules === undefined ? {} : { consentRules }),
 		};
 	},

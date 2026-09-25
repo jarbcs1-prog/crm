@@ -2,8 +2,8 @@ import { z } from "zod";
 import { enabled, unavailable } from "../lib/capabilities";
 import { spend } from "../lib/focus";
 import { searchTerms } from "../lib/names";
-import { findProfileUrls } from "../lib/web-search";
 import { defineTool } from "../lib/tool-factory";
+import { findProfileUrls } from "../lib/web-search";
 
 function searchEnabled(): boolean {
 	return (

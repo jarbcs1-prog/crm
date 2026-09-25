@@ -2,8 +2,14 @@ import { isWorkspaceAdmin } from "@crm/auth";
 import type { Db } from "@crm/db";
 import {
 	readAgentModel,
+	readVoiceProviderState,
+	SETTINGS_ID,
 	selectDefaultModel,
+	VOICE_PROVIDERS,
+	type VoiceProvider,
+	voiceProviderConfigured,
 	writeAgentModel,
+	writeVoiceProvider,
 } from "@crm/db/settings";
 import { WORKSPACE_ID } from "@crm/db/workspace";
 import {
@@ -37,6 +43,28 @@ export interface ModelCatalogResult {
 	available: boolean;
 }
 
+export interface VoiceProviderOption {
+	id: VoiceProvider;
+	label: string;
+	configured: boolean;
+}
+
+export interface VoiceProviderSettings {
+	selectedId: VoiceProvider | null;
+	invalid: boolean;
+	canConfigure: boolean;
+	options: VoiceProviderOption[];
+	updatedAt: string | null;
+}
+
+const VOICE_PROVIDER_LABELS: Record<VoiceProvider, string> = {
+	nonoh: "Nonoh.net SIP",
+	voipstudio: "VoIP Studio",
+	twilio: "Twilio",
+	plivo: "Plivo",
+	vapi: "Vapi",
+};
+
 @Injectable()
 export class SettingsService {
 	private readonly logger = new Logger(SettingsService.name);
@@ -59,6 +87,68 @@ export class SettingsService {
 			effective: await this.catalog.find(model.id),
 			updatedAt: row?.updatedAt.toISOString() ?? null,
 		};
+	}
+
+	async voiceProvider(actingUserId?: string): Promise<VoiceProviderSettings> {
+		const [state, row, member] = await Promise.all([
+			readVoiceProviderState(this.db),
+			this.db.appSetting.findUnique({
+				where: { id: SETTINGS_ID },
+				select: { updatedAt: true },
+			}),
+			actingUserId
+				? this.db.member.findUnique({
+						where: {
+							organizationId_userId: {
+								organizationId: WORKSPACE_ID,
+								userId: actingUserId,
+							},
+						},
+						select: { role: true },
+					})
+				: Promise.resolve(null),
+		]);
+		return {
+			selectedId: state.selectedId,
+			invalid: !state.valid,
+			canConfigure: Boolean(
+				member && isWorkspaceAdmin(member.role as never),
+			),
+			options: VOICE_PROVIDERS.map((id) => ({
+				id,
+				label: VOICE_PROVIDER_LABELS[id],
+				configured: voiceProviderConfigured(id),
+			})),
+			updatedAt: row?.updatedAt.toISOString() ?? null,
+		};
+	}
+
+	async setVoiceProvider(
+		provider: VoiceProvider | null,
+		actingUserId?: string,
+	): Promise<VoiceProviderSettings> {
+		if (actingUserId) {
+			const member = await this.db.member.findUnique({
+				where: {
+					organizationId_userId: {
+						organizationId: WORKSPACE_ID,
+						userId: actingUserId,
+					},
+				},
+				select: { role: true },
+			});
+			if (!member || !isWorkspaceAdmin(member.role as never)) {
+				throw new ForbiddenException(
+					"Only an owner or an admin can change the voice provider.",
+				);
+			}
+		}
+		await writeVoiceProvider(this.db, provider);
+		this.logger.log({
+			message: "Voice provider setting changed",
+			provider,
+		});
+		return this.voiceProvider(actingUserId);
 	}
 
 	async setAgentModel(
