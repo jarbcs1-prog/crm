@@ -1,7 +1,7 @@
 !include "MUI2.nsh"
 
 !ifndef APP_VERSION
-!define APP_VERSION "0.1.0"
+!define APP_VERSION "0.1.2"
 !endif
 !define APP_NAME "CRM Demo"
 !define APP_PUBLISHER "jarbcs1-prog"

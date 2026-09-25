@@ -89,7 +89,9 @@ export class SearchService {
 							kind: "contact",
 							id: contact.id,
 							label:
-								[contact.firstName, contact.lastName].filter(Boolean).join(" ") ||
+								[contact.firstName, contact.lastName]
+									.filter(Boolean)
+									.join(" ") ||
 								(contact.email ?? "Unnamed"),
 							detail: contact.company?.name ?? contact.email,
 							iconUrl: null,

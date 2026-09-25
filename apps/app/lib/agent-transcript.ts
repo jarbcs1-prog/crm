@@ -57,6 +57,7 @@ const VERBS: Record<string, string> = {
 
 	create_contact: "Created a contact",
 	create_ticket: "Created a ticket",
+	propose_pitch_patch: "Proposed a pitch patch",
 	find_leads: "Searched for leads",
 	listen_on_call: "Listened on the call",
 	list_tickets: "Listed tickets",

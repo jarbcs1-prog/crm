@@ -1,12 +1,13 @@
 import { CallEventType, CallStatus, db } from "@crm/db";
 import { z } from "zod";
+import { providerFromMeta, providerStatus } from "../lib/dialer";
 import { getSession } from "../lib/telephony/session";
-import { callCode, getCall, isTerminalStatus } from "../lib/voice";
 import { defineTool } from "../lib/tool-factory";
+import { isTerminalStatus } from "../lib/voice";
 
 export default defineTool({
 	description:
-		"Reports the current status of a call in plain English. A live Nonoh session is reported from its own RTP and SIP state; otherwise the voice provider is asked, when one is configured.",
+		"Reports the current status of a call in plain English. A live Nonoh session is reported from its own RTP and SIP state; hosted status is queried from the provider recorded on the call and normalized into the CRM status vocabulary.",
 	inputSchema: z.object({
 		callId: z.string().min(1).describe("The CRM id of the call to check."),
 	}),
@@ -17,11 +18,13 @@ export default defineTool({
 				id: true,
 				status: true,
 				sipCallId: true,
+				meta: true,
 				startedAt: true,
 				answeredAt: true,
 			},
 		});
 		if (!call) return { ok: false as const, reason: "No such call." };
+		const provider = providerFromMeta(call.meta);
 
 		if (isTerminalStatus(call.status)) {
 			return {
@@ -66,7 +69,7 @@ export default defineTool({
 
 			return {
 				ok: true as const,
-				final: false as const,
+				final: isTerminalStatus(status),
 				status,
 				live,
 				codephrase,
@@ -76,39 +79,34 @@ export default defineTool({
 
 		codephrase = `The call is ${call.status.toLowerCase()} according to the CRM and there is no live Nonoh session for it.`;
 
-		if (call.sipCallId) {
-			try {
-				const provider = await getCall(call.sipCallId);
-				const nested =
-					typeof provider?.data === "object" && provider.data !== null
-						? (provider.data as Record<string, unknown>)
-						: undefined;
-				const providerStatus = nested?.status ?? provider?.status;
-				const providerCode =
-					typeof nested?.code === "number"
-						? nested.code
-						: typeof provider?.code === "number"
-							? provider.code
-							: null;
-				const mapped = callCode(
-					providerStatus as string | number | undefined,
-					providerCode,
-				);
+		if (call.sipCallId && !provider) {
+			return {
+				ok: false as const,
+				reason:
+					"Call has no valid provider metadata; refusing to guess its status.",
+			};
+		}
 
-				status = mapped.status;
-				codephrase = mapped.codephrase;
+		if (call.sipCallId && provider) {
+			const providerResult = await providerStatus(provider, call.sipCallId);
+			if (!providerResult.ok) {
+				codephrase =
+					providerResult.reason ?? "The provider status is unavailable.";
+			} else if (providerResult.code) {
+				status = providerResult.code.status;
+				codephrase = providerResult.code.codephrase;
 
-				if (mapped.status !== call.status) {
+				if (status !== call.status) {
 					const now = new Date();
-					if (mapped.status === CallStatus.IN_PROGRESS) {
+					if (status === CallStatus.IN_PROGRESS) {
 						await db.call.update({
 							where: { id: call.id },
-							data: { status: CallStatus.IN_PROGRESS, answeredAt: now },
+							data: { status, answeredAt: now },
 						});
 						await db.callEvent.create({
 							data: { callId: call.id, type: CallEventType.ANSWER },
 						});
-					} else if (isTerminalStatus(mapped.status)) {
+					} else if (isTerminalStatus(status)) {
 						const anchor = call.answeredAt ?? call.startedAt;
 						const durationSecs = anchor
 							? Math.max(
@@ -118,18 +116,21 @@ export default defineTool({
 							: null;
 						await db.call.update({
 							where: { id: call.id },
-							data: { status: mapped.status, endedAt: now, durationSecs },
+							data: { status, endedAt: now, durationSecs },
 						});
 						await db.callEvent.create({
 							data: { callId: call.id, type: CallEventType.HANGUP },
 						});
 					}
 				}
-			} catch (error) {
-				codephrase = `Could not reach the provider (${String(error)}) and there is no live session to report on; leaving the CRM status as ${call.status.toLowerCase()}.`;
 			}
 		}
 
-		return { ok: true as const, final: false as const, status, codephrase };
+		return {
+			ok: true as const,
+			final: isTerminalStatus(status),
+			status,
+			codephrase,
+		};
 	},
 });

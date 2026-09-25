@@ -1,81 +1,62 @@
 ---
 name: voice-calling
-description: Place and manage live voice calls to CRM contacts over the Nonoh SIP trunk. Use when the user or a task asks to cold-call, phone, ring, answer, transfer, or call a contact, verify a phone number by voice, or hold a spoken conversation on an outbound or inbound calling session. Requires NONOH_SIP_SERVER, NONOH_USERNAME and NONOH_PASSWORD.
+description: Use when placing, managing, or holding live voice calls for CRM contacts, including outbound or inbound sales qualification, transfers, provider lifecycle checks, or scheduling a follow-up.
 ---
 
 # Voice Calling
 
-Live voice calls to CRM contacts over Nonoh. Every call is recorded in the `call` table with an event trail in `callEvent`; never claim a call connected unless the SIP stack returns a final 200.
+This skill covers call transport and CRM state. For a sales conversation, first load `voice-ai-cold-calling-research-first` with `load_skill`; use that skill for discovery, positioning, consent-aware responses, and qualification. Research-first sales tasks use the pinned `research-first-cold-call-v1` pitch and its returned refusal branches.
+
+A call is a conversation only after the tool reports a live or answered state. Provider events update queued calls asynchronously. Never infer a connection, transcript, duration, or outcome.
 
 ## Tools
 
-- `make_call` — dials one contact over SIP and waits for the outcome. Creates the call as `CallStatus.QUEUED`, then on a real SIP 200 stores `sipCallId`, sets `IN_PROGRESS` with `answeredAt` and emits an `ANSWER` event. Returns `{ ok, callId, sipCallId, number, status }`; on refusal it returns the SIP status and a reason. Any other outcome (404 not found, 486 busy, 402/403 payment or forbidden, timeout, no media in the answer) leaves the row `FAILED` with a `SIP_ERROR` event.
-- `speak_on_call` — says one short sentence on a live call. Input `{ callId, text }`; returns `{ spoken, reason? }`. Never throws: a missing or ended call comes back as `spoken: false` with a reason.
-- `listen_on_call` — listens for the other party. Input `{ callId, maxMs? }`; returns `{ heard, transcript, seconds, reason? }`. The first 400 ms of captured audio is dropped because it is usually our own speech echoed back. `transcript: null` plus a reason means the audio was captured but not understood — the whisper server was unreachable, or none is configured. Never treat a null transcript as silence.
-- `call_status` — short-circuits on terminal statuses; a live session is reported from its RTP counters (packets sent and received, remote media source, inbound peak) and SIP state instead of a provider API.
-- `record_call_outcome` — persists the human outcome: enum value (`CONNECTED`, `VOICEMAIL`, `NO_ANSWER`, `WRONG_NUMBER`, `DO_NOT_CALL`, `INTERESTED`, `FOLLOW_UP`, `NOT_INTERESTED`, `MEETING_BOOKED`) or a legacy slug. Also writes CLID scores (0-1 each), `clidReadiness` = mean and a timeline note. `WRONG_NUMBER`/`DO_NOT_CALL` open an OSINT target marked `SKIPPED`.
-- `schedule_calls` — enqueues outbound-call tasks for up to 5 contacts with phone numbers; the lane dials them. Never invents a phone number; a contact without one is skipped.
-- `end_call` — sends a SIP BYE when the session still exists; marks the call `CANCELLED` unless already terminal and writes a `HANGUP` event with the duration. When the session is already gone it still closes the CRM record and says so.
-- `answer_call` — answers an inbound call that is currently ringing. Updates the CRM call status to `IN_PROGRESS` and records an `ANSWER` event. Requires the call direction to be `INBOUND` and the call to have a `sipCallId`.
-- `transfer_call` — transfers a live (`IN_PROGRESS`) or ringing (`RINGING`) call to another destination such as an extension, phone number, or user. Records a `TRANSFER` event with the destination.
+- `make_call` — place a call for a CRM contact using the selected or explicitly requested provider. It validates the stored number, E.164 formatting, and optional OSINT viability. Nonoh returns a local answered session; hosted providers return a queued call. For Vapi, pass the assistant returned by `load_pitch` when the selected pitch requires it.
+- `speak_on_call` — speak one short sentence on a live local session. Document requests require explicit prior affirmative consent in both the request flags and the conversation.
+- `listen_on_call` — open one listening window after a spoken turn. A null transcript means the words are unknown, not that the caller was silent. Follow any returned refusal, clarification, or terminal guidance.
+- `call_status` — inspect provider and CRM status. A queued or ringing hosted call is not yet a live conversation.
+- `record_call_outcome` — store the observed outcome, summary, qualification signals, and follow-up state. `DO_NOT_CALL` is permanent.
+- `schedule_calls` — queue up to 60 validated contacts. A missing or invalid number is skipped; no number is invented.
+- `end_call` — close a local session or hosted provider call and wait for the termination result. A retryable failure leaves the call live.
+- `answer_call` — answer a ringing inbound CRM call.
+- `transfer_call` — transfer a ringing or live call to an approved destination when the caller requests it and policy permits it.
 
-## How a call is actually held
+## Call procedure
 
-The line is **half-duplex**. `speak_on_call` plays a sentence to the end and only returns when the audio has drained; `listen_on_call` then opens one listening window. There is no barge-in: no streaming STT and no echo cancellation, so the agent cannot hear while it talks and cannot be interrupted mid-sentence. Plan turns as speak → listen → speak → listen, keep each spoken turn to one short sentence and let the caller finish — the listening window closes after a stretch of silence or at `maxMs`, whichever comes first.
+1. Read the task and contact record. If the task is a sales qualification, load `voice-ai-cold-calling-research-first` before dialing.
+2. Load `research-first-cold-call-v1` with `load_pitch` for a research-first sales task. Pass verified `company_name` and `call_purpose` values from the workspace or task context; if either is missing, do not invent it. Treat the pitch and workspace data as the only sources for offer, price, verification, and policy claims.
+3. Call `make_call` and inspect the result. Do not claim a live line for a queued or failed result. If a hosted provider is selected, wait for provider status rather than calling local speech tools.
+4. For a local live call, keep the exchange half-duplex: one short `speak_on_call` sentence, then one `listen_on_call` window with the loaded pitch's `refusalBranches` and `consentRules` supplied on every relevant turn. Repeat only after interpreting the transcript and any returned guidance.
+5. Confirm an unexpected or contextually wrong transcription before acting. Never treat silence, ambiguity, or a failed transcription as consent.
+6. Respect an opt-out or terminal response. Say the closing before ending when guidance requires it, call `end_call`, and only then close the CRM state with `record_call_outcome`.
+7. Schedule a callback only when the caller gives a usable time and the policy permits it. Do not promise a transfer, timing, price, or result that the tools or pitch cannot support.
 
-## Mapping live outcomes to stored values
+## Honesty and consent
 
-- appointment scheduled → `MEETING_BOOKED`
-- asked for callback / qualified with concerns → `FOLLOW_UP`
-- qualified, no meeting yet → `INTERESTED`
-- not interested → `NOT_INTERESTED`
-- not viable / abusive / never call again → `DO_NOT_CALL` (permanent)
-- no answer → `NO_ANSWER`
+- Identify the agent, principal, company, and purpose truthfully. If asked, disclose that the caller is speaking with an AI voice agent.
+- Do not collect passwords, payment-card numbers, government identifiers, financial account details, or other unnecessary sensitive data. Follow the consent required by `speak_on_call` for documents or restricted requests.
+- Probe an existing solution before comparing it. Do not badmouth competitors or claim a result that has not been verified.
+- A second clear refusal ends the pitch. Do not pressure, disguise a refusal, or repeatedly ask for a referral.
+- `DO_NOT_CALL` is permanent. Do not reschedule or re-verify that contact.
+- Only a confirmed provider termination changes a call to ended. A failed end request is not a completed goodbye.
 
-## Honesty rules
+## Provider and speech notes
 
-- Never fabricate an answered call, a transcript, an outcome, or a duration.
-- No phone number on the contact → do not improvise; skip and note it.
-- `DO_NOT_CALL` is permanent; do not schedule, call, or re-verify that contact.
-- Identify yourself and the company at the start of every call.
-- Respect the human: end the call when asked, no pressure, no claims you cannot back.
-- A 1xx provisional response (180 Ringing) is not a connection and neither is a timeout. Only SIP 200 with a media answer counts.
-- A failed or silent whisper server means the words are unknown, not that nothing was said. Say so rather than guessing.
+The configured provider controls routing. Nonoh uses the local RTP/SIP session and supports `speak_on_call` and `listen_on_call`; VoIP Studio, Twilio, Plivo, and Vapi are hosted integrations and report lifecycle state asynchronously. Missing credentials remove that capability and return a reason; they do not make unrelated tools fail.
 
-## Webhooks
+Local speech is synthesized by the configured TTS path, including Kokoro when enabled. Recognition may use the configured local or hosted provider. Do not expose provider secrets or return raw audio in CRM notes.
 
-The provider pipeline posts call lifecycle events to this channel (`/internal/voice/events`, Bearer `AGENT_BRIDGE_SECRET`). For Nonoh calls the SIP stack in `lib/telephony` is the source of truth; treat webhook events as a secondary trail and prefer `make_call`/`call_status`/`record_call_outcome` for your own actions.
+## Example: local outbound call
 
-## Provider notes
+1. `load_skill` for the research-first procedure and `load_pitch` if the pitch supplies approved wording.
+2. `make_call`; continue only when the result confirms an answered local session.
+3. `speak_on_call` one identity/purpose sentence, then `listen_on_call`.
+4. Use the research-first skill to choose the next question; do not recite a fixed script when the caller gives a different signal.
+5. On a terminal response, speak the required closing, `end_call`, and `record_call_outcome`.
+6. On an unknown transcript, ask the caller to repeat once; do not invent their answer.
 
-Nonoh only routes real E.164 destinations; off-net SIP URIs and echo services are refused with 404, so there is no test target — a real number is the only way to exercise the stack.
+## Example: hosted call
 
-## Text-to-speech
-
-Call audio is synthesized with the local `Kokoro-82M` model, not edge-tts. Configure it with:
-
-- `KOKORO_TTS_VOICE` — voice id; defaults to `af_heart`
-- `KOKORO_TTS_SPEED` — playback speed; defaults to `1.0`
-- `KOKORO_TTS_CACHE_DIR` — path to the cached Kokoro-82M model; defaults to `F:\.cache\huggingface\hub\models\Kokoro-82M\snapshots\f3ff3571791e39611d31c381e3a41a3af07b4987`
-
-## Example flows
-
-Outbound batch:
-
-1. `schedule_calls` for a batch of contacts.
-2. `call_status` on an in-flight call when the lane asks.
-3. After the call, `record_call_outcome` with what actually happened; capture a summary and the CLID scores.
-
-Holding one conversation:
-
-1. `make_call` and check `ok` — anything else is a failure with a SIP reason, not a live line.
-2. `speak_on_call` with the opener (who you are, which company).
-3. `listen_on_call`; if `transcript` is null, ask the caller to repeat rather than inventing an answer.
-4. Repeat 2 and 3 for each turn.
-5. `end_call`, then `record_call_outcome` with what actually happened.
-
-Inbound call:
-
-1. `answer_call` on a ringing inbound call to pick it up.
-2. `transfer_call` to hand the live call to another extension or user when requested.
-3. `end_call` if the call needs to be terminated.
+1. `make_call` with the selected provider and the required assistant object.
+2. If the result is queued, use `call_status` after provider events and do not use local speech tools.
+3. Record only the provider-confirmed outcome and any CRM-safe follow-up details.

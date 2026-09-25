@@ -1,0 +1,150 @@
+{
+	"id": "research-first-cold-call-v1",
+	"name": "Research-first cold call v1",
+	"description": "Product-neutral, permission-first opening and follow-up policy for a live sales conversation. Approved offer, pricing, verification, and next-step wording must come from the workspace or another approved pitch.",
+	"variables": ["firstName", "company_name", "call_purpose"],
+	"policy": {
+		"forbidden": [
+			"Do not invent or state pricing, discounts, guarantees, customer counts, integrations, or performance claims.",
+			"Do not request passwords, payment-card details, government identifiers, financial-account numbers, medical details, or other sensitive data.",
+			"Do not claim to be a human or conceal that this is an AI voice agent.",
+			"Do not pressure a caller after a refusal or do-not-contact request.",
+			"Do not schedule a follow-up, transfer, document request, or other action without the required tool confirmation.",
+			"Do not treat silence, ambiguity, recognition, or permission to hear more as consent to a sensitive or restricted request."
+		]
+	},
+	"runtime_requirements": {
+		"company_name": "Verified workspace or principal name",
+		"call_purpose": "Approved, short call purpose from workspace or task context"
+	},
+	"states": {
+		"active": ["s1_identity", "s2_permission", "s3_discovery", "s4_next_step"],
+		"terminal": [
+			"r1_explicit_refusal",
+			"r2_do_not_contact",
+			"r3_wrong_number",
+			"r4_not_right_person",
+			"r5_busy_or_deferral",
+			"r6_ai_concern"
+		]
+	},
+	"conversation": [
+		{
+			"id": "s1_identity",
+			"listenAfter": true,
+			"listenMs": 8000,
+			"text": "Hello {firstName}. This is an AI voice agent calling on behalf of {company_name} about {call_purpose}. Are you the right person to speak with?"
+		},
+		{
+			"id": "s2_permission",
+			"listenAfter": true,
+			"listenMs": 8000,
+			"text": "If so, is now a good time for a brief conversation? If not, I can respect that and end the call."
+		},
+		{
+			"id": "s3_discovery",
+			"listenAfter": true,
+			"listenMs": 12000,
+			"text": "What is the most important challenge in that part of your process right now?"
+		},
+		{
+			"id": "s4_next_step",
+			"listenAfter": true,
+			"listenMs": 8000,
+			"text": "Would you like a team member to follow up with an approved summary? I will only arrange that if you give us a time and approve it."
+		},
+		{
+			"id": "s5_close",
+			"listenAfter": false,
+			"listenMs": 1000,
+			"text": "Thank you for speaking with me. Goodbye."
+		}
+	],
+	"refusal_branches": [
+		{
+			"id": "r1_explicit_refusal",
+			"trigger": [
+				"I am not interested",
+				"I'm not interested",
+				"not interested",
+				"do not want to talk",
+				"no thanks"
+			],
+			"action": "TERMINATE",
+			"text": "Understood. Thank you for your time. I will not continue the sales conversation. Goodbye."
+		},
+		{
+			"id": "r2_do_not_contact",
+			"trigger": [
+				"do not contact me",
+				"don't call me again",
+				"remove my number",
+				"take me off your list",
+				"stop calling"
+			],
+			"action": "TERMINATE_AND_OPTOUT",
+			"text": "Understood. I will record your request not to receive further contact. Thank you for letting me know. Goodbye."
+		},
+		{
+			"id": "r3_wrong_number",
+			"trigger": [
+				"wrong number",
+				"this is the wrong number",
+				"you have the wrong number"
+			],
+			"action": "TERMINATE",
+			"text": "Thank you for letting me know. I will not take any further information. Goodbye."
+		},
+		{
+			"id": "r4_not_right_person",
+			"trigger": [
+				"you have the wrong person",
+				"this is not the right person",
+				"that is not me"
+			],
+			"action": "TERMINATE",
+			"text": "Thank you for clarifying. I will not ask you for any further information. Goodbye."
+		},
+		{
+			"id": "r5_busy_or_deferral",
+			"trigger": [
+				"I am busy",
+				"I'm busy",
+				"not a good time",
+				"call me later",
+				"can I call you later"
+			],
+			"action": "CLARIFY_ONCE",
+			"text": "Understood. Would a specific day and time work for a callback?"
+		},
+		{
+			"id": "r6_ai_concern",
+			"trigger": [
+				"are you an AI",
+				"are you a robot",
+				"are you a real person",
+				"I do not talk to robots"
+			],
+			"action": "CLARIFY_ONCE",
+			"text": "I am an AI voice agent, and I can answer the call in a clearly labeled way. Would you like me to continue or end the call?"
+		}
+	],
+	"post_refusal_rules": {
+		"clarify_budget": "One CLARIFY_ONCE probe per call in total. After it is used, any further brush-off, vague deferral, silence, or deflection ends the call.",
+		"explicit_refusal": "Terminate immediately and do not pitch again.",
+		"do_not_contact": "Record the opt-out and terminate immediately. Do not schedule a follow-up.",
+		"wrong_number": "Terminate. Do not ask for the correct number.",
+		"not_right_person": "Terminate unless the person voluntarily offers a correction.",
+		"busy_or_deferral": "Pin down a specific callback time at most once. If the caller remains vague or declines, terminate politely.",
+		"ai_concern": "Answer the identity question plainly and let the caller choose whether to continue."
+	},
+	"consent_rules": {
+		"positive_consent_required": true,
+		"silence_is_consent": false,
+		"recognition_is_consent": false,
+		"prior_contact_is_consent": false,
+		"answering_the_call_is_consent": false,
+		"permission_to_hear_more_is_not_consent_to_a_restricted_request": true,
+		"permission_to_follow_up_requires_a_time": true
+	}
+}

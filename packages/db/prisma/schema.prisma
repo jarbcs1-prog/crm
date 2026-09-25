@@ -717,6 +717,8 @@ model AppSetting {
 
   agentModelContextWindow Int?
 
+  voiceProvider String?
+
   updatedAt DateTime @updatedAt
 
   @@map("appSetting")
@@ -829,6 +831,10 @@ model Call {
   clidLiquidityScore Float?
   clidInterestScore Float?
   clidDecisionMakerScore Float?
+  clidMotivationScore Float?
+  clidUrgencyScore Float?
+  clidExperienceScore Float?
+  clidBudgetScore Float?
 
   meta Json?
 

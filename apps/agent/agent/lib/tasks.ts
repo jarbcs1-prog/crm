@@ -100,6 +100,20 @@ export async function completeTask(
 	});
 }
 
+export async function releaseLease(taskId: string): Promise<void> {
+	await db.agentTask.updateMany({
+		where: { id: taskId, finishedAt: null },
+		data: { leasedUntil: null },
+	});
+}
+
+export async function deferTask(taskId: string, until: Date): Promise<void> {
+	await db.agentTask.updateMany({
+		where: { id: taskId, finishedAt: null },
+		data: { dueAt: until, leasedUntil: null },
+	});
+}
+
 export async function taskSubject(taskId: string): Promise<TaskSubject | null> {
 	return db.agentTask.findUnique({
 		where: { id: taskId },
