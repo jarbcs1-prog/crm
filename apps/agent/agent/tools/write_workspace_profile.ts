@@ -6,8 +6,8 @@ import {
 } from "@crm/db/workspace";
 import { z } from "zod";
 import { currentFocus } from "../lib/focus";
-import { identity } from "../lib/workspace";
 import { defineTool } from "../lib/tool-factory";
+import { identity } from "../lib/workspace";
 
 const line = (what: string) =>
 	z.string().max(MAX_LINE).optional().describe(what);

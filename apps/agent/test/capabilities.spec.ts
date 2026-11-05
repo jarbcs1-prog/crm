@@ -16,6 +16,9 @@ const KEYS = [
 	"GOOGLE_CSE_ID",
 	"CONTEXT_DEV_API_KEY",
 	"BLOB_READ_WRITE_TOKEN",
+	"NONOH_SIP_SERVER",
+	"NONOH_USERNAME",
+	"NONOH_PASSWORD",
 	"VOIPSTUDIO_API_KEY",
 	"OLLAMA_BASE_URL",
 	"LMSTUDIO_BASE_URL",
@@ -27,10 +30,21 @@ const KEYS = [
 	"DEEPGRAM_API_KEY",
 	"ELEVENLABS_API_KEY",
 	"CARTESIA_API_KEY",
+	"VAPI_API_KEY",
+	"VAPI_PHONE_NUMBER_ID",
+	"PLIVO_AUTH_ID",
+	"PLIVO_AUTH_TOKEN",
+	"PLIVO_CALLER_ID",
+	"PLIVO_ANSWER_URL",
 	"TWILIO_ACCOUNT_SID",
 	"TWILIO_AUTH_TOKEN",
+	"TWILIO_CALLER_ID",
+	"TWILIO_TWIML_URL",
+	"TWILIO_TWIML",
 	"TELNYX_API_KEY",
 	"FASTER_WHISPER_URL",
+	"QDRANT_URL",
+	"QDRANT_API_KEY",
 ] as const;
 
 const saved: Record<string, string | undefined> = {};
@@ -64,6 +78,19 @@ describe("capabilities", () => {
 		expect(enabled("RAPIDAPI_KEY")).toBe(false);
 	});
 
+	it("uses complete readiness for hosted voice providers", () => {
+		process.env.VAPI_API_KEY = "key";
+		expect(enabled("VAPI_API_KEY")).toBe(false);
+		process.env.VAPI_PHONE_NUMBER_ID = "phone";
+		expect(enabled("VAPI_API_KEY")).toBe(true);
+
+		process.env.TWILIO_ACCOUNT_SID = "AC1";
+		process.env.TWILIO_AUTH_TOKEN = "token";
+		process.env.TWILIO_CALLER_ID = "+15550001111";
+		expect(enabled("TWILIO_ACCOUNT_SID")).toBe(false);
+		process.env.TWILIO_TWIML_URL = "https://example.test/twiml";
+		expect(enabled("TWILIO_ACCOUNT_SID")).toBe(true);
+	});
 	it("treats blank and whitespace as unset", () => {
 		process.env.RAPIDAPI_KEY = "   ";
 		expect(enabled("RAPIDAPI_KEY")).toBe(false);

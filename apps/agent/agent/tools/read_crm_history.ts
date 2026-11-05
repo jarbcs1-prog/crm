@@ -5,7 +5,7 @@ import { createCrmReadTool } from "../lib/tool-factory";
 
 export default createCrmReadTool({
 	description:
-		"Read everything the CRM already has on a contact: email threads with full message bodies, meetings, whether they have ever replied, their company and its id, the deals they are on and who else we know at their company. Free, fast and the best evidence there is — call it before paying for a lookup.",
+		"Read everything the CRM already has on a contact: email threads with full message bodies, meetings, recent calls with outcomes and qualification scores plus call totals, whether they have ever replied, their company and its id, the deals they are on and who else we know at their company. Free, fast and the best evidence there is — call it before paying for a lookup.",
 	inputSchema: z.object({
 		contactId: z.string(),
 		threads: z

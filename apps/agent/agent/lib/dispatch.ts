@@ -2,7 +2,6 @@ import { EnrichmentStatus } from "@crm/db";
 import { APP_AUTH, type AppAuth } from "./app-auth";
 import { brandOutcome, runBrand } from "./brand";
 import { markRunning, settle } from "./enrichment";
-import { LEGAL_APPROACH_SCRIPT } from "./legal-approach";
 import { collapsing, runLimited } from "./pool";
 import { runPortrait } from "./portrait";
 import {
@@ -169,7 +168,9 @@ function work(kind: string, reason: string): string {
 		case "meeting-prep":
 			return "There is a meeting with this person soon. Make sure whoever is taking it opens the record knowing who they are dealing with.";
 		case "call":
-			return `Ring this contact on the number on file and qualify them using the legal approach script. Lead with who you are and which company you represent, ask about their situation, qualify their budget, timeline and fit, listen and come back with what happened. Script: ${LEGAL_APPROACH_SCRIPT}. Use record_call_outcome to capture the outcome with INTERESTED, FOLLOW_UP, DO_NOT_CALL, or NOT_INTERESTED. If there is no number, say so plainly rather than inventing one; flag them for OSINT with flag_for_osint instead.`;
+			return `Before dialing, load the voice-ai-cold-calling-research-first skill with load_skill and follow its research-first procedure. Call load_pitch with pitchId research-first-cold-call-v1 and pass verified company_name and call_purpose values from the workspace or task context; do not invent missing values. Use the returned refusalBranches and consentRules with listen_on_call on relevant turns. Use make_call and inspect its result before speaking. For an answered local call, keep short speak_on_call turns followed by listen_on_call; for a queued hosted call, use call_status and do not use local speech tools. Use record_call_outcome for the observed outcome, keep DO_NOT_CALL permanent, and flag a missing number with flag_for_osint rather than inventing one.`;
+		case "voice-batch":
+			return `This contact is one of a bulk call batch. Before dialing, load the voice-ai-cold-calling-research-first skill with load_skill and follow its research-first procedure exactly as for a single call. Call load_pitch with pitchId research-first-cold-call-v1 and pass verified company_name and call_purpose values from the workspace or task context; do not invent missing values. Use the returned refusalBranches and consentRules with listen_on_call on relevant turns, then call make_call and inspect its result. Use speak_on_call and listen_on_call only for an answered local call; use call_status for a hosted queued call. Record the observed outcome with record_call_outcome, keep DO_NOT_CALL permanent, and flag a missing number with flag_for_osint rather than inventing one. Batch pace never overrides consent or refusal policy.`;
 		case "osint-enrich":
 			return "Verify and enrich this contact from public sources: phone number, email address, current title. Correct the record where you find something better and note what you could not settle.";
 		case "company-profile":

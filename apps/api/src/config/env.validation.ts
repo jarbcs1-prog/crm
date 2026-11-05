@@ -131,6 +131,70 @@ export class EnvironmentVariables {
 	NONOH_DISPLAY_NAME?: string;
 
 	@IsOptional()
+	@IsString()
+	VOIPSTUDIO_API_KEY?: string;
+
+	@IsOptional()
+	@IsString()
+	VOIPSTUDIO_CALLER_ID?: string;
+
+	@IsOptional()
+	@IsUrl({ require_tld: false, require_protocol: true })
+	VOIPSTUDIO_BASE_URL?: string;
+
+	@IsOptional()
+	@IsString()
+	TWILIO_ACCOUNT_SID?: string;
+
+	@IsOptional()
+	@IsString()
+	TWILIO_AUTH_TOKEN?: string;
+
+	@IsOptional()
+	@IsString()
+	TWILIO_CALLER_ID?: string;
+
+	@IsOptional()
+	@IsUrl({ require_tld: false, require_protocol: true })
+	TWILIO_TWIML_URL?: string;
+
+	@IsOptional()
+	@IsString()
+	TWILIO_TWIML?: string;
+
+	@IsOptional()
+	@IsString()
+	PLIVO_AUTH_ID?: string;
+
+	@IsOptional()
+	@IsString()
+	PLIVO_AUTH_TOKEN?: string;
+
+	@IsOptional()
+	@IsString()
+	PLIVO_CALLER_ID?: string;
+
+	@IsOptional()
+	@IsUrl({ require_tld: false, require_protocol: true })
+	PLIVO_ANSWER_URL?: string;
+
+	@IsOptional()
+	@IsString()
+	VAPI_API_KEY?: string;
+
+	@IsOptional()
+	@IsString()
+	VAPI_PHONE_NUMBER_ID?: string;
+
+	@IsOptional()
+	@IsString()
+	VAPI_ASSISTANT_ID?: string;
+
+	@IsOptional()
+	@IsString()
+	VOICE_RECORDINGS_DIR?: string;
+
+	@IsOptional()
 	@IsUrl({ require_tld: false, require_protocol: true })
 	OLLAMA_BASE_URL?: string;
 

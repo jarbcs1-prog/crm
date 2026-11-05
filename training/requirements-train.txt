@@ -1,0 +1,8 @@
+transformers>=4.41
+peft>=0.11
+trl>=0.8
+accelerate>=0.30
+bitsandbytes>=0.43
+datasets>=2.19
+pyarrow>=15
+torch>=2.2

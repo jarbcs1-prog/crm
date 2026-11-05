@@ -7,8 +7,8 @@ import {
 } from "@crm/db";
 import { z } from "zod";
 import { writeTimelineNote } from "../lib/crm";
-import { isTerminalStatus } from "../lib/voice";
 import { defineTool } from "../lib/tool-factory";
+import { isTerminalStatus } from "../lib/voice";
 
 const OUTCOME_PORT: Record<string, CallOutcome> = {
 	...(Object.fromEntries(
@@ -58,6 +58,30 @@ export default defineTool({
 			.max(1)
 			.optional()
 			.describe("CLID decision-maker score, 0-1."),
+		motivation: z
+			.number()
+			.min(0)
+			.max(1)
+			.optional()
+			.describe("Lead motivation signal, 0-1."),
+		urgency: z
+			.number()
+			.min(0)
+			.max(1)
+			.optional()
+			.describe("Lead urgency signal, 0-1."),
+		experience: z
+			.number()
+			.min(0)
+			.max(1)
+			.optional()
+			.describe("Lead prior experience signal, 0-1."),
+		budget: z
+			.number()
+			.min(0)
+			.max(1)
+			.optional()
+			.describe("Lead budget-fit signal, 0-1."),
 		summary: z
 			.string()
 			.optional()
@@ -70,6 +94,10 @@ export default defineTool({
 		liquidity,
 		interest,
 		decisionMaker,
+		motivation,
+		urgency,
+		experience,
+		budget,
 		summary,
 	}) {
 		const call = await db.call.findUnique({
@@ -89,9 +117,16 @@ export default defineTool({
 		if (!mappedOutcome)
 			return { ok: false as const, reason: `Unknown outcome "${outcome}".` };
 
-		const clidScores = [control, liquidity, interest, decisionMaker].filter(
-			(value): value is number => typeof value === "number",
-		);
+		const clidScores = [
+			control,
+			liquidity,
+			interest,
+			decisionMaker,
+			motivation,
+			urgency,
+			experience,
+			budget,
+		].filter((value): value is number => typeof value === "number");
 		const clidReadiness =
 			clidScores.length > 0
 				? Math.round(
@@ -121,6 +156,14 @@ export default defineTool({
 				...(decisionMaker === undefined
 					? {}
 					: { clidDecisionMakerScore: decisionMaker }),
+				...(motivation === undefined
+					? {}
+					: { clidMotivationScore: motivation }),
+				...(urgency === undefined ? {} : { clidUrgencyScore: urgency }),
+				...(experience === undefined
+					? {}
+					: { clidExperienceScore: experience }),
+				...(budget === undefined ? {} : { clidBudgetScore: budget }),
 				...((summary ?? undefined) === undefined ? {} : { summary }),
 			},
 		});

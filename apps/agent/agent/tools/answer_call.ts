@@ -1,7 +1,8 @@
 import { CallDirection, CallEventType, CallStatus, db } from "@crm/db";
 import { z } from "zod";
-import { answer } from "../lib/voice";
+import { providerFromMeta } from "../lib/dialer";
 import { defineTool } from "../lib/tool-factory";
+import { answer } from "../lib/voice";
 
 export default defineTool({
 	description:
@@ -15,9 +16,21 @@ export default defineTool({
 	async execute({ callId }) {
 		const call = await db.call.findUnique({
 			where: { id: callId },
-			select: { id: true, direction: true, status: true, sipCallId: true },
+			select: {
+				id: true,
+				direction: true,
+				status: true,
+				sipCallId: true,
+				meta: true,
+			},
 		});
 		if (!call) return { ok: false as const, reason: "No such call." };
+		if (providerFromMeta(call.meta) !== "voipstudio") {
+			return {
+				ok: false as const,
+				reason: "Answering is supported only for VoIP Studio calls.",
+			};
+		}
 
 		if (call.direction !== CallDirection.INBOUND) {
 			return {

@@ -72,7 +72,7 @@ export const env = {
 } as const;
 
 export function isGoogleConfigured(): boolean {
-	return env.google !== undefined;
+	return googleCredentials() !== undefined;
 }
 
 export { apiUrl, appUrl };

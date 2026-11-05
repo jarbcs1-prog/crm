@@ -664,73 +664,163 @@ async function healLegacyData() {
 		select: { id: true, name: true, companyId: true },
 	});
 	for (const d of staleDeals) {
-		const c = await db.company.findUnique({ where: { id: d.companyId }, select: { name: true } });
+		const c = await db.company.findUnique({
+			where: { id: d.companyId },
+			select: { name: true },
+		});
 		const base = c?.name ?? "Deal";
-		const suffix = d.name.includes("expansion") ? " — expansion" : " — Shelf-Thought, Inc.";
-		const healed = d.name.includes(" — ") ? d.name.replace(/Comp AI/g, "Shelf-Thought") : `${base}${suffix}`;
+		const suffix = d.name.includes("expansion")
+			? " — expansion"
+			: " — Shelf-Thought, Inc.";
+		const healed = d.name.includes(" — ")
+			? d.name.replace(/Comp AI/g, "Shelf-Thought")
+			: `${base}${suffix}`;
 		await db.deal.update({ where: { id: d.id }, data: { name: healed } });
 	}
-	if (staleDeals.length) console.log(`Healed ${staleDeals.length} deal(s) with stale Comp AI name.`);
+	if (staleDeals.length)
+		console.log(`Healed ${staleDeals.length} deal(s) with stale Comp AI name.`);
 	const legacyNameMap: Record<string, { name: string; email: string }> = {
 		"Ada Okafor": { name: "Sofia Delgado", email: "sofia@shelf-thought.com" },
-		"Marcus Lindqvist": { name: "Kenji Tanaka", email: "kenji@shelf-thought.com" },
+		"Marcus Lindqvist": {
+			name: "Kenji Tanaka",
+			email: "kenji@shelf-thought.com",
+		},
 		"Priya Raman": { name: "Zara Al-Hassan", email: "zara@shelf-thought.com" },
 	};
 	for (const [legacyName, replacement] of Object.entries(legacyNameMap)) {
 		const legacyUser = await db.user.findFirst({ where: { name: legacyName } });
 		if (!legacyUser) continue;
-		const emailTaken = await db.user.findFirst({ where: { email: replacement.email, id: { not: legacyUser.id } } });
+		const emailTaken = await db.user.findFirst({
+			where: { email: replacement.email, id: { not: legacyUser.id } },
+		});
 		if (emailTaken) {
 			const fallbackId = emailTaken.id;
-			await db.company.updateMany({ where: { ownerId: legacyUser.id }, data: { ownerId: fallbackId } });
-			await db.contact.updateMany({ where: { ownerId: legacyUser.id }, data: { ownerId: fallbackId } });
-			await db.deal.updateMany({ where: { ownerId: legacyUser.id }, data: { ownerId: fallbackId } });
-			await db.activity.updateMany({ where: { createdById: legacyUser.id }, data: { createdById: fallbackId } });
+			await db.company.updateMany({
+				where: { ownerId: legacyUser.id },
+				data: { ownerId: fallbackId },
+			});
+			await db.contact.updateMany({
+				where: { ownerId: legacyUser.id },
+				data: { ownerId: fallbackId },
+			});
+			await db.deal.updateMany({
+				where: { ownerId: legacyUser.id },
+				data: { ownerId: fallbackId },
+			});
+			await db.activity.updateMany({
+				where: { createdById: legacyUser.id },
+				data: { createdById: fallbackId },
+			});
 			await db.user.delete({ where: { id: legacyUser.id } }).catch(() => {});
-			console.log(`Reassigned ${legacyName} -> ${replacement.name} (merged into existing user).`);
+			console.log(
+				`Reassigned ${legacyName} -> ${replacement.name} (merged into existing user).`,
+			);
 		} else {
-			await db.user.update({ where: { id: legacyUser.id }, data: { name: replacement.name, email: replacement.email } });
+			await db.user.update({
+				where: { id: legacyUser.id },
+				data: { name: replacement.name, email: replacement.email },
+			});
 			console.log(`Renamed user ${legacyName} -> ${replacement.name}.`);
 		}
 	}
-	const legacyEmails = ["ada@shelf-thought.com", "marcus@shelf-thought.com", "priya@shelf-thought.com"];
-	const legacyUsers = await db.user.findMany({ where: { email: { in: legacyEmails } }, select: { id: true } });
+	const legacyEmails = [
+		"ada@shelf-thought.com",
+		"marcus@shelf-thought.com",
+		"priya@shelf-thought.com",
+	];
+	const legacyUsers = await db.user.findMany({
+		where: { email: { in: legacyEmails } },
+		select: { id: true },
+	});
 	if (legacyUsers.length > 0) {
-		const fallbackOwner = await db.user.findFirst({ where: { email: { in: OWNERS.map((o) => o.email) } }, select: { id: true } });
+		const fallbackOwner = await db.user.findFirst({
+			where: { email: { in: OWNERS.map((o) => o.email) } },
+			select: { id: true },
+		});
 		const replacementId = fallbackOwner?.id ?? (await seedOwners())[0];
 		for (const u of legacyUsers) {
-			await db.company.updateMany({ where: { ownerId: u.id }, data: { ownerId: replacementId } });
-			await db.contact.updateMany({ where: { ownerId: u.id }, data: { ownerId: replacementId } });
-			await db.deal.updateMany({ where: { ownerId: u.id }, data: { ownerId: replacementId } });
-			await db.activity.updateMany({ where: { createdById: u.id }, data: { createdById: replacementId } });
+			await db.company.updateMany({
+				where: { ownerId: u.id },
+				data: { ownerId: replacementId },
+			});
+			await db.contact.updateMany({
+				where: { ownerId: u.id },
+				data: { ownerId: replacementId },
+			});
+			await db.deal.updateMany({
+				where: { ownerId: u.id },
+				data: { ownerId: replacementId },
+			});
+			await db.activity.updateMany({
+				where: { createdById: u.id },
+				data: { createdById: replacementId },
+			});
 			await db.user.delete({ where: { id: u.id } }).catch(() => {});
 		}
 		console.log(`Healed ${legacyUsers.length} legacy owner(s) by email.`);
 	}
 	const ws = await db.organization.findFirst();
 	if (ws && ws.name.trim().toLowerCase() === "crm") {
-		await db.organization.update({ where: { id: ws.id }, data: { name: "Shelf-Thought" } });
+		await db.organization.update({
+			where: { id: ws.id },
+			data: { name: "Shelf-Thought" },
+		});
 		console.log("Renamed workspace CRM -> Shelf-Thought");
 	}
 	const org = await db.organization.findFirst({ where: { id: "workspace" } });
 	if (org) {
 		const realOwnerEmail = "jarbcs1@gmail.com";
-		const realUser = await db.user.findFirst({ where: { email: realOwnerEmail } });
+		const realUser = await db.user.findFirst({
+			where: { email: realOwnerEmail },
+		});
 		if (realUser) {
-			await db.member.updateMany({ where: { organizationId: org.id, userId: realUser.id }, data: { role: "owner" } });
-			await db.member.updateMany({ where: { organizationId: org.id, userId: { not: realUser.id }, role: "owner" }, data: { role: "member" } });
+			await db.member.updateMany({
+				where: { organizationId: org.id, userId: realUser.id },
+				data: { role: "owner" },
+			});
+			await db.member.updateMany({
+				where: {
+					organizationId: org.id,
+					userId: { not: realUser.id },
+					role: "owner",
+				},
+				data: { role: "member" },
+			});
 		}
-		const demoEmails = ["ada@trycomp.ai", "marcus@trycomp.ai", "priya@trycomp.ai", "dev@localhost", "ada@shelf-thought.com", "marcus@shelf-thought.com", "priya@shelf-thought.com"];
+		const demoEmails = [
+			"ada@trycomp.ai",
+			"marcus@trycomp.ai",
+			"priya@trycomp.ai",
+			"dev@localhost",
+			"ada@shelf-thought.com",
+			"marcus@shelf-thought.com",
+			"priya@shelf-thought.com",
+		];
 		for (const email of demoEmails) {
 			const u = await db.user.findFirst({ where: { email } });
 			if (!u) continue;
-			await db.member.deleteMany({ where: { organizationId: org.id, userId: u.id } });
-			const fallbackId = realUser?.id ?? (await db.user.findFirst({ select: { id: true } }))?.id;
+			await db.member.deleteMany({
+				where: { organizationId: org.id, userId: u.id },
+			});
+			const fallbackId =
+				realUser?.id ?? (await db.user.findFirst({ select: { id: true } }))?.id;
 			if (fallbackId) {
-				await db.company.updateMany({ where: { ownerId: u.id }, data: { ownerId: fallbackId } });
-				await db.contact.updateMany({ where: { ownerId: u.id }, data: { ownerId: fallbackId } });
-				await db.deal.updateMany({ where: { ownerId: u.id }, data: { ownerId: fallbackId } });
-				await db.activity.updateMany({ where: { createdById: u.id }, data: { createdById: fallbackId } });
+				await db.company.updateMany({
+					where: { ownerId: u.id },
+					data: { ownerId: fallbackId },
+				});
+				await db.contact.updateMany({
+					where: { ownerId: u.id },
+					data: { ownerId: fallbackId },
+				});
+				await db.deal.updateMany({
+					where: { ownerId: u.id },
+					data: { ownerId: fallbackId },
+				});
+				await db.activity.updateMany({
+					where: { createdById: u.id },
+					data: { createdById: fallbackId },
+				});
 			}
 			await db.session.deleteMany({ where: { userId: u.id } });
 			await db.account.deleteMany({ where: { userId: u.id } });

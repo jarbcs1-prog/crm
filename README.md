@@ -110,7 +110,7 @@ With no API keys at all it still works: `read_crm_history` reads your own thread
 
 **You can talk to it and watch it work.** Every contact, company and deal has an **Agent** tab — the steps as it takes them, the leads it throws away and why and its questions answered in place when it cannot decide between two people. Conversations are durable and survive a reload; the record travels in a signed token rather than being bolted onto the front of your message. Set `AGENT_BRIDGE_SECRET` to the same value in both processes to turn it on. Without it the tab reports that it is not configured and the agent carries on running its own schedule.
 
-[`docs/agent.md`](./docs/agent.md) is the full write-up.
+[`docs/agent.md`](./docs/agent.md) is the full write-up. For the current live-call status and exact resume procedure, see [`docs/voice-ai-cold-calling-handoff.md`](./docs/voice-ai-cold-calling-handoff.md).
 
 ## The stack
 

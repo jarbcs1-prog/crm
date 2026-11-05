@@ -1,4 +1,5 @@
 import "@crm/env/load";
+import { voiceProviderConfigured } from "@crm/db/settings";
 
 export type Capability = {
 	readonly env: string;
@@ -70,11 +71,18 @@ export function capabilities(): readonly Capability[] {
 			enabled: set("BLOB_READ_WRITE_TOKEN"),
 		},
 		{
-			env: "VOIPSTUDIO_API_KEY",
-			label: "Voice calling",
+			env: "NONOH_SIP_SERVER",
+			label: "Nonoh.net SIP",
 			gives:
-				"an outbound live call to a contact. The agent rings them and qualifies them using the legal approach script; say quietly on every call that you are an AI assistant making a cold call for the company",
-			enabled: set("VOIPSTUDIO_API_KEY"),
+				"a live SIP call that the agent can hold with speak_on_call and listen_on_call",
+			enabled: voiceProviderConfigured("nonoh"),
+		},
+		{
+			env: "VOIPSTUDIO_API_KEY",
+			label: "VoIP Studio",
+			gives:
+				"a hosted outbound call with provider lifecycle events; the agent uses the returned call identifier and does not get a local SIP session",
+			enabled: voiceProviderConfigured("voipstudio"),
 		},
 		{
 			env: "DEEPGRAM_API_KEY",
@@ -104,17 +112,40 @@ export function capabilities(): readonly Capability[] {
 			enabled: set("CARTESIA_API_KEY"),
 		},
 		{
+			env: "VAPI_API_KEY",
+			label: "Vapi voice",
+			gives:
+				"hosted voice assistants for outbound cold calls, driven by the same pitch files via load_pitch",
+			enabled: voiceProviderConfigured("vapi"),
+		},
+		{
+			env: "PLIVO_AUTH_ID",
+			label: "Plivo dialing",
+			gives:
+				"outbound PSTN dialing for live cold calls, with the auth id and token set together",
+			enabled: voiceProviderConfigured("plivo"),
+		},
+		{
 			env: "TWILIO_ACCOUNT_SID",
 			label: "Twilio dialing",
 			gives:
 				"outbound PSTN and SIP dialing for live cold calls, with the account SID and auth token set together",
-			enabled: set("TWILIO_ACCOUNT_SID"),
+			enabled: voiceProviderConfigured("twilio"),
 		},
 		{
 			env: "TELNYX_API_KEY",
 			label: "Telnyx dialing",
 			gives: "SIP trunking for outbound cold calls as an alternative carrier",
 			enabled: set("TELNYX_API_KEY"),
+		},
+		{
+			env: "QDRANT_URL",
+			label: "Qdrant retrieval",
+			gives:
+				"a remote vector index over the pitch and objection-handler corpus. Without it retrieval still works from the checked-in files, so this only matters at a scale the local files cannot serve",
+			enabled:
+				Boolean(process.env.QDRANT_URL?.trim()) &&
+				Boolean(process.env.QDRANT_API_KEY?.trim()),
 		},
 		{
 			env: "OLLAMA_BASE_URL",

@@ -1,0 +1,10 @@
+DO $$
+BEGIN
+  IF to_regclass('call') IS NOT NULL THEN
+    ALTER TABLE "call"
+      ADD COLUMN IF NOT EXISTS "clidMotivationScore" DOUBLE PRECISION,
+      ADD COLUMN IF NOT EXISTS "clidUrgencyScore" DOUBLE PRECISION,
+      ADD COLUMN IF NOT EXISTS "clidExperienceScore" DOUBLE PRECISION,
+      ADD COLUMN IF NOT EXISTS "clidBudgetScore" DOUBLE PRECISION;
+  END IF;
+END $$;

@@ -11,6 +11,7 @@ import { requireSession } from "@/lib/session";
 import { HydrateClient } from "@/lib/trpc/hydrate";
 import { getServerQueryClient, getServerTrpc } from "@/lib/trpc/server";
 import { AgentModel } from "./agent-model";
+import { VoiceProvider } from "./voice-provider";
 import { WorkspaceForm } from "./workspace-form";
 
 export const metadata: Metadata = {
@@ -26,6 +27,7 @@ export default async function GeneralSettingsPage() {
 	await Promise.all([
 		queryClient.prefetchQuery(trpc.workspace.get.queryOptions()),
 		queryClient.prefetchQuery(trpc.settings.agentModel.queryOptions()),
+		queryClient.prefetchQuery(trpc.settings.voiceProvider.queryOptions()),
 		queryClient.prefetchQuery(trpc.settings.modelCatalog.queryOptions()),
 	]);
 
@@ -35,7 +37,8 @@ export default async function GeneralSettingsPage() {
 				<PageShellHeading>
 					<PageShellTitle>General</PageShellTitle>
 					<PageShellDescription>
-						Who you are and the model the research agent thinks with.
+						Who you are, the model the research agent thinks with, and the voice
+						provider it uses for calls.
 					</PageShellDescription>
 				</PageShellHeading>
 			</PageShellHeader>
@@ -45,6 +48,7 @@ export default async function GeneralSettingsPage() {
 					<div className="flex max-w-3xl flex-col gap-6">
 						<WorkspaceForm />
 						<AgentModel />
+						<VoiceProvider />
 					</div>
 				</HydrateClient>
 			</PageShellContent>

@@ -848,14 +848,9 @@ true if the transaction says so.
 
 ## Voice calling
 
-Outbound voice runs through Nonoh SIP (`NONOH_SIP_SERVER/USERNAME/PASSWORD`, see
-`agent/lib/nonoh-sip.ts` on the shared telephony `SipClient`), local Kokoro TTS
-(`lib/voice.ts synthesizeSpeech`) and local Faster-Whisper XXL transcription
-(`lib/voice.ts transcribe()`, `tiny` model under `F:/Faster-Whisper-XXL/_models`;
-Deepgram is fallback only). Proven: `test-output.wav` transcribes accurately in
-~4s with no vendor key.
+Outbound voice runs through the configured provider stack: Nonoh provides the local live session, while VoIP Studio, Twilio, Plivo, and Vapi are hosted integrations with asynchronous lifecycle state. The agent loads `voice-ai-cold-calling-research-first` for the research-first sales procedure and `voice-calling` for transport and CRM mechanics. Research-first sales tasks pin `load_pitch` to `research-first-cold-call-v1` and require verified `company_name` and `call_purpose` values; the procedure is product-neutral, and the pitch plus workspace data are the only sources for approved offer, pricing, verification, and policy wording. Local speech uses the configured Kokoro/Faster-Whisper/Deepgram paths, and hosted calls must not use local `speak_on_call`/`listen_on_call`. The integrated voice path is not approved for unattended calling until the safety gates and smoke-test checklist in [`voice-ai-cold-calling-handoff.md`](./voice-ai-cold-calling-handoff.md) are complete.
 
-Pitches live in `agent/pitches/` and load via the `load_pitch` tool, which speaks
+Pitches live in `apps/agent/data/pitches/` and load via the `load_pitch` tool, which speaks
 two schemas: legacy `segments[]`, and policy pitches (`conversation[]` plus
 `refusal_branches`, `consent_rules`, `states`, `policy`) whose deployment
 placeholders (`principal_name`, callback channel, case reference, callback slots)
@@ -865,3 +860,5 @@ and returns terminal/clarify guidance; `speak_on_call` refuses document-request
 turns without recorded explicit consent. House rules enforced by the v2.1 policy
 pitch: clarify-once on brush-offs, pin-down on deferrals, repeat-later-without-time
 terminates, and every terminal branch speaks its closing line before `end_call`.
+
+The current voice integration status, verification evidence, known build/formatting limitations, and the controlled live-call resume procedure are maintained in [`voice-ai-cold-calling-handoff.md`](./voice-ai-cold-calling-handoff.md).

@@ -1,0 +1,35 @@
+{
+	"name": "@crm/session-datasets",
+	"version": "0.0.0",
+	"private": true,
+	"type": "module",
+	"exports": {
+		".": "./src/schema.ts",
+		"./extractor": "./src/extractor/index.ts"
+	},
+	"scripts": {
+		"check-types": "tsc --noEmit",
+		"lint": "biome check .",
+		"test": "bun test",
+		"extract": "bun run src/extractor/runner.ts",
+		"build:safety": "bun run src/adapters/safetyRouting.ts --input data/canonical.jsonl --out data/safety-routing.jsonl",
+		"build:tool-calling": "bun run src/adapters/toolCalling.ts --input data/canonical.jsonl --out data/tool-calling.jsonl",
+		"build:agentic-mini": "bun run src/adapters/agenticMini.ts",
+		"export:easydataset": "bun run src/export/easyDataset.ts --input data/canonical.jsonl --out data/easydataset",
+		"export:call-dataset": "bun run src/export/callDataset.ts",
+		"build:synthetic-calls": "bun run src/export/syntheticCalls.ts",
+		"validate:call-dataset": "bun run src/validate/callDataset.ts",
+		"validate:agentic-mini": "bun run src/validate/agenticMini.ts",
+		"validate:tool-calling": "bun run src/validate/toolCalling.ts",
+		"validate:safety": "bun run src/validate/safety.ts",
+		"stats": "bun run src/validate/stats.ts"
+	},
+	"devDependencies": {
+		"@crm/typescript-config": "workspace:*",
+		"@types/better-sqlite3": "^9.6.0",
+		"typescript": "5.9.2"
+	},
+	"dependencies": {
+		"better-sqlite3": "^13.0.3"
+	}
+}

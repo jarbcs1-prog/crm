@@ -51,7 +51,7 @@ export function voiceRecordingsDir(): string {
 export function kokoroCacheDir(): string {
 	return (
 		process.env.KOKORO_TTS_CACHE_DIR?.trim() ||
-		"F:\\.cache\\huggingface\\hub\\models\\Kokoro-82M\\snapshots\\f3ff3571791e39611d31c381e3a41a3af07b4987"
+		".cache/huggingface/hub/models/Kokoro-82M"
 	);
 }
 
@@ -193,6 +193,59 @@ export function callCode(
 		typeof tail === "number" || (typeof tail === "string" && /^\d+$/.test(tail))
 			? Number(tail)
 			: 0;
+	const raw = typeof tail === "string" ? tail.toLowerCase() : "";
+	if (raw) {
+		switch (raw) {
+			case "queued":
+			case "ringing":
+			case "pending":
+				return {
+					status: CallStatus.RINGING,
+					codephrase: "The provider reports the call is queued or ringing.",
+				};
+			case "in-progress":
+			case "in_progress":
+			case "answered":
+			case "connected":
+				return {
+					status: CallStatus.IN_PROGRESS,
+					codephrase: "The provider reports the call is in progress.",
+				};
+			case "voicemail":
+				return {
+					status: CallStatus.IN_PROGRESS,
+					codephrase: "The provider reached voicemail.",
+				};
+			case "completed":
+			case "ended":
+			case "hangup":
+				return {
+					status: CallStatus.COMPLETED,
+					codephrase: "The provider reports the call completed.",
+				};
+			case "busy":
+				return { status: CallStatus.BUSY, codephrase: "The line was busy." };
+			case "no-answer":
+			case "no_answer":
+			case "noanswer":
+				return {
+					status: CallStatus.NO_ANSWER,
+					codephrase: "The provider reports the call was not answered.",
+				};
+			case "failed":
+			case "error":
+				return {
+					status: CallStatus.FAILED,
+					codephrase: "The provider reported a failure.",
+				};
+			case "cancelled":
+			case "canceled":
+				return {
+					status: CallStatus.CANCELLED,
+					codephrase: "The provider reports the call was cancelled.",
+				};
+		}
+	}
 
 	if (code === 487 || httpStatus === 487) {
 		return {

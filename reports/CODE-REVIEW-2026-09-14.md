@@ -14,7 +14,7 @@
 ### [H-01] Committed session-signing secret in `.env.example` + failing env test
 **Location**: `.env.example:8`, `INSTALL.md:950`, `packages/env/test/root.spec.ts:78-86`
 **Dimensions**: Security, Architecture
-**Description**: `BETTER_AUTH_SECRET="MqQi8l6apIUPiyFinjGzRMGhQ4Hmhgki5c/KSO+D5Hw="` ships as a real-looking value in both files. The repo's own env test enforces `.env.example` ships empty placeholders and is **red today** (6 pass, 1 fail). A self-hoster copying the example deploys with a publicly known session-signing key.
+**Description**: A real-looking `BETTER_AUTH_SECRET` value shipped in both files. The value is redacted from this report. The repo's own env test enforces `.env.example` ships empty placeholders and is **red today** (6 pass, 1 fail). A self-hoster copying the example deploys with a publicly known session-signing key.
 **Impact**: Session forgery / auth bypass on any install that doesn't rotate the key; CI is failing.
 **Fix**: Set to `""`, rotate any live secret copied from it, make the env test part of the gate.
 

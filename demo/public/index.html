@@ -27,7 +27,7 @@ input, select, button { padding: 0.35rem 0.5rem; font-size: 0.9rem; }
   <option value="plivo">plivo</option>
   <option value="vapi">vapi</option>
 </select>
-<button onclick="saveProvider()">Save provider</button>
+<button type="button" onclick="saveProvider()">Save provider</button>
 
 <h2>Nonoh SIP settings</h2>
 <p>Required for calls via <strong>nonoh</strong>. Same fields as the full CRM's
@@ -43,7 +43,7 @@ input, select, button { padding: 0.35rem 0.5rem; font-size: 0.9rem; }
 <td>STUN server</td><td><input id="sip-stun" size="24" /></td>
 <td>Port <input id="sip-stun-port" value="3478" size="6" /></td></tr>
 </table>
-<button onclick="saveSip()">Save Nonoh settings</button>
+<button type="button" onclick="saveSip()">Save Nonoh settings</button>
 <span id="sip-status"></span>
 
 <h2>Contacts</h2>
@@ -56,7 +56,7 @@ input, select, button { padding: 0.35rem 0.5rem; font-size: 0.9rem; }
 <p>Preview of the exact script a SIP call would speak, with {firstName}, {company_name}, {call_purpose} filled per contact. Mirrors <code>load_pitch</code> in the real agent.</p>
 <label>company_name <input id="pitch-company" value="" size="42" /></label>
 <label>call_purpose <input id="pitch-purpose" value="a brief introduction to how we help teams follow up faster" size="48" /></label>
-<button onclick="previewPitch()">Preview pitch</button>
+<button type="button" onclick="previewPitch()">Preview pitch</button>
 <div class="log" id="pitch">pick a contact, then preview</div>
 
 <h2>Output</h2>
