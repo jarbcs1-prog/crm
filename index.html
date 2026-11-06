@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="CRM for outbound voice sales agents — realtime lead management, compliance logging, and agent performance tracking for OSInt researchers and sales teams.">
+    <title>CRM — Realtime Outbound Voice Sales Agent Platform</title>
+    <link rel="icon" type="image/svg+xml" href="https://github.com/jarbcs1-prog/crm/blob/main/apps/app/public/logo-primary.svg">
+    <style>
+        :root {
+            --bg: #0a0a0f;
+            --bg-card: #12121a;
+            --bg-hover: #1a1a2a;
+            --text: #e8e8ed;
+            --text-muted: #8888a0;
+            --accent: #6366f1;
+            --accent-hover: #7c7cf0;
+            --border: #2a2a3a;
+            --success: #22c55e;
+            --radius: 8px;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Inter', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+        }
+        a { color: var(--accent); text-decoration: none; }
+        a:hover { color: var(--accent-hover); }
+        .container { max-width: 1100px; margin: 0 auto; padding: 0 24px; }
+        /* Header */
+        header {
+            padding: 24px 0;
+            border-bottom: 1px solid var(--border);
+            position: sticky;
+            top: 0;
+            background: rgba(10,10,15,0.85);
+            backdrop-filter: blur(12px);
+            z-index: 100;
+        }
+        nav { display: flex; justify-content: space-between; align-items: center; }
+        .logo { display: flex; align-items: center; gap: 12px; font-weight: 700; font-size: 1.25rem; }
+        .logo svg { width: 36px; height: 36px; }
+        nav ul { display: flex; list-style: none; gap: 24px; }
+        nav ul li a { color: var(--text-muted); font-size: 0.9rem; transition: color 0.2s; }
+        nav ul li a:hover { color: var(--text); }
+        .btn {
+            padding: 10px 20px;
+            border-radius: var(--radius);
+            border: 1px solid var(--border);
+            background: var(--bg);
+            color: var(--text);
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .btn:hover { border-color: var(--accent); color: var(--accent); }
+        .btn-primary { background: var(--accent); border-color: var(--accent); color: #fff; font-weight: 600; }
+        .btn-primary:hover { background: var(--accent-hover); }
+        /* Hero */
+        .hero {
+            padding: 80px 0 60px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: -100px; right: -100px;
+            width: 400px; height: 400px;
+            background: radial-gradient(circle, rgba(99,102,241,0.08), transparent 70%);
+        }
+        .hero h1 {
+            font-size: 2.5rem;
+            line-height: 1.2;
+            margin-bottom: 20px;
+            max-width: 700px;
+        }
+        .hero p { font-size: 1.15rem; color: var(--text-muted); max-width: 600px; margin: 0 auto 32px; }
+        .hero-actions { display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; }
+        .features {
+            padding: 60px 0;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 24px;
+        }
+        .feature-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 24px;
+            transition: all 0.2s;
+        }
+        .feature-card:hover { border-color: var(--accent); transform: translateY(-2px); }
+        .feature-card h3 { margin-bottom: 12px; font-size: 1.1rem; }
+        .feature-card p { color: var(--text-muted); font-size: 0.95rem; }
+        .feature-icon { font-size: 2rem; margin-bottom: 12px; }
+        /* How it works */
+        .how-it-works {
+            padding: 60px 0;
+            background: var(--bg-card);
+            border-top: 1px solid var(--border);
+            border-bottom: 1px solid var(--border);
+        }
+        .how-it-works h2 {
+            text-align: center;
+            font-size: 1.8rem;
+            margin-bottom: 40px;
+        }
+        .steps { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 24px; }
+        .step { text-align: center; padding: 24px; }
+        .step-number {
+            width: 40px; height: 40px;
+            border-radius: 50%;
+            background: var(--accent);
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            margin-bottom: 16px;
+        }
+        .step h3 { font-size: 1rem; margin-bottom: 8px; }
+        .step p { color: var(--text-muted); font-size: 0.9rem; }
+        /* CTA */
+        .cta {
+            padding: 80px 0;
+            text-align: center;
+        }
+        .cta h2 { font-size: 1.8rem; margin-bottom: 16px; }
+        .cta p { color: var(--text-muted); max-width: 500px; margin: 0 auto 32px; }
+        /* Footer */
+        footer {
+            padding: 32px 0;
+            border-top: 1px solid var(--border);
+            color: var(--text-muted);
+            font-size: 0.85rem;
+        }
+        footer .container { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 16px; }
+        footer a { color: var(--text-muted); }
+        footer a:hover { color: var(--text); }
+        @media (max-width: 640px) {
+            .hero h1 { font-size: 1.8rem; }
+            nav ul { gap: 12px; }
+            footer .container { flex-direction: column; }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <nav>
+                <div class="logo">
+                    <svg viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <rect width="36" height="36" rx="8" fill="#6366f1"/>
+                        <path d="M9 12h18M9 18h18M9 24h9" stroke="#fff" stroke-width="2.5" stroke-linecap="round"/>
+                    </svg>
+                    <span>CRM</span>
+                </div>
+                <ul>
+                    <li><a href="#features">Features</a></li>
+                    <li><a href="#how-it-works">How it works</a></li>
+                    <li><a href="#pricing">Pricing</a></li>
+                    <li><a href="#contact">Contact</a></li>
+                </ul>
+                <a href="#contact" class="btn btn-primary">Get Started</a>
+            </nav>
+        </div>
+    </header>
+
+    <section class="hero">
+        <div class="container">
+            <h1>CRM for Realtime Outbound Voice Sales Agents</h1>
+            <p>The first compliance-first CRM built for outbound voice selling. Track every call, log every interaction, and keep your OSInt research pipeline compliant.</p>
+            <div class="hero-actions">
+                <a href="#contact" class="btn btn-primary">Start Free Trial</a>
+                <a href="#features" class="btn">Learn More</a>
+            </div>
+        </div>
+    </section>
+
+    <section id="features" class="features">
+        <div class="feature-card">
+            <div class="feature-icon">🎙️</div>
+            <h3>Realtime Call Tracking</h3>
+            <p>Capture every outbound call with realtime transcription, call recording, and CRM integration. Never lose a lead conversational thread.</p>
+        </div>
+        <div class="feature-card">
+            <div class="feature-icon">🛡️</div>
+            <h3>Compliance-First</h3>
+            <p>Built in compliance by design. Full audit trails, consent management, and automated compliance logging for regulatory requirements.</p>
+        </div>
+        <div class="feature-card">
+            <div class="feature-icon">📊</div>
+            <h3>Lead Enrichment</h3>
+            <p>Enrich leads with OSInt data sources. Qualify, revive, and manage your sales pipeline with context-aware insights.</p>
+        </div>
+        <div class="feature-card">
+            <div class="feature-icon">🤖</div>
+            <h3>AI-Powered Agents</h3>
+            <p>Agent-assisted outreach that learns from every conversation. Predictive dialing and smart call routing.</p>
+        </div>
+        <div class="feature-card">
+            <div class="feature-icon">🔔</div>
+            <h3>Multi-Channel</h3>
+            <p>Connect phone, email, SMS, and web channels in one unified pipeline. Omnichannel customer engagement.</p>
+        </div>
+        <div class="feature-card">
+            <div class="feature-icon">🔒</div>
+            <h3>Enterprise Security</h3>
+            <p>SOC 2 compliant infrastructure. Encrypted data at rest and in transit. Role-based access controls.</p>
+        </div>
+    </section>
+
+    <section id="how-it-works" class="how-it-works">
+        <div class="container">
+            <h2>How It Works</h2>
+            <div class="steps">
+                <div class="step">
+                    <div class="step-number">1</div>
+                    <h3>Sign Up &amp; Configure</h3>
+                    <p>Create your account, set up your sales team, and connect your phone system in minutes.</p>
+                </div>
+                <div class="step">
+                    <div class="step-number">2</div>
+                    <h3>Import Your Leads</h3>
+                    <p>Import leads from CSV, connect your OSInt research pipeline, or use our built-in lead finder.</p>
+                </div>
+                <div class="step">
+                    <div class="step-number">3</div>
+                    <h3>Go Live &amp; Scale</h3>
+                    <p>Start making calls with realtime guidance, auto-dialing, and compliance logging.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="pricing" class="how-it-works">
+        <div class="container">
+            <h2>Pricing</h2>
+            <div class="steps" style="grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); max-width: 800px;">
+                <div class="step" style="padding: 20px;">
+                    <div style="font-size: 2rem; margin-bottom: 12px;">$49</div>
+                    <div style="font-weight: 600; margin-bottom: 8px;">Autonomy</div>
+                    <div style="font-size: 0.9rem; color: var(--text-muted);">For solo researchers &amp; small teams</div>
+                    <ul style="list-style: none; color: var(--text-muted); font-size: 0.85rem; margin-top: 12px;">
+                        <li>✓ Up to 3 seats</li>
+                        <li>✓ 500 call minutes/mo</li>
+                        <li>✓ 10,000 lead records</li>
+                        <li>✓ Call recording (30 day retention)</li>
+                        <li>✓ Email &amp; chat support</li>
+                    </ul>
+                </div>
+                <div class="step" style="padding: 20px;">
+                    <div style="font-size: 2rem; margin-bottom: 12px;">$149</div>
+                    <div style="font-weight: 600; margin-bottom: 8px;">Professional</div>
+                    <div style="font-size: 0.9rem; color: var(--text-muted);">For growing agencies &amp; sales teams</div>
+                    <ul style="list-style: none; color: var(--text-muted); font-size: 0.85rem; margin-top: 12px;">
+                        <li>✓ Up to 10 seats</li>
+                        <li>✓ 2,500 call minutes/mo</li>
+                        <li>✓ Unlimited lead records</li>
+                        <li>✓ Call recording (forever)</li>
+                        <li>✓ Priority email &amp; chat</li>
+                        <li>✓ API access</li>
+                    </ul>
+                </div>
+                <div class="step" style="padding: 20px;">
+                    <div style="font-size: 2rem; margin-bottom: 12px;">Custom</div>
+                    <div style="font-weight: 600; margin-bottom: 8px;">Enterprise</div>
+                    <div style="font-size: 0.9rem; color: var(--text-muted);">For organizations with custom needs</div>
+                    <ul style="list-style: none; color: var(--text-muted); font-size: 0.85rem; margin-top: 12px;">
+                        <li>✓ Unlimited seats</li>
+                        <li>✓ Unlimited call minutes</li>
+                        <li>✓ Dedicated account manager</li>
+                        <li>✓ Custom integrations</li>
+                        <li>✓ SSO &amp; SCIM</li>
+                        <li>✓ 99.9% SLA</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="testimonials" class="features">
+        <div class="feature-card">
+            <h3>“CRM changed how we manage our outbound pipeline. The compliance logging alone saved us from a potential audit disaster.”</h3>
+            <p style="color: var(--text-muted); font-size: 0.9rem; margin-top: 12px;">— OSInt Research Team, Tier 2</p>
+        </div>
+        <div class="feature-card">
+            <h3>“The realtime call tracking and lead enrichment is a game changer. We're closing leads 3x faster now.”</h3>
+            <p style="color: var(--text-muted); font-size: 0.9rem; margin-top: 12px;">— Independent Sales Agent</p>
+        </div>
+        <div class="feature-card">
+            <h3>“We replaced our 5-tool stack with CRM. Now it's one platform, one source of truth.”</h3>
+            <p style="color: var(--text-muted); font-size: 0.9rem; margin-top: 12px;">— Growth Team Lead at Analytics Firm</p>
+        </div>
+    </section>
+
+    <section id="contact" class="cta">
+        <div class="container">
+            <h2>Ready to Transform Your Outbound Sales?</h2>
+            <p>Join hundreds of sales teams and OSInt researchers already using CRM. Get started today.</p>
+            <div class="hero-actions">
+                <a href="#" class="btn btn-primary">Start Free Trial</a>
+                <a href="mailto:hello@crm.example.com" class="btn">Contact Sales</a>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <div class="container">
+            <div>
+                <strong>CRM</strong><br>
+                <span style="color: #666680;">Realtime outbound voice sales agent platform</span>
+            </div>
+            <div>
+                <a href="#">Privacy Policy</a> &nbsp;|&nbsp; <a href="#">Terms of Service</a> &nbsp;|&nbsp; <a href="#">Security</a>
+            </div>
+        </div>
+    </footer>
+</body>
+</html>
